@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carta de Notícia</title>
+  <link rel="icon" type="image/png" href="assets/images/cart.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #111111;
+      --ink-light: #555555;
+      --ink-muted: #999999;
+      --rule: #e0e0e0;
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --accent: #c0392b;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────── */
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo span { color: var(--accent); margin-left: -0.4em; }
+
+    .header-meta {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ── ARTICLE ────────────────────────────────────────────── */
+    article {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── META (category + date) ─────────────────────────────── */
+    .article-meta {
+      padding-top: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .article-category {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .article-meta-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--ink-muted);
+    }
+
+    .article-date {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── HEADLINE ───────────────────────────────────────────── */
+    .article-headline {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    /* ── DESCRIPTION ────────────────────────────────────────── */
+    .article-description {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--ink-light);
+      line-height: 1.6;
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── SOURCE ─────────────────────────────────────────────── */
+    .article-source {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .article-source a {
+      color: var(--ink);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .article-source a:hover {
+      color: var(--accent);
+    }
+
+    /* ── FEATURED IMAGE ─────────────────────────────────────── */
+    .article-image {
+      margin-bottom: 2.5rem;
+    }
+
+    .article-image img {
+      width: 92%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      border-radius: 10px;
+    }
+
+    .article-image figcaption {
+      width: 92%;
+      margin: 0.6rem auto 0;
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+      text-align: right;
+    }
+
+    /* ── STORY BODY ─────────────────────────────────────────── */
+    .article-body {
+      padding-bottom: 3rem;
+    }
+
+    .article-body p {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--ink);
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ── DIVIDER ────────────────────────────────────────────── */
+    .article-end {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+    }
+
+    .article-end::before,
+    .article-end::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .article-end span {
+      font-family: 'Lora', serif;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── ANIMATION ───────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .article-meta { animation: fadeUp 0.6s ease both; }
+    .article-headline { animation: fadeUp 0.6s ease 0.05s both; }
+    .article-description { animation: fadeUp 0.6s ease 0.1s both; }
+    .article-image { animation: fadeUp 0.6s ease 0.15s both; }
+    .article-body { animation: fadeUp 0.6s ease 0.2s both; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      article { padding: 0 1.25rem; }
+      .article-end { padding: 0 1.25rem 3rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <a class="logo" href="index.html">Carta de Notícia<span>.</span></a>
+    <p class="header-meta">Carta de Notícia · Breaking news</p>
+  </header>
+
+  <!-- ARTICLE -->
+  <article>
+
+    <!-- META -->
+    <div class="article-meta">
+      <span class="article-category" id="articleCategory">Política</span>
+      <span class="article-meta-dot"></span>
+      <span class="article-date" id="articleDate">28 de fevereiro de 2026, 13h50</span>
+    </div>
+
+    <!-- HEADLINE -->
+    <h1 class="article-headline" id="articleHeadline">Perdas materiais serão recuperadas, diz Lula em visita a Minas Gerais</h1>
+
+    <!-- DESCRIPTION -->
+    <p class="article-description" id="articleDescription">O presidente Luiz Inácio Lula da Silva afirmou neste sábado que todos os prejuízos causados pelas chuvas no estado serão reparados com recursos federais.</p>
+
+    <!-- SOURCE -->
+    <div class="article-source">
+      <span>Fonte:</span>
+      <a href="https://agenciabrasil.ebc.com.br" target="_blank" rel="noopener" id="articleSourceLink">Agência Brasil</a>
+      <span>&middot;</span>
+      <span id="articleAuthor">Andreia Verdélio</span>
+    </div>
+
+    <!-- IMAGE -->
+    <figure class="article-image">
+      <img
+        src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=880&q=80"
+        alt="Presidente Lula em visita a Minas Gerais"
+        id="articleImage"
+      />
+      <figcaption id="articleImageCaption">Ricardo Stuckert / Presidência da República</figcaption>
+    </figure>
+
+    <!-- BODY -->
+    <div class="article-body" id="articleBody">
+      <p>O presidente Luiz Inácio Lula da Silva afirmou neste sábado (28) que todos os prejuízos causados pelas fortes chuvas em Minas Gerais serão recuperados com apoio do governo federal. A declaração foi feita durante visita às áreas mais atingidas no estado.</p>
+
+      <p>"Nós vamos reconstruir tudo o que foi destruído. O governo federal está aqui para garantir que nenhuma família fique desamparada", disse o presidente durante coletiva de imprensa na cidade de Juiz de Fora.</p>
+
+      <p>Segundo o Ministério da Integração e do Desenvolvimento Regional, mais de 120 municípios mineiros foram afetados pelas chuvas que atingiram o estado nas últimas semanas. O governo já liberou R$ 450 milhões em recursos emergenciais para a reconstrução de estradas, pontes e moradias.</p>
+
+      <p>O presidente também anunciou a criação de uma linha de crédito especial para pequenos agricultores e comerciantes que perderam seus estoques e equipamentos. Os empréstimos terão juros subsidiados e carência de 12 meses para o início dos pagamentos.</p>
+    </div>
+
+  </article>
+
+  <!-- END DIVIDER -->
+  <div class="article-end">
+    <span>&#9830;</span>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 Carta de Notícia &middot; Todos os direitos reservados</p>
+    <p>Privacidade &middot; Descadastrar</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    // ── CONFIG (trocar pelos valores reais do seu projeto Supabase) ──
+    const SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const categoryLabels = {
+      politica: 'Política',
+      mercados: 'Mercados',
+      internacional: 'Internacional',
+      tecnologia: 'Tecnologia',
+      geral: 'Geral'
+    };
+
+    async function loadArticle() {
+      const params = new URLSearchParams(window.location.search);
+      const articleId = params.get('id');
+      if (!articleId) return;
+
+      const { data: article, error } = await sb
+        .from('articles')
+        .select('*')
+        .eq('id', articleId)
+        .maybeSingle();
+
+      if (error || !article) {
+        document.querySelector('.article-headline').textContent = 'Artigo não encontrado.';
+        return;
+      }
+
+      // Preenche os campos
+      document.title = article.title + ' — Carta de Notícia';
+      document.getElementById('articleCategory').textContent = categoryLabels[article.category] || article.category;
+      document.getElementById('articleHeadline').textContent = article.title;
+      document.getElementById('articleDescription').textContent = article.description || '';
+      document.getElementById('articleAuthor').textContent = article.author || '';
+
+      // Data formatada
+      const d = new Date(article.published_at);
+      const opts = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+      document.getElementById('articleDate').textContent = d.toLocaleDateString('pt-BR', opts);
+
+      // Fonte
+      const sourceLink = document.getElementById('articleSourceLink');
+      sourceLink.textContent = article.source_name;
+      if (article.source_url) sourceLink.href = article.source_url;
+
+      // Imagem
+      const img = document.getElementById('articleImage');
+      if (article.image_url) {
+        img.src = article.image_url;
+        img.alt = article.title;
+      } else {
+        img.parentElement.style.display = 'none';
+      }
+      document.getElementById('articleImageCaption').textContent = article.image_caption || '';
+
+      // Corpo
+      const bodyEl = document.getElementById('articleBody');
+      if (article.body) {
+        bodyEl.innerHTML = article.body.split('\n').filter(p => p.trim()).map(p => '<p>' + p + '</p>').join('');
+      }
+    }
+
+    loadArticle();
+  </script>
+
+</body>
+</html>
