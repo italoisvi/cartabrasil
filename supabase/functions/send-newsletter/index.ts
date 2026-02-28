@@ -177,7 +177,7 @@ async function sendEmail(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Carta de Notícia <news@cartadenoticia.com.br>",
+      from: "Carta de Notícia <onboarding@resend.dev>",
       to: [to],
       subject,
       html,
