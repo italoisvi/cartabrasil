@@ -281,13 +281,13 @@
     </div>
 
     <!-- IMAGE -->
-    <figure class="article-image">
+    <figure class="article-image" style="display:none;">
       <img
-        src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=880&q=80"
-        alt="Presidente Lula em visita a Minas Gerais"
+        src=""
+        alt=""
         id="articleImage"
       />
-      <figcaption id="articleImageCaption">Ricardo Stuckert / Presidência da República</figcaption>
+      <figcaption id="articleImageCaption"></figcaption>
     </figure>
 
     <!-- BODY -->
@@ -368,8 +368,7 @@
       if (article.image_url) {
         img.src = article.image_url;
         img.alt = article.title;
-      } else {
-        img.parentElement.style.display = 'none';
+        img.parentElement.style.display = '';
       }
       document.getElementById('articleImageCaption').textContent = article.image_caption || '';
 

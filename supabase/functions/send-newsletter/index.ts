@@ -131,7 +131,7 @@ function buildEmail(
           </tr>
           <tr>
             <td align="center" style="padding: 32px;">
-              <a href="${baseUrl}" style="display: inline-block; background: #111111; color: #ffffff; padding: 14px 28px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;">
+              <a href="${baseUrl}/noticias.html" style="display: inline-block; background: #111111; color: #ffffff; padding: 14px 28px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;">
                 Ver todas as notícias
               </a>
             </td>
