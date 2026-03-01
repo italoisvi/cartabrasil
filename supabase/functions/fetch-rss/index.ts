@@ -121,16 +121,28 @@ async function fetchAndStore(feedUrl: string, category: string) {
       .replace(/&amp;/g, "&")
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
-    const cleanDescription = decoded
+    const fullText = decoded
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/p>/gi, "\n")
+      .replace(/<\/div>/gi, "\n")
       .replace(/<[^>]*>/g, " ")
-      .replace(/\s{2,}/g, " ")
+      .replace(/[^\S\n]+/g, " ")
+      .replace(/\n\s*/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
       .trim();
+
+    // Description: extrai o lead do RSS (conteúdo da primeira tag <strong>)
+    const leadMatch = decoded.match(/<strong>([\s\S]*?)<\/strong>/i);
+    const lead = leadMatch
+      ? leadMatch[1].replace(/<[^>]*>/g, "").replace(/\s{2,}/g, " ").trim()
+      : null;
+    const shortDescription = lead || fullText.slice(0, 200) + "…";
 
     const { error } = await supabase.from("articles").insert({
       id: articleId,
       title: item.title,
-      description: cleanDescription,
-      body: cleanDescription,
+      description: shortDescription,
+      body: fullText,
       category,
       image_url: storedImageUrl,
       image_caption: item.creator ? `Foto: ${item.creator}` : null,
