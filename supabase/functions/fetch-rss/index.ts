@@ -1,5 +1,4 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.47/deno-dom-wasm.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -23,24 +22,28 @@ interface RSSItem {
   imageUrl: string | null;
 }
 
+function getTagContent(xml: string, tag: string): string {
+  const regex = new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>|<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i");
+  const match = xml.match(regex);
+  return (match?.[1] ?? match?.[2] ?? "").trim();
+}
+
 function parseRSSItems(xml: string): RSSItem[] {
-  const doc = new DOMParser().parseFromString(xml, "text/xml");
-  if (!doc) return [];
-
-  const items = doc.querySelectorAll("item");
   const results: RSSItem[] = [];
+  const itemRegex = /<item[\s>]([\s\S]*?)<\/item>/gi;
+  let match;
 
-  for (const item of items) {
-    const title = item.querySelector("title")?.textContent?.trim() ?? "";
-    const description =
-      item.querySelector("description")?.textContent?.trim() ?? "";
-    const link = item.querySelector("link")?.textContent?.trim() ?? "";
-    const pubDate = item.querySelector("pubDate")?.textContent?.trim() ?? "";
-    const creator =
-      item.getElementsByTagName("dc:creator")[0]?.textContent?.trim() ?? "";
-    const imageUrl =
-      item.getElementsByTagName("imagem-destaque")[0]?.textContent?.trim() ??
-      null;
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const block = match[1];
+    const title = getTagContent(block, "title");
+    const description = getTagContent(block, "description");
+    const pubDate = getTagContent(block, "pubDate");
+    const creator = getTagContent(block, "dc:creator");
+    const imageUrl = getTagContent(block, "imagem-destaque") || null;
+
+    // <link> em RSS geralmente não tem CDATA, pega direto
+    const linkMatch = block.match(/<link[^>]*>([\s\S]*?)<\/link>/i);
+    const link = (linkMatch?.[1] ?? "").trim();
 
     if (title && link) {
       results.push({ title, description, link, pubDate, creator, imageUrl });
@@ -111,8 +114,17 @@ async function fetchAndStore(feedUrl: string, category: string) {
       storedImageUrl = await uploadImage(item.imageUrl, articleId);
     }
 
-    // Limpa o HTML da description pra texto plano
-    const cleanDescription = item.description.replace(/<[^>]*>/g, "").trim();
+    // Decodifica HTML entities e depois remove tags HTML
+    const decoded = item.description
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+    const cleanDescription = decoded
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s{2,}/g, " ")
+      .trim();
 
     const { error } = await supabase.from("articles").insert({
       id: articleId,
