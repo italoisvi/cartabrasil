@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carta de Notícia — Portal</title>
+  <link rel="icon" type="image/png" href="assets/images/cart.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #111111;
+      --ink-light: #555555;
+      --ink-muted: #999999;
+      --rule: #e0e0e0;
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --accent: #c0392b;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ── HEADER ─────────────────────────────────────────────── */
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .logo span { color: var(--accent); margin-left: -0.4em; }
+
+    .header-meta {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ── NAV ────────────────────────────────────────────────── */
+    .nav-bar {
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      position: sticky;
+      top: 58px;
+      z-index: 9;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      flex: 1;
+    }
+
+    .nav-date {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      margin-left: auto;
+    }
+
+    .nav-link {
+      padding: 0.7rem 1.4rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--ink-light);
+      transition: all 0.15s;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .nav-link:hover { color: var(--ink); }
+
+    .nav-link.active {
+      color: var(--ink);
+      border-bottom-color: var(--accent);
+    }
+
+    /* dateline removed — date is inside nav-bar now */
+
+    /* ── CONTAINER ─────────────────────────────────────────── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ── CATEGORY LABELS ───────────────────────────────────── */
+    .cat {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    .cat-politica { color: #c0392b; }
+    .cat-mercados { color: #2c3e50; }
+    .cat-internacional { color: #d4a017; }
+    .cat-tecnologia { color: #2980b9; }
+    .cat-geral { color: #7f8c8d; }
+
+    .time {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    /* ── HERO ──────────────────────────────────────────────── */
+    .hero {
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero a { display: block; transition: opacity 0.15s; }
+    .hero a:hover { opacity: 0.8; }
+
+    .hero-img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      margin-bottom: 1.2rem;
+      border-radius: 8px;
+    }
+
+    .hero-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .hero-title {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--ink-light);
+      line-height: 1.65;
+      font-weight: 300;
+      max-width: 700px;
+    }
+
+    /* ── SECONDARY ─────────────────────────────────────────── */
+    .secondary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 2rem;
+    }
+
+    .secondary-card {
+      display: block;
+      transition: opacity 0.15s;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .secondary-card:nth-child(2) { animation-delay: 0.08s; }
+    .secondary-card:hover { opacity: 0.7; }
+
+    .secondary-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      margin-bottom: 0.8rem;
+      border-radius: 8px;
+    }
+
+    .secondary-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.35rem;
+    }
+
+    .secondary-title {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .secondary-desc {
+      font-size: 0.82rem;
+      color: var(--ink-light);
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    /* ── SECTION RULE ──────────────────────────────────────── */
+    .section-rule {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-rule::before,
+    .section-rule::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .section-rule span {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    /* ── LATEST ────────────────────────────────────────────── */
+    .latest {
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 2.5rem;
+    }
+
+    .latest-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--rule);
+      transition: opacity 0.15s;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .latest-item:last-child { border-bottom: none; }
+    .latest-item:hover { opacity: 0.65; }
+
+    .latest-title {
+      font-family: 'Lora', serif;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--ink);
+      margin-top: 0.25rem;
+    }
+
+    /* ── CATEGORY SECTIONS ─────────────────────────────────── */
+    .cat-section { margin-bottom: 2.5rem; }
+
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .cat-card {
+      display: block;
+      transition: opacity 0.15s;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .cat-card:nth-child(2) { animation-delay: 0.06s; }
+    .cat-card:nth-child(3) { animation-delay: 0.12s; }
+    .cat-card:hover { opacity: 0.7; }
+
+    .cat-card-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      margin-bottom: 0.7rem;
+      border-radius: 8px;
+    }
+
+    .cat-card-title {
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .cat-card-desc {
+      font-size: 0.78rem;
+      color: var(--ink-light);
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .cat-card-meta { margin-bottom: 0.35rem; }
+
+    /* ── PLACEHOLDER IMG ───────────────────────────────────── */
+    .img-placeholder {
+      background: var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 8px;
+    }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── LOADING ───────────────────────────────────────────── */
+    .loading {
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── ANIMATION ─────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .secondary { grid-template-columns: 1fr; gap: 1.5rem; }
+      .cat-grid { grid-template-columns: 1fr 1fr; }
+      .nav-bar { overflow-x: auto; }
+      .nav-link { white-space: nowrap; padding: 0.7rem 1rem; }
+    }
+
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .container { padding: 1.5rem 1rem; }
+      .cat-grid { grid-template-columns: 1fr; }
+      .latest-item { flex-direction: column; gap: 0.3rem; }
+      .nav-date { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <a class="logo" href="portal.html">Carta de Notícia<span>.</span></a>
+    <p class="header-meta">Carta de Notícia · Breaking news</p>
+  </header>
+
+  <!-- NAV -->
+  <nav class="nav-bar">
+    <div class="nav-links">
+      <a class="nav-link active" data-section="home">Home</a>
+      <a class="nav-link" data-section="politica">Política</a>
+      <a class="nav-link" data-section="internacional">Internacional</a>
+      <a class="nav-link" data-section="mercados">Mercados</a>
+    </div>
+    <span class="nav-date" id="dateline"></span>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="container" id="content">
+    <div class="loading">Carregando notícias...</div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 Carta de Notícia &middot; Todos os direitos reservados</p>
+    <p>Privacidade &middot; Descadastrar</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const categoryLabels = {
+      politica: 'Política',
+      mercados: 'Mercados',
+      internacional: 'Internacional',
+      tecnologia: 'Tecnologia',
+      geral: 'Geral'
+    };
+
+    let allArticles = [];
+    let currentSection = 'home';
+
+    // ── HELPERS ───────────────────────────────────────────────
+
+    function formatTime(dateStr) {
+      const dt = new Date(dateStr);
+      const now = new Date();
+      const isToday = dt.toDateString() === now.toDateString();
+      const h = dt.getHours().toString().padStart(2, '0');
+      const m = dt.getMinutes().toString().padStart(2, '0');
+      const time = h + 'h' + m;
+      if (isToday) return time;
+      const day = dt.getDate();
+      const month = dt.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+      return day + ' ' + month + ' · ' + time;
+    }
+
+    function imgTag(url, cls) {
+      if (url) return '<img class="' + cls + '" src="' + url + '" alt="" />';
+      return '<div class="' + cls + ' img-placeholder">Sem imagem</div>';
+    }
+
+    function truncate(text, max) {
+      if (!text) return '';
+      if (text.length <= max) return text;
+      return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
+    }
+
+    function link(id) { return 'noticia.html?id=' + id; }
+
+    // ── DATELINE ─────────────────────────────────────────────
+
+    const d = new Date();
+    const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const fmt = d.toLocaleDateString('pt-BR', opts);
+    document.getElementById('dateline').textContent = fmt.charAt(0).toUpperCase() + fmt.slice(1);
+
+    // ── NAV ──────────────────────────────────────────────────
+
+    document.querySelectorAll('.nav-link').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSection = btn.dataset.section;
+        render();
+      });
+    });
+
+    // ── RENDER ───────────────────────────────────────────────
+
+    function renderPage(articles) {
+      if (articles.length === 0) return '<div class="loading">Nenhuma notícia disponível.</div>';
+
+      const hero = articles[0];
+      const secondaryList = articles.slice(1, 3);
+      const latestList = articles.slice(3, 9);
+
+      const usedIds = new Set([hero.id, ...secondaryList.map(a => a.id), ...latestList.map(a => a.id)]);
+      const remaining = articles.filter(a => !usedIds.has(a.id));
+
+      const byCategory = {};
+      remaining.forEach(a => {
+        if (!byCategory[a.category]) byCategory[a.category] = [];
+        if (byCategory[a.category].length < 3) byCategory[a.category].push(a);
+      });
+
+      let html = '';
+
+      // Hero
+      html += '<div class="hero"><a href="' + link(hero.id) + '">' +
+        imgTag(hero.image_url, 'hero-img') +
+        '<div class="hero-meta">' +
+          '<span class="cat cat-' + hero.category + '">' + (categoryLabels[hero.category] || hero.category) + '</span>' +
+          '<span class="time">' + formatTime(hero.published_at) + '</span>' +
+        '</div>' +
+        '<h1 class="hero-title">' + hero.title + '</h1>' +
+        (hero.description ? '<p class="hero-desc">' + hero.description + '</p>' : '') +
+      '</a></div>';
+
+      // Secondary
+      if (secondaryList.length > 0) {
+        html += '<div class="secondary">';
+        secondaryList.forEach(a => {
+          html += '<a class="secondary-card" href="' + link(a.id) + '">' +
+            imgTag(a.image_url, 'secondary-img') +
+            '<div class="secondary-meta">' +
+              '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+              '<span class="time">' + formatTime(a.published_at) + '</span>' +
+            '</div>' +
+            '<p class="secondary-title">' + a.title + '</p>' +
+            (a.description ? '<p class="secondary-desc">' + truncate(a.description, 120) + '</p>' : '') +
+          '</a>';
+        });
+        html += '</div>';
+      }
+
+      // Latest
+      if (latestList.length > 0) {
+        html += '<div class="latest">' +
+          '<div class="section-rule"><span>Últimas notícias</span></div>';
+        latestList.forEach((a, i) => {
+          html += '<a class="latest-item" href="' + link(a.id) + '" style="animation-delay:' + (i * 0.04) + 's">' +
+            '<div>' +
+              '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+              '<p class="latest-title">' + a.title + '</p>' +
+            '</div>' +
+            '<span class="time">' + formatTime(a.published_at) + '</span>' +
+          '</a>';
+        });
+        html += '</div>';
+      }
+
+      // Category sections
+      var catOrder = ['politica', 'mercados', 'internacional', 'tecnologia', 'geral'];
+      catOrder.forEach(function(catKey) {
+        if (byCategory[catKey] && byCategory[catKey].length > 0) {
+          var label = categoryLabels[catKey] || catKey;
+          html += '<div class="cat-section">' +
+            '<div class="section-rule"><span>' + label + '</span></div>' +
+            '<div class="cat-grid">';
+          byCategory[catKey].forEach(function(a) {
+            html += '<a class="cat-card" href="' + link(a.id) + '">' +
+              imgTag(a.image_url, 'cat-card-img') +
+              '<div class="cat-card-meta"><span class="time">' + formatTime(a.published_at) + '</span></div>' +
+              '<p class="cat-card-title">' + a.title + '</p>' +
+              (a.description ? '<p class="cat-card-desc">' + truncate(a.description, 100) + '</p>' : '') +
+            '</a>';
+          });
+          html += '</div></div>';
+        }
+      });
+
+      return html;
+    }
+
+    function render() {
+      const container = document.getElementById('content');
+      let filtered = allArticles;
+      if (currentSection !== 'home') {
+        filtered = allArticles.filter(a => a.category === currentSection);
+      }
+      container.innerHTML = renderPage(filtered);
+    }
+
+    // ── LOAD ─────────────────────────────────────────────────
+
+    async function loadPortal() {
+      const { data: articles, error } = await sb
+        .from('articles')
+        .select('id, title, description, category, image_url, published_at')
+        .order('published_at', { ascending: false })
+        .limit(50);
+
+      if (error || !articles || articles.length === 0) {
+        document.getElementById('content').innerHTML = '<div class="loading">Nenhuma notícia disponível no momento.</div>';
+        return;
+      }
+
+      allArticles = articles;
+      render();
+    }
+
+    loadPortal();
+  </script>
+
+</body>
+</html>

@@ -114,18 +114,28 @@ async function fetchAndStore(feedUrl: string, category: string) {
       storedImageUrl = await uploadImage(item.imageUrl, articleId);
     }
 
-    // Decodifica HTML entities e depois remove tags HTML
+    // Decodifica HTML entities
     const decoded = item.description
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
       .replace(/&amp;/g, "&")
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
+
+    // Converte <strong>/<b> em marcadores para preservar subtítulos
+    // Converte blocos em quebras de linha, mantendo estrutura
     const fullText = decoded
+      // Preserva <strong> como marcador §BOLD§...§/BOLD§
+      .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, "§BOLD§$1§/BOLD§")
+      .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, "§BOLD§$1§/BOLD§")
+      // Quebras de bloco
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<\/p>/gi, "\n")
       .replace(/<\/div>/gi, "\n")
+      .replace(/<\/h[1-6]>/gi, "\n")
+      // Remove tags restantes
       .replace(/<[^>]*>/g, " ")
+      // Limpa espaços (preserva \n)
       .replace(/[^\S\n]+/g, " ")
       .replace(/\n\s*/g, "\n")
       .replace(/\n{3,}/g, "\n\n")
@@ -136,7 +146,8 @@ async function fetchAndStore(feedUrl: string, category: string) {
     const lead = leadMatch
       ? leadMatch[1].replace(/<[^>]*>/g, "").replace(/\s{2,}/g, " ").trim()
       : null;
-    const shortDescription = lead || fullText.slice(0, 200) + "…";
+    const shortDescription = (lead || fullText.slice(0, 200) + "…")
+      .replace(/§\/?BOLD§/g, "");
 
     const { error } = await supabase.from("articles").insert({
       id: articleId,

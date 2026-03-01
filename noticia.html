@@ -187,6 +187,41 @@
       margin-bottom: 0;
     }
 
+    .article-body h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+    }
+
+    .article-body h2:first-child {
+      margin-top: 0;
+    }
+
+    .article-body blockquote {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.8;
+      color: var(--ink-light);
+      border-left: 3px solid var(--accent);
+      padding: 0.8rem 0 0.8rem 1.5rem;
+      margin: 1.5rem 0;
+      background: var(--bg);
+    }
+
+    .article-body .article-credit {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-style: italic;
+      color: var(--ink-muted);
+      margin-top: 2rem;
+    }
+
     /* ── DIVIDER ────────────────────────────────────────────── */
     .article-end {
       display: flex;
@@ -238,6 +273,55 @@
     .article-description { animation: fadeUp 0.6s ease 0.1s both; }
     .article-image { animation: fadeUp 0.6s ease 0.15s both; }
     .article-body { animation: fadeUp 0.6s ease 0.2s both; }
+
+    /* ── RELATED ────────────────────────────────────────────── */
+    .related {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+    }
+
+    .related-title {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 1rem;
+    }
+
+    .related-list {
+      list-style: none;
+    }
+
+    .related-item {
+      border-bottom: 1px solid var(--rule);
+      padding: 0.65rem 0;
+    }
+
+    .related-item:last-child { border-bottom: none; }
+
+    .related-link {
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--ink);
+      text-decoration: none;
+      transition: color 0.15s;
+      display: block;
+    }
+
+    .related-link:hover { color: var(--accent); }
+
+    .related-link.no-link {
+      color: var(--ink-light);
+      cursor: default;
+    }
+
+    .related-link.no-link:hover { color: var(--ink-light); }
 
     /* ── RESPONSIVE ──────────────────────────────────────────── */
     @media (max-width: 600px) {
@@ -291,15 +375,10 @@
     </figure>
 
     <!-- BODY -->
-    <div class="article-body" id="articleBody">
-      <p>O presidente Luiz Inácio Lula da Silva afirmou neste sábado (28) que todos os prejuízos causados pelas fortes chuvas em Minas Gerais serão recuperados com apoio do governo federal. A declaração foi feita durante visita às áreas mais atingidas no estado.</p>
+    <div class="article-body" id="articleBody"></div>
 
-      <p>"Nós vamos reconstruir tudo o que foi destruído. O governo federal está aqui para garantir que nenhuma família fique desamparada", disse o presidente durante coletiva de imprensa na cidade de Juiz de Fora.</p>
-
-      <p>Segundo o Ministério da Integração e do Desenvolvimento Regional, mais de 120 municípios mineiros foram afetados pelas chuvas que atingiram o estado nas últimas semanas. O governo já liberou R$ 450 milhões em recursos emergenciais para a reconstrução de estradas, pontes e moradias.</p>
-
-      <p>O presidente também anunciou a criação de uma linha de crédito especial para pequenos agricultores e comerciantes que perderam seus estoques e equipamentos. Os empréstimos terão juros subsidiados e carência de 12 meses para o início dos pagamentos.</p>
-    </div>
+    <!-- RELATED (populated by JS) -->
+    <div id="relatedSection"></div>
 
   </article>
 
@@ -372,10 +451,191 @@
       }
       document.getElementById('articleImageCaption').textContent = article.image_caption || '';
 
-      // Corpo
+      // Corpo — separa "Notícias relacionadas:" do texto principal
       const bodyEl = document.getElementById('articleBody');
+      const relatedEl = document.getElementById('relatedSection');
+
       if (article.body) {
-        bodyEl.innerHTML = article.body.split('\n').filter(p => p.trim()).map(p => '<p>' + p + '</p>').join('');
+        const relatedRegex = /Notícias?\s+relacionadas?\s*:\s*/i;
+        const hasRelated = relatedRegex.test(article.body);
+
+        let mainText = article.body;
+        let relatedFragments = [];
+
+        if (hasRelated) {
+          const idx = article.body.search(relatedRegex);
+          mainText = article.body.slice(0, idx).trim();
+          const afterText = article.body.slice(idx).replace(relatedRegex, '').trim();
+          relatedFragments = afterText
+            .split(/\.\s+/)
+            .map(t => t.replace(/\.\s*$/, '').trim())
+            .filter(t => t.length > 5);
+        }
+
+        bodyEl.innerHTML = formatBody(mainText);
+
+        if (relatedFragments.length > 0) {
+          await resolveRelated(relatedFragments, bodyEl, relatedEl);
+        }
+      }
+    }
+
+    // ── FORMATADOR INTELIGENTE DO BODY ────────────────────────
+    function formatBody(text) {
+      var lines = text.split('\n').filter(function(l) { return l.trim().length > 0; });
+      var html = '';
+      var i = 0;
+
+      while (i < lines.length) {
+        var line = lines[i].trim();
+
+        // Crédito editorial: *Com informações...
+        if (/^\*/.test(line)) {
+          html += '<p class="article-credit">' + line + '</p>';
+          i++;
+          continue;
+        }
+
+        // Subtítulo: linha curta, sem ponto final, não é citação, ou marcada com §BOLD§
+        if (isSubtitle(line, lines, i)) {
+          var cleanTitle = line.replace(/§BOLD§/g, '').replace(/§\/BOLD§/g, '').trim();
+          html += '<h2>' + cleanTitle + '</h2>';
+          i++;
+          continue;
+        }
+
+        // Citação: começa com aspas ou com travessão
+        if (isQuoteStart(line)) {
+          var quoteLines = [line];
+          // Agrupa linhas seguintes que continuam a citação
+          while (i + 1 < lines.length && isQuoteContinuation(lines[i + 1].trim(), quoteLines.join(' '))) {
+            i++;
+            quoteLines.push(lines[i].trim());
+          }
+          html += '<blockquote>' + quoteLines.join(' ') + '</blockquote>';
+          i++;
+          continue;
+        }
+
+        // Parágrafo normal — limpa marcadores e formata
+        var cleanLine = line.replace(/§BOLD§(.*?)§\/BOLD§/g, '<strong>$1</strong>').replace(/§\/?BOLD§/g, '');
+        html += '<p>' + formatInlineQuotes(cleanLine) + '</p>';
+        i++;
+      }
+
+      return html;
+    }
+
+    function isSubtitle(line, allLines, index) {
+      // Marcado como bold pelo fetch-rss — é subtítulo
+      if (/§BOLD§/.test(line)) return true;
+
+      // Não pode ser a primeira linha
+      if (index === 0) return false;
+
+      // Remove possíveis caracteres especiais pra contar
+      var clean = line.replace(/[^\w\sÀ-ú]/g, '').trim();
+      var words = clean.split(/\s+/);
+
+      // Subtítulo: entre 1 e 5 palavras
+      if (words.length > 5) return false;
+
+      // Não termina com ponto, vírgula, dois pontos
+      if (/[.;,!?]$/.test(line)) return false;
+
+      // Não começa com aspas ou travessão (seria citação)
+      if (/^[""\u201C\u201D\u2018\u2019\u2014\u2013–—]/.test(line)) return false;
+
+      // Tem que ser curto (menos de 50 chars)
+      if (line.length > 50) return false;
+
+      // Pelo menos a primeira letra maiúscula
+      if (!/^[A-ZÀ-Ú]/.test(clean)) return false;
+
+      // Deve ter um parágrafo depois (não pode ser a última coisa)
+      if (index >= allLines.length - 1) return false;
+
+      return true;
+    }
+
+    function isQuoteStart(line) {
+      // Começa com aspas, aspas tipográficas ou travessão
+      return /^[""\u201C\u201D\u2018\u2019]/.test(line) || /^[\u2014\u2013–—]\s/.test(line);
+    }
+
+    function isQuoteContinuation(nextLine, currentQuote) {
+      // Se a citação atual não fechou as aspas, a próxima linha continua
+      if (!nextLine || nextLine.length === 0) return false;
+
+      // Se a linha atual começa com aspas e não fechou
+      var openQuotes = (currentQuote.match(/[""\u201C]/g) || []).length;
+      var closeQuotes = (currentQuote.match(/[""\u201D]/g) || []).length;
+
+      if (openQuotes > closeQuotes) {
+        // Aspas abertas — continua
+        return true;
+      }
+
+      // Linhas curtas que parecem continuação de fala
+      if (nextLine.length < 80 && !isSubtitleCandidate(nextLine) && /^[a-zà-ú]/.test(nextLine)) {
+        return true;
+      }
+
+      return false;
+    }
+
+    function isSubtitleCandidate(line) {
+      var words = line.replace(/[^\w\sÀ-ú]/g, '').trim().split(/\s+/);
+      return words.length <= 5 && line.length <= 50 && !/[.;,!?]$/.test(line) && /^[A-ZÀ-Ú]/.test(line);
+    }
+
+    function formatInlineQuotes(text) {
+      // Transforma citações inline em <q> com estilo
+      return text.replace(
+        /[""\u201C](.*?)[""\u201D]/g,
+        '\u201C$1\u201D'
+      );
+    }
+
+    async function resolveRelated(fragments, bodyEl, container) {
+      const related = [];
+      const extraBody = [];
+
+      for (const frag of fragments) {
+        // Busca no Supabase se esse fragmento é título de artigo
+        const words = frag.split(' ').slice(0, 6).join('%');
+        const { data } = await sb
+          .from('articles')
+          .select('id, title')
+          .ilike('title', '%' + words + '%')
+          .limit(1);
+
+        if (data && data.length > 0) {
+          related.push({ title: frag, id: data[0].id });
+        } else {
+          // Não é título — devolve pro corpo
+          extraBody.push(frag);
+        }
+      }
+
+      // Adiciona texto extra de volta ao body
+      if (extraBody.length > 0) {
+        const extraHtml = extraBody.map(t => '<p>' + t + '.</p>').join('');
+        bodyEl.insertAdjacentHTML('beforeend', extraHtml);
+      }
+
+      // Renderiza só os que encontrou como artigos
+      if (related.length > 0) {
+        let html = '<div class="related">' +
+          '<p class="related-title">Notícias relacionadas</p>' +
+          '<ul class="related-list">';
+        related.forEach(r => {
+          html += '<li class="related-item">' +
+            '<a class="related-link" href="noticia.html?id=' + r.id + '">' + r.title + '</a>' +
+          '</li>';
+        });
+        html += '</ul></div>';
+        container.innerHTML = html;
       }
     }
 
