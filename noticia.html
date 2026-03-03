@@ -298,11 +298,34 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .article-meta      { animation: fadeUp 0.6s ease both; }
-    .article-headline  { animation: fadeUp 0.6s ease 0.05s both; }
-    .article-description { animation: fadeUp 0.6s ease 0.1s both; }
-    .article-image     { animation: fadeUp 0.6s ease 0.15s both; }
-    .article-body      { animation: fadeUp 0.6s ease 0.2s both; }
+    @keyframes shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg) 25%, #eee 50%, var(--bg) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s infinite ease-in-out;
+      border-radius: 4px;
+    }
+
+    .skeleton-text { height: 1rem; margin-bottom: 0.5rem; }
+    .skeleton-title { height: 2.4rem; width: 80%; margin-bottom: 1rem; }
+    .skeleton-title-2 { height: 2.4rem; width: 55%; margin-bottom: 1rem; }
+    .skeleton-desc { height: 1rem; width: 90%; margin-bottom: 0.5rem; }
+    .skeleton-desc-2 { height: 1rem; width: 60%; margin-bottom: 1.5rem; }
+    .skeleton-meta { height: 0.7rem; width: 30%; margin-bottom: 1.25rem; }
+    .skeleton-source { height: 0.7rem; width: 25%; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--rule); }
+    .skeleton-image { height: 320px; width: 92%; margin: 0 auto 2.5rem; border-radius: 10px; }
+    .skeleton-body-line { height: 1rem; width: 100%; margin-bottom: 1.2rem; }
+    .skeleton-body-short { height: 1rem; width: 70%; margin-bottom: 1.2rem; }
+
+    article.loaded .article-meta      { animation: fadeUp 0.6s ease both; }
+    article.loaded .article-headline   { animation: fadeUp 0.6s ease 0.05s both; }
+    article.loaded .article-description { animation: fadeUp 0.6s ease 0.1s both; }
+    article.loaded .article-image      { animation: fadeUp 0.6s ease 0.15s both; }
+    article.loaded .article-body       { animation: fadeUp 0.6s ease 0.2s both; }
 
     .related {
       margin-top: 2rem;
@@ -363,35 +386,55 @@
 
   <article>
 
-    <div class="article-meta">
-      <span class="article-category" id="articleCategory">Política</span>
-      <span class="article-meta-dot"></span>
-      <span class="article-date" id="articleDate">28 de fevereiro de 2026, 13h50</span>
+    <!-- Skeleton (visível enquanto carrega) -->
+    <div id="articleSkeleton" style="padding-top:3rem;">
+      <div class="skeleton skeleton-meta"></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-title-2"></div>
+      <div class="skeleton skeleton-desc"></div>
+      <div class="skeleton skeleton-desc-2"></div>
+      <div class="skeleton skeleton-source"></div>
+      <div class="skeleton skeleton-image"></div>
+      <div class="skeleton skeleton-body-line"></div>
+      <div class="skeleton skeleton-body-line"></div>
+      <div class="skeleton skeleton-body-short"></div>
+      <div class="skeleton skeleton-body-line"></div>
+      <div class="skeleton skeleton-body-line"></div>
+      <div class="skeleton skeleton-body-short"></div>
     </div>
 
-    <h1 class="article-headline" id="articleHeadline">Perdas materiais serão recuperadas, diz Lula em visita a Minas Gerais</h1>
+    <!-- Conteúdo real (oculto até carregar) -->
+    <div id="articleContent" style="display:none;">
+      <div class="article-meta">
+        <span class="article-category" id="articleCategory"></span>
+        <span class="article-meta-dot"></span>
+        <span class="article-date" id="articleDate"></span>
+      </div>
 
-    <p class="article-description" id="articleDescription">O presidente Luiz Inácio Lula da Silva afirmou neste sábado que todos os prejuízos causados pelas chuvas no estado serão reparados com recursos federais.</p>
+      <h1 class="article-headline" id="articleHeadline"></h1>
 
-    <div class="article-source">
-      <span>Fonte:</span>
-      <a href="https://agenciabrasil.ebc.com.br" target="_blank" rel="noopener" id="articleSourceLink">Agência Brasil</a>
-      <span>&middot;</span>
-      <span id="articleAuthor">Andreia Verdélio</span>
+      <p class="article-description" id="articleDescription"></p>
+
+      <div class="article-source">
+        <span>Fonte:</span>
+        <a href="#" target="_blank" rel="noopener" id="articleSourceLink"></a>
+        <span>&middot;</span>
+        <span id="articleAuthor"></span>
+      </div>
+
+      <figure class="article-image" style="display:none;">
+        <img src="" alt="" id="articleImage" />
+        <figcaption id="articleImageCaption"></figcaption>
+      </figure>
+
+      <div class="article-body" id="articleBody"></div>
+
+      <div id="relatedSection"></div>
     </div>
-
-    <figure class="article-image" style="display:none;">
-      <img src="" alt="" id="articleImage" />
-      <figcaption id="articleImageCaption"></figcaption>
-    </figure>
-
-    <div class="article-body" id="articleBody"></div>
-
-    <div id="relatedSection"></div>
 
   </article>
 
-  <div class="article-end">
+  <div class="article-end" id="articleEnd" style="display:none;">
     <span>&#9830;</span>
   </div>
 
@@ -428,7 +471,9 @@
         .maybeSingle();
 
       if (error || !article) {
-        document.querySelector('.article-headline').textContent = 'Artigo não encontrado.';
+        document.getElementById('articleSkeleton').style.display = 'none';
+        document.getElementById('articleContent').style.display = '';
+        document.getElementById('articleHeadline').textContent = 'Artigo não encontrado.';
         return;
       }
 
@@ -516,6 +561,12 @@
           }
         }
       }
+
+      // Transição: skeleton → conteúdo
+      document.getElementById('articleSkeleton').style.display = 'none';
+      document.getElementById('articleContent').style.display = '';
+      document.getElementById('articleEnd').style.display = '';
+      document.querySelector('article').classList.add('loaded');
     }
 
     // Remove todas as tags HTML — usado para inspecionar só o texto da linha
