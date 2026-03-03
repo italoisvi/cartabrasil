@@ -17,14 +17,23 @@ function decodeHtmlEntities(raw: string): string {
 
 /**
  * Normaliza o corpo HTML do RSS para texto limpo com <strong> preservados.
- * Pipeline: decode entities → preservar bold → strip HTML → restaurar bold.
+ * Pipeline: decode entities → substituir bold por tags neutras → strip HTML → restaurar bold.
+ *
+ * NOTA: Não usamos marcadores com "/" (ex: §/BOLD§) pois causam problemas de
+ * regex no Deno em determinados contextos. Usamos XBOLDSTARTX / XBOLDENDX.
  */
 export function normalizeBody(rawHtml: string): string {
   const decoded = decodeHtmlEntities(rawHtml);
 
-  return decoded
-    .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, "§BOLD§$1§/BOLD§")
-    .replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, "§BOLD§$1§/BOLD§")
+  // 1. Substitui <strong> e <b> por marcadores neutros (sem "/" no marcador)
+  let text = decoded
+    .replace(/<strong[^>]*>/gi, "XBOLDSTARTX")
+    .replace(/<\/strong>/gi, "XBOLDENDX")
+    .replace(/<b[^>]*>/gi, "XBOLDSTARTX")
+    .replace(/<\/b>/gi, "XBOLDENDX");
+
+  // 2. Converte estrutura HTML em quebras de linha e remove demais tags
+  text = text
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/p>/gi, "\n")
     .replace(/<\/div>/gi, "\n")
@@ -33,9 +42,19 @@ export function normalizeBody(rawHtml: string): string {
     .replace(/[^\S\n]+/g, " ")
     .replace(/\n\s*/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
-    .trim()
+    .trim();
+
+  // 3. Restaura <strong> a partir dos marcadores neutros
+  text = text
+    .replace(/XBOLDSTARTX([\s\S]*?)XBOLDENDX/g, "<strong>$1</strong>")
+    .replace(/XBOLDSTARTX|XBOLDENDX/g, "");
+
+  // 4. Compatibilidade: limpa marcadores antigos §BOLD§ que possam existir
+  text = text
     .replace(/§BOLD§([\s\S]*?)§\/BOLD§/g, "<strong>$1</strong>")
     .replace(/§\/?BOLD§/g, "");
+
+  return text;
 }
 
 /**

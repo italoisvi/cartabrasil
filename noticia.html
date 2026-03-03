@@ -366,11 +366,7 @@
 
     <!-- IMAGE -->
     <figure class="article-image" style="display:none;">
-      <img
-        src=""
-        alt=""
-        id="articleImage"
-      />
+      <img src="" alt="" id="articleImage" />
       <figcaption id="articleImageCaption"></figcaption>
     </figure>
 
@@ -395,7 +391,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
-    // ── CONFIG (trocar pelos valores reais do seu projeto Supabase) ──
     const SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
 
@@ -425,24 +420,20 @@
         return;
       }
 
-      // Preenche os campos
       document.title = article.title + ' — Carta de Notícia';
       document.getElementById('articleCategory').textContent = categoryLabels[article.category] || article.category;
       document.getElementById('articleHeadline').textContent = article.title;
       document.getElementById('articleDescription').textContent = article.description || '';
       document.getElementById('articleAuthor').textContent = article.author || '';
 
-      // Data formatada
       const d = new Date(article.published_at);
       const opts = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
       document.getElementById('articleDate').textContent = d.toLocaleDateString('pt-BR', opts);
 
-      // Fonte
       const sourceLink = document.getElementById('articleSourceLink');
       sourceLink.textContent = article.source_name;
       if (article.source_url) sourceLink.href = article.source_url;
 
-      // Imagem
       const img = document.getElementById('articleImage');
       if (article.image_url) {
         img.src = article.image_url;
@@ -451,7 +442,6 @@
       }
       document.getElementById('articleImageCaption').textContent = article.image_caption || '';
 
-      // Corpo — separa "Notícias relacionadas:" do texto principal
       const bodyEl = document.getElementById('articleBody');
       const relatedEl = document.getElementById('relatedSection');
 
@@ -480,9 +470,9 @@
       }
     }
 
-    // ── FORMATADOR INTELIGENTE DO BODY ────────────────────────
+    // ── FORMATADOR DO BODY ────────────────────────────────────
     function formatBody(text) {
-      // Compatibilidade: converte §BOLD§ de artigos antigos para <strong>
+      // Compatibilidade: converte marcadores antigos §BOLD§ para <strong>
       text = text.replace(/§BOLD§([\s\S]*?)§\/BOLD§/g, '<strong>$1</strong>').replace(/§\/?BOLD§/g, '');
 
       var lines = text.split('\n').filter(function(l) { return l.trim().length > 0; });
@@ -499,7 +489,7 @@
           continue;
         }
 
-        // Subtítulo: linha curta, sem ponto final, não é citação
+        // Subtítulo: linha curta, sem ponto final
         if (isSubtitle(line, lines, i)) {
           var cleanTitle = line.replace(/<\/?strong>/g, '').trim();
           html += '<h2>' + cleanTitle + '</h2>';
@@ -507,11 +497,11 @@
           continue;
         }
 
-        // Citação: começa com aspas ou com travessão
+        // Blockquote: travessão OU linha que começa com aspas de abertura.
+        // Citações inline (aspas no meio do parágrafo) ficam como <p> normal.
         if (isQuoteStart(line)) {
           var quoteLines = [line];
-          // Agrupa linhas seguintes que continuam a citação
-          while (i + 1 < lines.length && isQuoteContinuation(lines[i + 1].trim(), quoteLines.join(' '))) {
+          while (i + 1 < lines.length && isQuoteContinuation(lines[i + 1].trim())) {
             i++;
             quoteLines.push(lines[i].trim());
           }
@@ -529,59 +519,39 @@
     }
 
     function isSubtitle(line, allLines, index) {
-      // Não pode ser a primeira linha
       if (index === 0) return false;
 
-      // Remove tags <strong> para analisar o texto puro
       var clean = line.replace(/<\/?strong>/g, '').replace(/[^\w\sÀ-ú]/g, '').trim();
       var words = clean.split(/\s+/);
 
-      // Subtítulo: entre 1 e 5 palavras
       if (words.length > 5) return false;
 
-      // Não termina com ponto, vírgula, dois pontos
       var plainLine = line.replace(/<\/?strong>/g, '').trim();
       if (/[.;,!?]$/.test(plainLine)) return false;
-
-      // Não começa com aspas ou travessão (seria citação)
       if (/^[""\u201C\u201D\u2018\u2019\u2014\u2013–—]/.test(plainLine)) return false;
-
-      // Tem que ser curto (menos de 50 chars)
       if (plainLine.length > 50) return false;
-
-      // Pelo menos a primeira letra maiúscula
       if (!/^[A-ZÀ-Ú]/.test(clean)) return false;
-
-      // Deve ter um parágrafo depois (não pode ser a última coisa)
       if (index >= allLines.length - 1) return false;
 
       return true;
     }
 
     function isQuoteStart(line) {
-      // Começa com aspas, aspas tipográficas ou travessão
-      return /^[""\u201C\u201D\u2018\u2019]/.test(line) || /^[\u2014\u2013–—]\s/.test(line);
-    }
+      // Travessão → sempre blockquote
+      if (/^[\u2014\u2013\u2013–—]\s/.test(line)) return true;
 
-    function isQuoteContinuation(nextLine, currentQuote) {
-      // Se a citação atual não fechou as aspas, a próxima linha continua
-      if (!nextLine || nextLine.length === 0) return false;
-
-      // Se a linha atual começa com aspas e não fechou
-      var openQuotes = (currentQuote.match(/[""\u201C]/g) || []).length;
-      var closeQuotes = (currentQuote.match(/[""\u201D]/g) || []).length;
-
-      if (openQuotes > closeQuotes) {
-        // Aspas abertas — continua
-        return true;
-      }
-
-      // Linhas curtas que parecem continuação de fala
-      if (nextLine.length < 80 && !isSubtitleCandidate(nextLine) && /^[a-zà-ú]/.test(nextLine)) {
-        return true;
-      }
+      // Aspas → blockquote somente se a linha COMEÇA com aspas de abertura.
+      // Isso distingue: '"Na manhã desta..."' (bloco) de 'A empresa diz que "constatou..."' (inline).
+      if (/^["\u201C\u2018]/.test(line)) return true;
 
       return false;
+    }
+
+    function isQuoteContinuation(nextLine) {
+      // Continua o blockquote se a próxima linha começa em minúscula
+      // (citação longa que quebrou em múltiplos parágrafos no RSS)
+      if (!nextLine || nextLine.length === 0) return false;
+      return /^[a-zà-ú]/.test(nextLine) && !isSubtitleCandidate(nextLine);
     }
 
     function isSubtitleCandidate(line) {
@@ -591,7 +561,6 @@
     }
 
     function formatInlineQuotes(text) {
-      // Transforma citações inline em <q> com estilo
       return text.replace(
         /[""\u201C](.*?)[""\u201D]/g,
         '\u201C$1\u201D'
@@ -603,7 +572,6 @@
       const extraBody = [];
 
       for (const frag of fragments) {
-        // Busca no Supabase se esse fragmento é título de artigo
         const words = frag.split(' ').slice(0, 6).join('%');
         const { data } = await sb
           .from('articles')
@@ -614,18 +582,15 @@
         if (data && data.length > 0) {
           related.push({ title: frag, id: data[0].id });
         } else {
-          // Não é título — devolve pro corpo
           extraBody.push(frag);
         }
       }
 
-      // Adiciona texto extra de volta ao body
       if (extraBody.length > 0) {
         const extraHtml = extraBody.map(t => '<p>' + t + '.</p>').join('');
         bodyEl.insertAdjacentHTML('beforeend', extraHtml);
       }
 
-      // Renderiza só os que encontrou como artigos
       if (related.length > 0) {
         let html = '<div class="related">' +
           '<p class="related-title">Notícias relacionadas</p>' +
