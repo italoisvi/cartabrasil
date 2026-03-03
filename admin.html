@@ -216,8 +216,45 @@
     .dash-filters {
       display: flex;
       gap: 0.5rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
     }
+
+    .dash-search {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .dash-search input {
+      flex: 1;
+      min-width: 180px;
+      border: 1px solid var(--rule);
+      padding: 0.45rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .dash-search input:focus { border-color: var(--ink); }
+
+    .dash-search select {
+      border: 1px solid var(--rule);
+      padding: 0.45rem 0.8rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      background: var(--paper);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .dash-search select:focus { border-color: var(--ink); }
 
     .filter-btn {
       background: none;
@@ -774,12 +811,16 @@
       background: var(--bg);
     }
 
+    .preview-container .article-body img {
+      width: 92%; height: auto; display: block; margin: 2rem auto; border-radius: 10px;
+    }
+
     .preview-container .article-body figure {
       margin: 2rem 0;
     }
 
     .preview-container .article-body figure img {
-      width: 92%; height: auto; display: block; margin: 0 auto; border-radius: 10px;
+      margin: 0 auto;
     }
 
     .preview-container .article-body figure figcaption {
@@ -877,6 +918,17 @@
         <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Todos</button>
         <button class="filter-btn" data-filter="published" onclick="setFilter('published', this)">Publicados</button>
         <button class="filter-btn" data-filter="draft" onclick="setFilter('draft', this)">Rascunhos</button>
+      </div>
+      <div class="dash-search">
+        <input type="text" id="dashSearch" placeholder="Buscar por título ou autor..." onkeyup="debounceSearch()" />
+        <select id="dashCategory" onchange="loadArticles()">
+          <option value="">Todas categorias</option>
+          <option value="politica">Política</option>
+          <option value="mercados">Mercados</option>
+          <option value="internacional">Internacional</option>
+          <option value="tecnologia">Tecnologia</option>
+          <option value="geral">Geral</option>
+        </select>
       </div>
       <div id="articleList"></div>
     </div>
@@ -1000,6 +1052,12 @@
     let currentFilter = 'all';
     let editingArticleId = null;
     let quill = null;
+    let searchTimer = null;
+
+    function debounceSearch() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(loadArticles, 300);
+    }
 
     // ── Auth ────────────────────────────────────
     async function checkSession() {
@@ -1047,12 +1105,22 @@
     // ── Dashboard ───────────────────────────────
     async function loadArticles() {
       var query = sb.from('articles')
-        .select('id, title, category, status, published_at, source_name')
+        .select('id, title, category, status, published_at, source_name, author')
         .eq('source_name', 'Carta de Notícia')
         .order('created_at', { ascending: false });
 
       if (currentFilter !== 'all') {
         query = query.eq('status', currentFilter);
+      }
+
+      var catFilter = document.getElementById('dashCategory') ? document.getElementById('dashCategory').value : '';
+      if (catFilter) {
+        query = query.eq('category', catFilter);
+      }
+
+      var searchTerm = document.getElementById('dashSearch') ? document.getElementById('dashSearch').value.trim() : '';
+      if (searchTerm) {
+        query = query.or('title.ilike.%' + searchTerm + '%,author.ilike.%' + searchTerm + '%');
       }
 
       var { data, error } = await query;
@@ -1065,7 +1133,7 @@
       }
 
       var html = '<table class="article-table"><thead><tr>' +
-        '<th>Título</th><th>Categoria</th><th>Status</th><th>Data</th><th></th>' +
+        '<th>Título</th><th>Autor</th><th>Categoria</th><th>Status</th><th>Data</th><th></th>' +
         '</tr></thead><tbody>';
 
       data.forEach(function(a) {
@@ -1077,6 +1145,7 @@
 
         html += '<tr>' +
           '<td class="td-title">' + a.title + '</td>' +
+          '<td style="font-size:0.78rem;color:var(--ink-muted);">' + (a.author || '—') + '</td>' +
           '<td><span class="cat-label ' + catClass + '">' + (categoryLabels[a.category] || a.category) + '</span></td>' +
           '<td><span class="badge ' + badgeClass + '">' + badgeText + '</span></td>' +
           '<td style="font-size:0.78rem;color:var(--ink-muted);">' + dateStr + '</td>' +
@@ -1243,6 +1312,10 @@
 
       var body = quill.root.innerHTML;
       if (body === '<p><br></p>') body = '';
+      // Limpar atributos que o Quill 2 adiciona em links (causa about:blank no file://)
+      if (body) {
+        body = body.replace(/ target="_blank"/g, '').replace(/ rel="noopener noreferrer"/g, '');
+      }
 
       var record = {
         id: articleId,
@@ -1366,15 +1439,25 @@
     function insertRelatedInBody() {
       if (selectedRelated.length === 0) return;
 
-      var html = '<h3>Notícias relacionadas</h3><ul>';
-      selectedRelated.forEach(function(s) {
-        html += '<li><a href="noticia.html?id=' + s.id + '">' + s.title + '</a></li>';
-      });
-      html += '</ul>';
+      // Usar a Delta API do Quill para inserir corretamente
+      var len = quill.getLength();
 
-      // Inserir no final do Quill
-      var length = quill.getLength();
-      quill.clipboard.dangerouslyPasteHTML(length - 1, html);
+      // Quebra de linha antes do bloco
+      quill.insertText(len - 1, '\n');
+
+      // Header "Notícias relacionadas" como h3
+      len = quill.getLength();
+      quill.insertText(len - 1, 'Notícias relacionadas');
+      quill.formatLine(len - 1, 1, 'header', 3);
+
+      // Cada notícia como item de lista com link
+      selectedRelated.forEach(function(s) {
+        len = quill.getLength();
+        quill.insertText(len - 1, '\n');
+        len = quill.getLength();
+        quill.insertText(len - 1, s.title, { link: 'noticia.html?id=' + s.id });
+        quill.formatLine(len - 1, 1, 'list', 'bullet');
+      });
 
       toast('Notícias relacionadas inseridas');
       selectedRelated = [];

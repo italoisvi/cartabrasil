@@ -204,16 +204,20 @@
       margin-top: 2rem;
     }
 
+    .article-body img {
+      width: 92%;
+      height: auto;
+      display: block;
+      margin: 2rem auto;
+      border-radius: 10px;
+    }
+
     .article-body figure {
       margin: 2rem 0;
     }
 
     .article-body figure img {
-      width: 92%;
-      height: auto;
-      display: block;
       margin: 0 auto;
-      border-radius: 10px;
     }
 
     .article-body figure figcaption {
@@ -457,7 +461,34 @@
         var isRichHtml = /<(p|blockquote|h2|figure)[\s>]/i.test(article.body);
 
         if (isRichHtml) {
-          bodyEl.innerHTML = article.body;
+          // Detectar bloco de notícias relacionadas inserido pelo CMS
+          var relatedBlockRegex = /<h3>Not[ií]cias?\s+relacionadas?<\/h3>\s*<ul>([\s\S]*?)<\/ul>/i;
+          var relatedBlockMatch = article.body.match(relatedBlockRegex);
+
+          if (relatedBlockMatch) {
+            // Remover o bloco do body
+            var cleanBody = article.body.replace(relatedBlockRegex, '');
+            bodyEl.innerHTML = cleanBody;
+
+            // Extrair links do <ul>
+            var linkRegex = /<li><a[^>]*href="noticia\.html\?id=([^"]+)"[^>]*>([^<]+)<\/a><\/li>/gi;
+            var links = [];
+            var m;
+            while ((m = linkRegex.exec(relatedBlockMatch[1])) !== null) {
+              links.push({ id: m[1], title: m[2] });
+            }
+
+            if (links.length > 0) {
+              var relHtml = '<div class="related"><p class="related-title">Notícias relacionadas</p><ul class="related-list">';
+              links.forEach(function(r) {
+                relHtml += '<li class="related-item"><a class="related-link" href="noticia.html?id=' + r.id + '">' + r.title + '</a></li>';
+              });
+              relHtml += '</ul></div>';
+              relatedEl.innerHTML = relHtml;
+            }
+          } else {
+            bodyEl.innerHTML = article.body;
+          }
         } else {
           // Legado: texto plano com heurística de formatação
           const relatedRegex = /Notícias?\s+relacionadas?\s*:\s*/i;
