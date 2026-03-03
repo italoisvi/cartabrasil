@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Editorial — Carta de Notícia</title>
+  <link rel="icon" type="image/png" href="assets/images/cart.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #111111;
+      --ink-light: #555555;
+      --ink-muted: #999999;
+      --rule: #e0e0e0;
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --accent: #c0392b;
+      --green: #27ae60;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .logo span { color: var(--accent); margin-left: -0.4em; }
+
+    .header-meta {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-user {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--rule);
+      padding: 0.4rem 0.8rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover { border-color: var(--ink); color: var(--ink); }
+
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Views ─────────────────────────────────── */
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ── Login ─────────────────────────────────── */
+
+    .login-wrap {
+      max-width: 380px;
+      margin: 6rem auto;
+      text-align: center;
+    }
+
+    .login-title {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-subtitle {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .login-form input {
+      border: 1px solid var(--rule);
+      padding: 0.85rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .login-form input:focus { border-color: var(--ink); }
+
+    .login-error {
+      font-size: 0.78rem;
+      color: var(--accent);
+      min-height: 1.2em;
+    }
+
+    /* ── Buttons ────────────────────────────────── */
+
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover { background: #333; }
+
+    .btn-outline { background: transparent; border: 1px solid var(--ink); color: var(--ink); }
+    .btn-outline:hover { background: var(--ink); color: #fff; }
+
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: #a93226; }
+
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-green:hover { background: #219a52; }
+
+    .btn-danger { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+    .btn-danger:hover { background: var(--accent); color: #fff; }
+
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.65rem; }
+
+    /* ── Dashboard ──────────────────────────────── */
+
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .dash-title {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .dash-filters {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-btn {
+      background: none;
+      border: 1px solid var(--rule);
+      padding: 0.4rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .filter-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .article-table th {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      text-align: left;
+      padding: 0.75rem 0.5rem;
+      border-bottom: 2px solid var(--rule);
+    }
+
+    .article-table td {
+      padding: 1rem 0.5rem;
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+
+    .article-table tr:hover { background: var(--bg); }
+
+    .td-title {
+      font-family: 'Lora', serif;
+      font-weight: 400;
+      line-height: 1.3;
+    }
+
+    .td-actions {
+      display: flex;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+    }
+
+    .badge-published { background: var(--green); color: #fff; }
+    .badge-draft { background: var(--ink-muted); color: #fff; }
+
+    .cat-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .cat-politica { color: #c0392b; }
+    .cat-mercados { color: #2c3e50; }
+    .cat-internacional { color: #d4a017; }
+    .cat-tecnologia { color: #2980b9; }
+    .cat-geral { color: #7f8c8d; }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--ink-muted);
+    }
+
+    .empty-state p {
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Editor ─────────────────────────────────── */
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .editor-back {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .editor-back:hover { color: var(--ink); }
+
+    .editor-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      border: 1px solid var(--rule);
+      padding: 0.75rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--ink);
+    }
+
+    .form-textarea { resize: vertical; min-height: 80px; }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+    }
+
+    .form-file-wrap {
+      position: relative;
+      border: 1px dashed var(--rule);
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .form-file-wrap:hover { border-color: var(--ink); }
+
+    .form-file-wrap input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .form-file-label {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+
+    .cover-preview {
+      margin-top: 0.5rem;
+      max-height: 200px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    /* Quill customization */
+    .quill-wrap {
+      margin-bottom: 2rem;
+    }
+
+    .quill-wrap .ql-toolbar {
+      border: 1px solid var(--rule);
+      border-bottom: none;
+      background: var(--paper);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .quill-wrap .ql-container {
+      border: 1px solid var(--rule);
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      line-height: 1.85;
+      min-height: 400px;
+      background: var(--paper);
+    }
+
+    .quill-wrap .ql-editor { padding: 1.5rem; }
+    .quill-wrap .ql-editor h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .quill-wrap .ql-editor blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 1.5rem;
+      color: var(--ink-light);
+      font-style: italic;
+    }
+
+    /* ── Related Articles Panel ─────────────────── */
+    .related-panel {
+      margin-bottom: 2rem;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+    }
+
+    .related-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 1.2rem;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .related-toggle:hover { background: var(--bg); }
+
+    .related-panel.open .related-toggle {
+      border-bottom-color: var(--rule);
+    }
+
+    .related-toggle-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink);
+    }
+
+    .related-toggle-icon {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      transition: transform 0.2s;
+    }
+
+    .related-panel.open .related-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .related-body {
+      display: none;
+      padding: 1.2rem;
+    }
+
+    .related-panel.open .related-body {
+      display: block;
+    }
+
+    .related-search-wrap {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .related-search-wrap input {
+      flex: 1;
+      border: 1px solid var(--rule);
+      padding: 0.6rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .related-search-wrap input:focus {
+      border-color: var(--ink);
+    }
+
+    .related-search-wrap button {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .related-results {
+      max-height: 250px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .related-result-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--bg);
+      gap: 0.8rem;
+    }
+
+    .related-result-item:last-child { border-bottom: none; }
+
+    .related-result-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .related-result-title {
+      font-family: 'Lora', serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .related-result-meta {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      margin-top: 0.15rem;
+    }
+
+    .related-result-add {
+      background: none;
+      border: 1px solid var(--rule);
+      padding: 0.3rem 0.6rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .related-result-add:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .related-selected {
+      margin-top: 0.5rem;
+    }
+
+    .related-selected-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .related-selected-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.8rem;
+      background: var(--bg);
+      margin-bottom: 0.3rem;
+      gap: 0.8rem;
+    }
+
+    .related-selected-title {
+      font-family: 'Lora', serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .related-selected-remove {
+      background: none;
+      border: none;
+      color: var(--ink-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 0.3rem;
+      transition: color 0.2s;
+    }
+
+    .related-selected-remove:hover { color: var(--accent); }
+
+    .related-insert-btn {
+      margin-top: 0.8rem;
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .related-insert-btn:hover { opacity: 0.85; }
+
+    .related-empty {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+
+    /* ── Preview Modal ──────────────────────────── */
+
+    .preview-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      overflow-y: auto;
+    }
+
+    .preview-overlay.active { display: block; }
+
+    .preview-container {
+      max-width: 720px;
+      margin: 2rem auto;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 2rem;
+      position: relative;
+    }
+
+    .preview-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Preview article styles — espelha noticia.html */
+    .preview-container .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .preview-container .article-category {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .preview-container .article-meta-dot {
+      width: 3px; height: 3px; border-radius: 50%; background: var(--ink-muted);
+    }
+
+    .preview-container .article-date {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    .preview-container .article-headline {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .preview-container .article-description {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--ink-light);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .preview-container .article-body p {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      line-height: 1.85;
+      margin-bottom: 1.5rem;
+    }
+
+    .preview-container .article-body h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+    }
+
+    .preview-container .article-body blockquote {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.8;
+      color: var(--ink-light);
+      border-left: 3px solid var(--accent);
+      padding: 0.8rem 0 0.8rem 1.5rem;
+      margin: 1.5rem 0;
+      background: var(--bg);
+    }
+
+    .preview-container .article-body figure {
+      margin: 2rem 0;
+    }
+
+    .preview-container .article-body figure img {
+      width: 92%; height: auto; display: block; margin: 0 auto; border-radius: 10px;
+    }
+
+    .preview-container .article-body figure figcaption {
+      width: 92%; margin: 0.6rem auto 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem; color: var(--ink-muted); text-align: right;
+    }
+
+    .preview-container .article-body a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-color: rgba(192,57,43,0.3);
+    }
+
+    .preview-cover { width: 92%; display: block; margin: 0 auto 2rem; border-radius: 10px; }
+
+    /* ── Toast ──────────────────────────────────── */
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--ink);
+      color: #fff;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.82rem;
+      font-weight: 400;
+      z-index: 300;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Animations ─────────────────────────────── */
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .view.active .container { animation: fadeUp 0.4s ease both; }
+
+    /* ── Responsive ─────────────────────────────── */
+
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .dash-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+      .article-table th:nth-child(3),
+      .article-table td:nth-child(3) { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      .container { padding: 1.5rem 1.25rem; }
+      .editor-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="index.html">Carta de Notícia<span>.</span></a>
+    <div class="header-actions" id="headerActions" style="display:none;">
+      <span class="header-meta">Painel editorial</span>
+      <span class="header-user" id="headerUser"></span>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <!-- ════════════ LOGIN ════════════ -->
+  <section class="view active" id="loginView">
+    <div class="login-wrap">
+      <h1 class="login-title">Painel Editorial</h1>
+      <p class="login-subtitle">Acesso restrito à equipe editorial</p>
+      <form class="login-form" onsubmit="handleLogin(event)">
+        <input type="email" id="loginEmail" placeholder="Email" required />
+        <input type="password" id="loginPassword" placeholder="Senha" required />
+        <p class="login-error" id="loginError"></p>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ════════════ DASHBOARD ════════════ -->
+  <section class="view" id="dashboardView">
+    <div class="container">
+      <div class="dash-header">
+        <h2 class="dash-title">Artigos</h2>
+        <button class="btn btn-primary" onclick="openEditor()">Novo artigo</button>
+      </div>
+      <div class="dash-filters">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Todos</button>
+        <button class="filter-btn" data-filter="published" onclick="setFilter('published', this)">Publicados</button>
+        <button class="filter-btn" data-filter="draft" onclick="setFilter('draft', this)">Rascunhos</button>
+      </div>
+      <div id="articleList"></div>
+    </div>
+  </section>
+
+  <!-- ════════════ EDITOR ════════════ -->
+  <section class="view" id="editorView">
+    <div class="container">
+      <div class="editor-header">
+        <a class="editor-back" onclick="showDashboard()">&larr; Voltar aos artigos</a>
+        <div class="editor-actions">
+          <button class="btn btn-outline btn-sm" onclick="openPreview()">Pré-visualizar</button>
+          <button class="btn btn-sm" style="background:var(--ink-muted);color:#fff;" onclick="saveArticle('draft')">Salvar rascunho</button>
+          <button class="btn btn-green btn-sm" onclick="saveArticle('published')">Publicar</button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Título</label>
+          <input type="text" class="form-input" id="edTitle" placeholder="Título do artigo" />
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">Descrição / Lead</label>
+          <textarea class="form-textarea" id="edDescription" placeholder="Resumo curto que aparece na listagem"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" id="edCategory">
+            <option value="politica">Política</option>
+            <option value="mercados">Mercados</option>
+            <option value="internacional">Internacional</option>
+            <option value="tecnologia">Tecnologia</option>
+            <option value="geral">Geral</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Autor</label>
+          <input type="text" class="form-input" id="edAuthor" placeholder="Nome do autor" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Imagem de capa</label>
+          <div class="form-file-wrap">
+            <input type="file" accept="image/*" id="edCoverFile" onchange="previewCover(this)" />
+            <p class="form-file-label" id="coverLabel">Clique ou arraste uma imagem</p>
+          </div>
+          <img class="cover-preview" id="coverPreview" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Legenda da imagem</label>
+          <input type="text" class="form-input" id="edImageCaption" placeholder="Ex: Foto: João Silva / Agência" />
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label class="form-label">Corpo do artigo</label>
+      </div>
+      <div class="quill-wrap">
+        <div id="quillEditor"></div>
+      </div>
+
+      <!-- Painel de notícias relacionadas -->
+      <div class="related-panel" id="relatedPanel">
+        <div class="related-toggle" onclick="toggleRelatedPanel()">
+          <span class="related-toggle-label">Notícias relacionadas</span>
+          <span class="related-toggle-icon">&#9660;</span>
+        </div>
+        <div class="related-body">
+          <div class="related-search-wrap">
+            <input type="text" id="relatedSearch" placeholder="Buscar por título..." onkeydown="if(event.key==='Enter'){event.preventDefault();searchRelated()}" />
+            <button onclick="searchRelated()">Buscar</button>
+          </div>
+          <div class="related-results" id="relatedResults">
+            <p class="related-empty">Digite um termo para buscar artigos.</p>
+          </div>
+          <div class="related-selected" id="relatedSelectedWrap" style="display:none;">
+            <p class="related-selected-label">Selecionadas</p>
+            <div id="relatedSelectedList"></div>
+            <button class="related-insert-btn" onclick="insertRelatedInBody()">Inserir no artigo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════ PREVIEW MODAL ════════════ -->
+  <div class="preview-overlay" id="previewOverlay">
+    <div class="preview-container">
+      <button class="preview-close" onclick="closePreview()">&times;</button>
+      <div id="previewContent"></div>
+    </div>
+  </div>
+
+  <!-- ════════════ TOAST ════════════ -->
+  <div class="toast" id="toast"></div>
+
+  <footer>
+    <p>&copy; 2026 Carta de Notícia &middot; Todos os direitos reservados</p>
+    <p>Painel Editorial</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+  <script>
+    // ── Config ──────────────────────────────────
+    const SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const categoryLabels = {
+      politica: 'Política', mercados: 'Mercados',
+      internacional: 'Internacional', tecnologia: 'Tecnologia', geral: 'Geral'
+    };
+
+    let currentFilter = 'all';
+    let editingArticleId = null;
+    let quill = null;
+
+    // ── Auth ────────────────────────────────────
+    async function checkSession() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        showDashboard();
+        document.getElementById('headerActions').style.display = 'flex';
+        document.getElementById('headerUser').textContent = session.user.email;
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      var email = document.getElementById('loginEmail').value;
+      var password = document.getElementById('loginPassword').value;
+      var errorEl = document.getElementById('loginError');
+      errorEl.textContent = '';
+
+      var { error } = await sb.auth.signInWithPassword({ email: email, password: password });
+      if (error) {
+        errorEl.textContent = 'Email ou senha inválidos';
+        return;
+      }
+      checkSession();
+    }
+
+    async function logout() {
+      await sb.auth.signOut();
+      editingArticleId = null;
+      document.getElementById('headerActions').style.display = 'none';
+      showView('loginView');
+    }
+
+    // ── Navigation ──────────────────────────────
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+      document.getElementById(id).classList.add('active');
+    }
+
+    async function showDashboard() {
+      showView('dashboardView');
+      await loadArticles();
+    }
+
+    // ── Dashboard ───────────────────────────────
+    async function loadArticles() {
+      var query = sb.from('articles')
+        .select('id, title, category, status, published_at, source_name')
+        .eq('source_name', 'Carta de Notícia')
+        .order('created_at', { ascending: false });
+
+      if (currentFilter !== 'all') {
+        query = query.eq('status', currentFilter);
+      }
+
+      var { data, error } = await query;
+      var listEl = document.getElementById('articleList');
+
+      if (error || !data || data.length === 0) {
+        listEl.innerHTML = '<div class="empty-state"><p>Nenhum artigo encontrado.</p>' +
+          '<button class="btn btn-primary" onclick="openEditor()">Criar primeiro artigo</button></div>';
+        return;
+      }
+
+      var html = '<table class="article-table"><thead><tr>' +
+        '<th>Título</th><th>Categoria</th><th>Status</th><th>Data</th><th></th>' +
+        '</tr></thead><tbody>';
+
+      data.forEach(function(a) {
+        var d = new Date(a.published_at);
+        var dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        var badgeClass = a.status === 'published' ? 'badge-published' : 'badge-draft';
+        var badgeText = a.status === 'published' ? 'Publicado' : 'Rascunho';
+        var catClass = 'cat-' + a.category;
+
+        html += '<tr>' +
+          '<td class="td-title">' + a.title + '</td>' +
+          '<td><span class="cat-label ' + catClass + '">' + (categoryLabels[a.category] || a.category) + '</span></td>' +
+          '<td><span class="badge ' + badgeClass + '">' + badgeText + '</span></td>' +
+          '<td style="font-size:0.78rem;color:var(--ink-muted);">' + dateStr + '</td>' +
+          '<td><div class="td-actions">' +
+            '<button class="btn btn-outline btn-sm" onclick="editArticle(\'' + a.id + '\')">Editar</button>' +
+            '<button class="btn btn-danger btn-sm" onclick="deleteArticle(\'' + a.id + '\', this)">Excluir</button>' +
+          '</div></td>' +
+          '</tr>';
+      });
+
+      html += '</tbody></table>';
+      listEl.innerHTML = html;
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      loadArticles();
+    }
+
+    async function deleteArticle(id, btn) {
+      if (!confirm('Tem certeza que deseja excluir este artigo?')) return;
+      var { error } = await sb.from('articles').delete().eq('id', id);
+      if (error) { toast('Erro ao excluir: ' + error.message); return; }
+      toast('Artigo excluído');
+      loadArticles();
+    }
+
+    // ── Editor ──────────────────────────────────
+    function initQuill() {
+      if (quill) return;
+      quill = new Quill('#quillEditor', {
+        theme: 'snow',
+        placeholder: 'Escreva o corpo do artigo...',
+        modules: {
+          toolbar: {
+            container: [
+              [{ header: [2, 3, false] }],
+              ['bold', 'italic'],
+              ['blockquote'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              ['link', 'image'],
+              ['clean']
+            ],
+            handlers: {
+              image: imageHandler
+            }
+          }
+        }
+      });
+    }
+
+    function imageHandler() {
+      var input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = async function() {
+        var file = input.files[0];
+        if (!file) return;
+
+        var articleId = editingArticleId || crypto.randomUUID();
+        if (!editingArticleId) editingArticleId = articleId;
+
+        var ext = file.name.split('.').pop().toLowerCase();
+        var path = articleId + '-' + Date.now() + '.' + ext;
+
+        toast('Enviando imagem...');
+        var { error } = await sb.storage.from('article-images').upload(path, file, {
+          upsert: true,
+          contentType: file.type
+        });
+
+        if (error) { toast('Erro no upload: ' + error.message); return; }
+
+        var { data: urlData } = sb.storage.from('article-images').getPublicUrl(path);
+        var range = quill.getSelection(true);
+        quill.insertEmbed(range.index, 'image', urlData.publicUrl);
+        quill.setSelection(range.index + 1);
+        toast('Imagem inserida');
+      };
+      input.click();
+    }
+
+    function openEditor(articleData) {
+      initQuill();
+      editingArticleId = articleData ? articleData.id : null;
+
+      document.getElementById('edTitle').value = articleData ? articleData.title : '';
+      document.getElementById('edDescription').value = articleData ? (articleData.description || '') : '';
+      document.getElementById('edCategory').value = articleData ? articleData.category : 'geral';
+      document.getElementById('edAuthor').value = articleData ? (articleData.author || '') : '';
+      document.getElementById('edImageCaption').value = articleData ? (articleData.image_caption || '') : '';
+
+      quill.root.innerHTML = articleData ? (articleData.body || '') : '';
+
+      var preview = document.getElementById('coverPreview');
+      if (articleData && articleData.image_url) {
+        preview.src = articleData.image_url;
+        preview.style.display = 'block';
+        document.getElementById('coverLabel').textContent = 'Imagem carregada — clique para trocar';
+      } else {
+        preview.style.display = 'none';
+        document.getElementById('coverLabel').textContent = 'Clique ou arraste uma imagem';
+      }
+
+      document.getElementById('edCoverFile').value = '';
+
+      // Limpar painel de notícias relacionadas
+      selectedRelated = [];
+      renderSelectedRelated();
+      document.getElementById('relatedResults').innerHTML = '<p class="related-empty">Digite um termo para buscar artigos.</p>';
+      document.getElementById('relatedSearch').value = '';
+      document.getElementById('relatedPanel').classList.remove('open');
+
+      showView('editorView');
+    }
+
+    async function editArticle(id) {
+      var { data, error } = await sb.from('articles').select('*').eq('id', id).maybeSingle();
+      if (error || !data) { toast('Erro ao carregar artigo'); return; }
+      openEditor(data);
+    }
+
+    function previewCover(input) {
+      var file = input.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var preview = document.getElementById('coverPreview');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+        document.getElementById('coverLabel').textContent = file.name;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveArticle(status) {
+      var title = document.getElementById('edTitle').value.trim();
+      if (!title) { toast('Título é obrigatório'); return; }
+
+      var articleId = editingArticleId || crypto.randomUUID();
+      var isNew = !editingArticleId;
+      editingArticleId = articleId;
+
+      // Upload cover if new file selected
+      var coverFile = document.getElementById('edCoverFile').files[0];
+      var imageUrl = null;
+
+      if (coverFile) {
+        var ext = coverFile.name.split('.').pop().toLowerCase();
+        var coverPath = articleId + '.' + ext;
+
+        toast('Enviando imagem de capa...');
+        var { error: uploadErr } = await sb.storage.from('article-images').upload(coverPath, coverFile, {
+          upsert: true,
+          contentType: coverFile.type
+        });
+
+        if (uploadErr) { toast('Erro no upload: ' + uploadErr.message); return; }
+        var { data: urlData } = sb.storage.from('article-images').getPublicUrl(coverPath);
+        imageUrl = urlData.publicUrl;
+      }
+
+      var body = quill.root.innerHTML;
+      if (body === '<p><br></p>') body = '';
+
+      var record = {
+        id: articleId,
+        title: title,
+        description: document.getElementById('edDescription').value.trim() || null,
+        body: body || null,
+        category: document.getElementById('edCategory').value,
+        author: document.getElementById('edAuthor').value.trim() || null,
+        image_caption: document.getElementById('edImageCaption').value.trim() || null,
+        source_name: 'Carta de Notícia',
+        status: status
+      };
+
+      if (imageUrl) record.image_url = imageUrl;
+
+      if (isNew) {
+        record.original_url = 'cms://' + articleId;
+        record.published_at = new Date().toISOString();
+      }
+
+      if (status === 'published' && isNew) {
+        record.published_at = new Date().toISOString();
+      }
+
+      var { error } = isNew
+        ? await sb.from('articles').insert(record)
+        : await sb.from('articles').update(record).eq('id', articleId);
+
+      if (error) { toast('Erro ao salvar: ' + error.message); return; }
+      toast(status === 'published' ? 'Artigo publicado!' : 'Rascunho salvo');
+
+      if (isNew) {
+        // After first save, stay in editor but mark as editing
+        editingArticleId = articleId;
+      }
+    }
+
+    // ── Related Articles ────────────────────────
+    var selectedRelated = [];
+
+    function toggleRelatedPanel() {
+      document.getElementById('relatedPanel').classList.toggle('open');
+    }
+
+    async function searchRelated() {
+      var term = document.getElementById('relatedSearch').value.trim();
+      if (!term) return;
+
+      var { data, error } = await sb.from('articles')
+        .select('id, title, category, published_at')
+        .eq('status', 'published')
+        .ilike('title', '%' + term + '%')
+        .order('published_at', { ascending: false })
+        .limit(10);
+
+      var container = document.getElementById('relatedResults');
+
+      if (error || !data || data.length === 0) {
+        container.innerHTML = '<p class="related-empty">Nenhum artigo encontrado.</p>';
+        return;
+      }
+
+      // Filtrar artigos já selecionados e o próprio artigo em edição
+      var filtered = data.filter(function(a) {
+        if (a.id === editingArticleId) return false;
+        return !selectedRelated.some(function(s) { return s.id === a.id; });
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="related-empty">Nenhum artigo novo encontrado.</p>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(function(a) {
+        var cat = categoryLabels[a.category] || a.category;
+        var date = new Date(a.published_at).toLocaleDateString('pt-BR');
+        return '<div class="related-result-item">' +
+          '<div class="related-result-info">' +
+            '<div class="related-result-title">' + a.title + '</div>' +
+            '<div class="related-result-meta">' + cat + ' &middot; ' + date + '</div>' +
+          '</div>' +
+          '<button class="related-result-add" onclick="addRelated(\'' + a.id + '\', this)" data-title="' + a.title.replace(/"/g, '&quot;') + '">Adicionar</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    function addRelated(id, btn) {
+      var title = btn.getAttribute('data-title');
+      if (selectedRelated.some(function(s) { return s.id === id; })) return;
+
+      selectedRelated.push({ id: id, title: title });
+      renderSelectedRelated();
+
+      // Remove da lista de resultados
+      btn.closest('.related-result-item').remove();
+    }
+
+    function removeRelated(id) {
+      selectedRelated = selectedRelated.filter(function(s) { return s.id !== id; });
+      renderSelectedRelated();
+    }
+
+    function renderSelectedRelated() {
+      var wrap = document.getElementById('relatedSelectedWrap');
+      var list = document.getElementById('relatedSelectedList');
+
+      if (selectedRelated.length === 0) {
+        wrap.style.display = 'none';
+        return;
+      }
+
+      wrap.style.display = 'block';
+      list.innerHTML = selectedRelated.map(function(s) {
+        return '<div class="related-selected-item">' +
+          '<span class="related-selected-title">' + s.title + '</span>' +
+          '<button class="related-selected-remove" onclick="removeRelated(\'' + s.id + '\')" title="Remover">&times;</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    function insertRelatedInBody() {
+      if (selectedRelated.length === 0) return;
+
+      var html = '<h3>Notícias relacionadas</h3><ul>';
+      selectedRelated.forEach(function(s) {
+        html += '<li><a href="noticia.html?id=' + s.id + '">' + s.title + '</a></li>';
+      });
+      html += '</ul>';
+
+      // Inserir no final do Quill
+      var length = quill.getLength();
+      quill.clipboard.dangerouslyPasteHTML(length - 1, html);
+
+      toast('Notícias relacionadas inseridas');
+      selectedRelated = [];
+      renderSelectedRelated();
+      document.getElementById('relatedResults').innerHTML = '<p class="related-empty">Digite um termo para buscar artigos.</p>';
+      document.getElementById('relatedSearch').value = '';
+    }
+
+    // ── Preview ─────────────────────────────────
+    function openPreview() {
+      var title = document.getElementById('edTitle').value || 'Sem título';
+      var description = document.getElementById('edDescription').value || '';
+      var category = document.getElementById('edCategory').value;
+      var body = quill ? quill.root.innerHTML : '';
+      var coverSrc = document.getElementById('coverPreview').src;
+      var coverVisible = document.getElementById('coverPreview').style.display !== 'none';
+
+      var now = new Date();
+      var dateStr = now.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      var html = '<div class="article-meta">' +
+        '<span class="article-category">' + (categoryLabels[category] || category) + '</span>' +
+        '<span class="article-meta-dot"></span>' +
+        '<span class="article-date">' + dateStr + '</span></div>' +
+        '<h1 class="article-headline">' + title + '</h1>';
+
+      if (description) {
+        html += '<p class="article-description">' + description + '</p>';
+      }
+
+      if (coverVisible && coverSrc) {
+        html += '<img class="preview-cover" src="' + coverSrc + '" />';
+      }
+
+      html += '<div class="article-body">' + body + '</div>';
+
+      document.getElementById('previewContent').innerHTML = html;
+      document.getElementById('previewOverlay').classList.add('active');
+    }
+
+    function closePreview() {
+      document.getElementById('previewOverlay').classList.remove('active');
+    }
+
+    // ── Toast ───────────────────────────────────
+    function toast(msg) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(function() { el.classList.remove('show'); }, 3000);
+    }
+
+    // ── Init ────────────────────────────────────
+    checkSession();
+  </script>
+
+</body>
+</html>

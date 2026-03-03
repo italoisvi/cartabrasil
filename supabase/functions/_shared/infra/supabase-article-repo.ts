@@ -47,6 +47,7 @@ export class SupabaseArticleRepo implements ArticleRepository {
     const { data, error } = await this.supabase
       .from("articles")
       .select("id, title, category, published_at")
+      .eq("status", "published")
       .gte("published_at", since.toISOString())
       .order("published_at", { ascending: false })
       .limit(limit);

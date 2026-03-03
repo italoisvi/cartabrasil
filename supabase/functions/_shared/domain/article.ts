@@ -16,45 +16,168 @@ function decodeHtmlEntities(raw: string): string {
 }
 
 /**
- * Normaliza o corpo HTML do RSS para texto limpo com <strong> preservados.
- * Pipeline: decode entities → substituir bold por tags neutras → strip HTML → restaurar bold.
- *
- * NOTA: Não usamos marcadores com "/" (ex: §/BOLD§) pois causam problemas de
- * regex no Deno em determinados contextos. Usamos XBOLDSTARTX / XBOLDENDX.
+ * Transforma blocos de imagem inline da EBC (div.dnd-widget-wrapper)
+ * em <figure><img><figcaption> semânticos.
+ */
+function transformInlineImages(html: string): string {
+  return html.replace(
+    /<div[^>]*class="[^"]*dnd-widget-wrapper[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/gi,
+    (_match, inner: string) => {
+      // Extrair URL real: data-echo tem prioridade, senão pega do <noscript><img src>
+      const dataEchoMatch = inner.match(/data-echo="([^"]+)"/i);
+      const noscriptMatch = inner.match(/<noscript>\s*<img[^>]*src="([^"]+)"/i);
+      const imgUrl = dataEchoMatch?.[1] || noscriptMatch?.[1] || "";
+      if (!imgUrl) return "";
+
+      // Extrair alt text
+      const altMatch = inner.match(/alt="([^"]+)"/i);
+      const alt = altMatch?.[1] || "";
+
+      // Extrair legenda do .dnd-caption-wrapper > .meta
+      const captionMatch = inner.match(
+        /<div[^>]*class="[^"]*meta[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+      );
+      let caption = "";
+      if (captionMatch) {
+        caption = captionMatch[1].replace(/<[^>]*>/g, "").trim();
+      }
+
+      const figcaption = caption
+        ? `<figcaption>${caption}</figcaption>`
+        : "";
+      return `<figure><img src="${imgUrl}" alt="${alt}">${figcaption}</figure>`;
+    },
+  );
+}
+
+/**
+ * Remove lixo editorial que a EBC injeta no HTML do RSS.
+ */
+function removeJunk(html: string): string {
+  let clean = html;
+
+  // Logo da Agência Brasil no topo
+  clean = clean.replace(
+    /<p[^>]*>\s*<a[^>]*>\s*<img[^>]*alt="Logo Ag[eê]ncia Brasil"[^>]*>\s*<\/a>\s*<\/p>/gi,
+    "",
+  );
+
+  // Tracking pixels (imagens 1x1)
+  clean = clean.replace(
+    /<img[^>]*style="[^"]*width:\s*1px[^"]*"[^>]*\/?>/gi,
+    "",
+  );
+
+  // Promoção WhatsApp — parágrafo inteiro ou link
+  clean = clean.replace(
+    /<p[^>]*>[\s\S]*?Siga o canal da Ag[eê]ncia Brasil no WhatsApp[\s\S]*?<\/p>/gi,
+    "",
+  );
+
+  // Seção "Notícias relacionadas" (h3 + ul)
+  clean = clean.replace(
+    /<h3>\s*Not[ií]cias?\s+relacionadas?[\s\S]*?<\/ul>/gi,
+    "",
+  );
+
+  // Iframes (vídeos embarcados)
+  clean = clean.replace(/<iframe[\s\S]*?<\/iframe>/gi, "");
+  // Parágrafos que ficaram só com iframe
+  clean = clean.replace(/<p[^>]*>\s*<\/p>/gi, "");
+
+  // Blocos noscript
+  clean = clean.replace(/<noscript>[\s\S]*?<\/noscript>/gi, "");
+
+  // Script e style
+  clean = clean.replace(/<script[\s\S]*?<\/script>/gi, "");
+  clean = clean.replace(/<style[\s\S]*?<\/style>/gi, "");
+
+  // Parágrafos vazios
+  clean = clean.replace(/<p[^>]*>\s*(&nbsp;|\u00A0)?\s*<\/p>/gi, "");
+
+  return clean;
+}
+
+/**
+ * Sanitiza HTML preservando apenas tags semânticas permitidas.
+ * Remove todos os atributos exceto href (links) e src/alt (imagens).
+ */
+function sanitizeTags(html: string): string {
+  const allowedTags = new Set([
+    "p", "strong", "b", "em", "i", "h2", "h3",
+    "blockquote", "a", "ul", "ol", "li",
+    "figure", "img", "figcaption", "br",
+  ]);
+
+  // Unwrap divs (mantém conteúdo, remove a tag)
+  let result = html.replace(/<\/?div[^>]*>/gi, "");
+
+  // Processar tags: manter permitidas, remover o resto
+  result = result.replace(/<(\/?)(\w+)([^>]*)>/gi, (full, slash, tag, attrs) => {
+    const t = tag.toLowerCase();
+    if (!allowedTags.has(t)) return "";
+
+    // Tag de fechamento: retorna limpa
+    if (slash) return `</${t}>`;
+
+    // Tags self-closing ou sem atributos necessários
+    if (t === "br") return "<br>";
+
+    // Preservar atributos específicos por tag
+    let cleanAttrs = "";
+    if (t === "a") {
+      const href = attrs.match(/href="([^"]*)"/i);
+      if (href) cleanAttrs = ` href="${href[1]}"`;
+    } else if (t === "img") {
+      const src = attrs.match(/src="([^"]*)"/i);
+      const alt = attrs.match(/alt="([^"]*)"/i);
+      if (src) cleanAttrs += ` src="${src[1]}"`;
+      if (alt) cleanAttrs += ` alt="${alt[1]}"`;
+    }
+
+    return `<${t}${cleanAttrs}>`;
+  });
+
+  return result;
+}
+
+/**
+ * Normaliza o corpo HTML do RSS para HTML semântico limpo.
+ * Pipeline: decode entities → remover lixo → transformar imagens →
+ *           sanitizar tags → normalizar formatação → limpar.
  */
 export function normalizeBody(rawHtml: string): string {
-  const decoded = decodeHtmlEntities(rawHtml);
+  let html = decodeHtmlEntities(rawHtml);
 
-  // 1. Substitui <strong> e <b> por marcadores neutros (sem "/" no marcador)
-  let text = decoded
-    .replace(/<strong[^>]*>/gi, "XBOLDSTARTX")
-    .replace(/<\/strong>/gi, "XBOLDENDX")
-    .replace(/<b[^>]*>/gi, "XBOLDSTARTX")
-    .replace(/<\/b>/gi, "XBOLDENDX");
+  // 1. Transformar imagens inline da EBC antes de qualquer limpeza
+  html = transformInlineImages(html);
 
-  // 2. Converte estrutura HTML em quebras de linha e remove demais tags
-  text = text
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/p>/gi, "\n")
-    .replace(/<\/div>/gi, "\n")
-    .replace(/<\/h[1-6]>/gi, "\n")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/[^\S\n]+/g, " ")
-    .replace(/\n\s*/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
+  // 2. Remover lixo editorial
+  html = removeJunk(html);
+
+  // 3. Sanitizar: manter apenas tags permitidas, limpar atributos
+  html = sanitizeTags(html);
+
+  // 4. Normalizar: <b> → <strong>, <i> → <em>
+  html = html
+    .replace(/<b>/gi, "<strong>")
+    .replace(/<\/b>/gi, "</strong>")
+    .replace(/<i>/gi, "<em>")
+    .replace(/<\/i>/gi, "</em>");
+
+  // 5. Limpar whitespace excessivo entre tags
+  html = html
+    .replace(/>\s+</g, "><")
+    .replace(/<p><\/p>/g, "")
+    .replace(/<blockquote>\s*<\/blockquote>/g, "")
     .trim();
 
-  // 3. Restaura <strong> a partir dos marcadores neutros
-  text = text
-    .replace(/XBOLDSTARTX([\s\S]*?)XBOLDENDX/g, "<strong>$1</strong>")
-    .replace(/XBOLDSTARTX|XBOLDENDX/g, "");
-
-  // 4. Compatibilidade: limpa marcadores antigos §BOLD§ que possam existir
-  text = text
+  // 6. Compatibilidade: limpa marcadores antigos §BOLD§
+  html = html
     .replace(/§BOLD§([\s\S]*?)§\/BOLD§/g, "<strong>$1</strong>")
     .replace(/§\/?BOLD§/g, "");
 
-  return text;
+  return html;
 }
 
 /**

@@ -594,6 +594,7 @@
       const { data: articles, error } = await sb
         .from('articles')
         .select('id, title, description, category, image_url, published_at')
+        .eq('status', 'published')
         .order('published_at', { ascending: false })
         .limit(50);
 
