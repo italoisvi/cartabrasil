@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pdftotext \"c:/Users/italo/source/repo/cartadenoticia/knowledge/Arquitetura Limpa - O Guia do Artesão para Estrutura e Design de Software - Autor \\(Robert C. Martin\\).pdf\" -)"
+    ]
+  }
+}

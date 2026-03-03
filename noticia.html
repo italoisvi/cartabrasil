@@ -482,6 +482,9 @@
 
     // ── FORMATADOR INTELIGENTE DO BODY ────────────────────────
     function formatBody(text) {
+      // Compatibilidade: converte §BOLD§ de artigos antigos para <strong>
+      text = text.replace(/§BOLD§([\s\S]*?)§\/BOLD§/g, '<strong>$1</strong>').replace(/§\/?BOLD§/g, '');
+
       var lines = text.split('\n').filter(function(l) { return l.trim().length > 0; });
       var html = '';
       var i = 0;
@@ -496,9 +499,9 @@
           continue;
         }
 
-        // Subtítulo: linha curta, sem ponto final, não é citação, ou marcada com §BOLD§
+        // Subtítulo: linha curta, sem ponto final, não é citação
         if (isSubtitle(line, lines, i)) {
-          var cleanTitle = line.replace(/§BOLD§/g, '').replace(/§\/BOLD§/g, '').trim();
+          var cleanTitle = line.replace(/<\/?strong>/g, '').trim();
           html += '<h2>' + cleanTitle + '</h2>';
           i++;
           continue;
@@ -517,9 +520,8 @@
           continue;
         }
 
-        // Parágrafo normal — limpa marcadores e formata
-        var cleanLine = line.replace(/§BOLD§(.*?)§\/BOLD§/g, '<strong>$1</strong>').replace(/§\/?BOLD§/g, '');
-        html += '<p>' + formatInlineQuotes(cleanLine) + '</p>';
+        // Parágrafo normal
+        html += '<p>' + formatInlineQuotes(line) + '</p>';
         i++;
       }
 
@@ -527,27 +529,25 @@
     }
 
     function isSubtitle(line, allLines, index) {
-      // Marcado como bold pelo fetch-rss — é subtítulo
-      if (/§BOLD§/.test(line)) return true;
-
       // Não pode ser a primeira linha
       if (index === 0) return false;
 
-      // Remove possíveis caracteres especiais pra contar
-      var clean = line.replace(/[^\w\sÀ-ú]/g, '').trim();
+      // Remove tags <strong> para analisar o texto puro
+      var clean = line.replace(/<\/?strong>/g, '').replace(/[^\w\sÀ-ú]/g, '').trim();
       var words = clean.split(/\s+/);
 
       // Subtítulo: entre 1 e 5 palavras
       if (words.length > 5) return false;
 
       // Não termina com ponto, vírgula, dois pontos
-      if (/[.;,!?]$/.test(line)) return false;
+      var plainLine = line.replace(/<\/?strong>/g, '').trim();
+      if (/[.;,!?]$/.test(plainLine)) return false;
 
       // Não começa com aspas ou travessão (seria citação)
-      if (/^[""\u201C\u201D\u2018\u2019\u2014\u2013–—]/.test(line)) return false;
+      if (/^[""\u201C\u201D\u2018\u2019\u2014\u2013–—]/.test(plainLine)) return false;
 
       // Tem que ser curto (menos de 50 chars)
-      if (line.length > 50) return false;
+      if (plainLine.length > 50) return false;
 
       // Pelo menos a primeira letra maiúscula
       if (!/^[A-ZÀ-Ú]/.test(clean)) return false;
@@ -585,8 +585,9 @@
     }
 
     function isSubtitleCandidate(line) {
-      var words = line.replace(/[^\w\sÀ-ú]/g, '').trim().split(/\s+/);
-      return words.length <= 5 && line.length <= 50 && !/[.;,!?]$/.test(line) && /^[A-ZÀ-Ú]/.test(line);
+      var plain = line.replace(/<\/?strong>/g, '').trim();
+      var words = plain.replace(/[^\w\sÀ-ú]/g, '').trim().split(/\s+/);
+      return words.length <= 5 && plain.length <= 50 && !/[.;,!?]$/.test(plain) && /^[A-ZÀ-Ú]/.test(plain);
     }
 
     function formatInlineQuotes(text) {
