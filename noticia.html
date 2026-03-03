@@ -462,7 +462,7 @@
 
         if (isRichHtml) {
           // Detectar bloco de notícias relacionadas inserido pelo CMS
-          var relatedBlockRegex = /<h3>Not[ií]cias?\s+relacionadas?<\/h3>\s*<ul>([\s\S]*?)<\/ul>/i;
+          var relatedBlockRegex = /<h3>Not[ií]cias?\s+relacionadas?<\/h3>\s*<(?:ul|ol)>([\s\S]*?)<\/(?:ul|ol)>/i;
           var relatedBlockMatch = article.body.match(relatedBlockRegex);
 
           if (relatedBlockMatch) {
@@ -471,7 +471,7 @@
             bodyEl.innerHTML = cleanBody;
 
             // Extrair links do <ul>
-            var linkRegex = /<li><a[^>]*href="noticia\.html\?id=([^"]+)"[^>]*>([^<]+)<\/a><\/li>/gi;
+            var linkRegex = /<li[^>]*><a[^>]*href="noticia\.html\?id=([^"]+)"[^>]*>([^<]+)<\/a><\/li>/gi;
             var links = [];
             var m;
             while ((m = linkRegex.exec(relatedBlockMatch[1])) !== null) {

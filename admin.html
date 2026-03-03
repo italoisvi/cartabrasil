@@ -1176,6 +1176,14 @@
     }
 
     // ── Editor ──────────────────────────────────
+    // Quill 2 rejeita URLs relativas (converte para about:blank).
+    // Override para permitir links internos como noticia.html?id=...
+    var Link = Quill.import('formats/link');
+    Link.sanitize = function(url) {
+      if (/^\s*(javascript|data)\s*:/i.test(url)) return 'about:blank';
+      return url;
+    };
+
     function initQuill() {
       if (quill) return;
       quill = new Quill('#quillEditor', {
@@ -1312,9 +1320,16 @@
 
       var body = quill.root.innerHTML;
       if (body === '<p><br></p>') body = '';
-      // Limpar atributos que o Quill 2 adiciona em links (causa about:blank no file://)
+      // Limpar atributos do Quill 2 e normalizar HTML
       if (body) {
         body = body.replace(/ target="_blank"/g, '').replace(/ rel="noopener noreferrer"/g, '');
+        // Quill 2 gera <ol><li data-list="bullet"> em vez de <ul><li>
+        body = body.replace(/<ol>([\s\S]*?)<\/ol>/gi, function(match, inner) {
+          if (/data-list="bullet"/.test(inner)) {
+            return '<ul>' + inner.replace(/ data-list="bullet"/g, '') + '</ul>';
+          }
+          return '<ol>' + inner.replace(/ data-list="ordered"/g, '') + '</ol>';
+        });
       }
 
       var record = {
