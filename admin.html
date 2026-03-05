@@ -26,6 +26,9 @@
     html { font-size: 16px; scroll-behavior: smooth; }
 
     body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       background: var(--bg);
       color: var(--ink);
       font-family: 'DM Sans', sans-serif;
@@ -112,19 +115,24 @@
     /* ── Views ─────────────────────────────────── */
 
     .view { display: none; }
-    .view.active { display: block; }
+    .view.active { display: block; flex: 1; }
 
     .container {
       max-width: 960px;
       margin: 0 auto;
       padding: 2rem;
+      flex: 1;
     }
 
     /* ── Login ─────────────────────────────────── */
 
+    #loginView { flex: 1; display: flex; align-items: center; justify-content: center; }
+    #loginView.view { display: none; }
+    #loginView.view.active { display: flex; }
+
     .login-wrap {
       max-width: 380px;
-      margin: 6rem auto;
+      width: 100%;
       text-align: center;
     }
 
@@ -897,6 +905,7 @@
     <div class="header-actions" id="headerActions" style="display:none;">
       <span class="header-meta">Painel editorial</span>
       <span class="header-user" id="headerUser"></span>
+      <a href="perfil.html" class="btn-logout" style="text-decoration:none;">Meu perfil</a>
       <button class="btn-logout" onclick="logout()">Sair</button>
     </div>
   </header>
@@ -912,6 +921,7 @@
         <p class="login-error" id="loginError"></p>
         <button type="submit" class="btn btn-primary">Entrar</button>
       </form>
+      <p style="text-align:center;margin-top:1.5rem;font-size:0.8rem;color:var(--ink-muted);">Não tem conta? <a href="cadastro.html" style="color:var(--ink);font-weight:500;border-bottom:1px solid var(--rule);">Cadastrar</a></p>
     </div>
   </section>
 
@@ -991,6 +1001,11 @@
         <div class="form-group">
           <label class="form-label">Autor</label>
           <input type="text" class="form-input" id="edAuthor" placeholder="Nome do autor" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Local</label>
+          <input type="text" class="form-input" id="edLocation" placeholder="Ex: São Paulo, SP" />
         </div>
 
         <div class="form-group">
@@ -1127,7 +1142,7 @@
     // ── Dashboard ───────────────────────────────
     async function loadArticles() {
       var query = sb.from('articles')
-        .select('id, title, category, status, published_at, source_name, author')
+        .select('id, title, category, status, published_at, source_name, author, location, updated_at')
         .eq('source_name', 'Carta de Notícia')
         .order('created_at', { ascending: false });
 
@@ -1268,6 +1283,7 @@
       document.getElementById('edDescription').value = articleData ? (articleData.description || '') : '';
       document.getElementById('edCategory').value = articleData ? articleData.category : 'geral';
       document.getElementById('edAuthor').value = articleData ? (articleData.author || '') : '';
+      document.getElementById('edLocation').value = articleData ? (articleData.location || '') : '';
       document.getElementById('edImageCaption').value = articleData ? (articleData.image_caption || '') : '';
 
       quill.root.innerHTML = articleData ? (articleData.body || '') : '';
@@ -1361,6 +1377,7 @@
         body: body || null,
         category: document.getElementById('edCategory').value,
         author: document.getElementById('edAuthor').value.trim() || null,
+        location: document.getElementById('edLocation').value.trim() || null,
         image_caption: document.getElementById('edImageCaption').value.trim() || null,
         source_name: 'Carta de Notícia',
         status: status
@@ -1371,6 +1388,8 @@
       if (isNew) {
         record.original_url = 'cms://' + articleId;
         record.published_at = new Date().toISOString();
+      } else {
+        record.updated_at = new Date().toISOString();
       }
 
       if (status === 'published' && isNew) {

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro — Carta Brasil</title>
+  <link rel="icon" type="image/png" href="assets/images/cart.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #111111;
+      --ink-light: #555555;
+      --ink-muted: #999999;
+      --rule: #e0e0e0;
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --accent: #c0392b;
+      --green: #27ae60;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+    }
+
+    .logo {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    /* ── FORM ──────────────────────────────────── */
+    .register-wrap {
+      max-width: 580px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      flex: 1;
+    }
+
+    .register-title {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .register-subtitle {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      border: 1px solid var(--rule);
+      padding: 0.85rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--ink);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-group select {
+      cursor: pointer;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-error {
+      font-size: 0.78rem;
+      color: var(--accent);
+      min-height: 1.2em;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.85rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-align: center;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .btn-success {
+      background: var(--green);
+      color: var(--paper);
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    .login-link a {
+      color: var(--ink);
+      font-weight: 500;
+      border-bottom: 1px solid var(--rule);
+      transition: border-color 0.15s;
+    }
+
+    .login-link a:hover { border-color: var(--ink); }
+
+    /* ── FOOTER ──────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── ANIMATION ───────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .register-wrap { animation: fadeUp 0.6s ease both; }
+
+    @media (max-width: 600px) {
+      header { padding: 1rem; }
+      .register-wrap { margin: 2rem auto; padding: 0 1.25rem; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="admin.html">Carta Brasil</a>
+  </header>
+
+  <div class="register-wrap">
+    <h1 class="register-title">Criar conta</h1>
+    <p class="register-subtitle">Cadastre-se para acessar o painel editorial</p>
+
+    <form id="registerForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fullName">Nome completo</label>
+          <input type="text" id="fullName" placeholder="Maria Silva" required />
+        </div>
+        <div class="form-group">
+          <label for="displayName">Nome de exibição</label>
+          <input type="text" id="displayName" placeholder="Maria Silva" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="regEmail">Email</label>
+        <input type="email" id="regEmail" placeholder="maria@cartabrasil.com.br" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="regPassword">Senha</label>
+          <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" minlength="6" required />
+        </div>
+        <div class="form-group">
+          <label for="regPasswordConfirm">Confirmar senha</label>
+          <input type="password" id="regPasswordConfirm" placeholder="Repita a senha" minlength="6" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="regRole">Função</label>
+        <select id="regRole" required>
+          <option value="reporter">Repórter</option>
+          <option value="columnist">Colunista</option>
+          <option value="analyst">Analista</option>
+          <option value="editor">Editor</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="regBio">Bio (opcional)</label>
+        <textarea id="regBio" placeholder="Uma breve descrição sobre você..."></textarea>
+      </div>
+
+      <p class="form-error" id="regError"></p>
+
+      <button type="submit" class="btn btn-primary" id="btnRegister">Criar conta</button>
+    </form>
+
+    <p class="login-link">Já tem conta? <a href="admin.html">Entrar</a></p>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Carta Brasil &middot; Todos os direitos reservados</p>
+    <p>Painel Editorial</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Se já está logado, redireciona
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = 'perfil.html';
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('regError');
+      const btn = document.getElementById('btnRegister');
+      errorEl.textContent = '';
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const displayName = document.getElementById('displayName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+      const role = document.getElementById('regRole').value;
+      const bio = document.getElementById('regBio').value.trim();
+
+      if (password !== passwordConfirm) {
+        errorEl.textContent = 'As senhas não coincidem.';
+        return;
+      }
+
+      btn.textContent = 'Criando...';
+      btn.disabled = true;
+
+      // 1. Criar usuário no auth (metadata será usada para criar perfil no primeiro login)
+      const { data: authData, error: authError } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            display_name: displayName,
+            role: role,
+            bio: bio || null
+          }
+        }
+      });
+
+      if (authError) {
+        errorEl.textContent = authError.message;
+        btn.textContent = 'Criar conta';
+        btn.disabled = false;
+        return;
+      }
+
+      // 2. Se há sessão ativa (email confirmation desabilitado), criar perfil agora
+      if (authData.session) {
+        await sb.from('profiles').insert({
+          id: authData.user.id,
+          full_name: fullName,
+          display_name: displayName,
+          role: role,
+          bio: bio || null
+        });
+      }
+
+      btn.textContent = 'Conta criada!';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-success');
+
+      // Se não há sessão, precisa confirmar email primeiro
+      if (!authData.session) {
+        errorEl.style.color = 'var(--green)';
+        errorEl.textContent = 'Verifique seu email para confirmar a conta.';
+        return;
+      }
+
+      setTimeout(() => {
+        window.location.href = 'perfil.html';
+      }, 1000);
+    });
+  </script>
+
+</body>
+</html>

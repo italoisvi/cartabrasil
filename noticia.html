@@ -122,6 +122,73 @@
       margin-bottom: 1.5rem;
     }
 
+    .article-byline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .byline-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .byline-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .byline-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      flex-shrink: 0;
+    }
+
+    .byline-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .byline-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .byline-role {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .byline-right {
+      text-align: right;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .byline-updated {
+      font-style: italic;
+    }
+
     .article-source {
       display: flex;
       align-items: center;
@@ -389,6 +456,7 @@
     article.loaded .article-meta      { animation: fadeUp 0.6s ease both; }
     article.loaded .article-headline   { animation: fadeUp 0.6s ease 0.05s both; }
     article.loaded .article-description { animation: fadeUp 0.6s ease 0.1s both; }
+    article.loaded .article-byline     { animation: fadeUp 0.6s ease 0.12s both; }
     article.loaded .article-image      { animation: fadeUp 0.6s ease 0.15s both; }
     article.loaded .article-body       { animation: fadeUp 0.6s ease 0.2s both; }
 
@@ -480,6 +548,8 @@
       <h1 class="article-headline" id="articleHeadline"></h1>
 
       <p class="article-description" id="articleDescription"></p>
+
+      <div class="article-byline" id="articleByline" style="display:none;"></div>
 
       <div class="article-source">
         <span>Fonte:</span>
@@ -586,6 +656,55 @@
       document.getElementById('articleHeadline').textContent = article.title;
       document.getElementById('articleDescription').textContent = article.description || '';
       document.getElementById('articleAuthor').textContent = article.author || '';
+
+      // Byline editorial (apenas para artigos do Carta de Notícia)
+      if (article.source_name === 'Carta de Notícia' && article.author) {
+        const { data: authorProfile } = await sb
+          .from('profiles')
+          .select('display_name, role, avatar_url')
+          .eq('display_name', article.author)
+          .maybeSingle();
+
+        if (authorProfile) {
+          const roleLabels = { reporter: 'Repórter', columnist: 'Colunista', analyst: 'Analista', editor: 'Editor' };
+          const bylineEl = document.getElementById('articleByline');
+
+          // Left: avatar + name + role
+          let avatarHtml;
+          if (authorProfile.avatar_url) {
+            avatarHtml = '<img class="byline-avatar" src="' + authorProfile.avatar_url + '" alt="" />';
+          } else {
+            avatarHtml = '<div class="byline-placeholder">' + authorProfile.display_name.charAt(0).toUpperCase() + '</div>';
+          }
+
+          let leftHtml = '<div class="byline-left">' + avatarHtml +
+            '<div class="byline-info">' +
+              '<span class="byline-name">' + authorProfile.display_name + '</span>' +
+              '<span class="byline-role">' + (roleLabels[authorProfile.role] || authorProfile.role) + '</span>' +
+            '</div></div>';
+
+          // Right: location · date · atualizado
+          const pubDate = new Date(article.published_at);
+          const dateOpts = { day: 'numeric', month: 'long', year: 'numeric' };
+          let rightParts = [];
+          if (article.location) rightParts.push(article.location);
+          rightParts.push(pubDate.toLocaleDateString('pt-BR', dateOpts));
+
+          let rightHtml = '<div class="byline-right">' + rightParts.join(' · ');
+          if (article.updated_at) {
+            const updDate = new Date(article.updated_at);
+            const updOpts = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
+            rightHtml += '<br><span class="byline-updated">Atualizado em ' + updDate.toLocaleDateString('pt-BR', updOpts) + '</span>';
+          }
+          rightHtml += '</div>';
+
+          bylineEl.innerHTML = leftHtml + rightHtml;
+          bylineEl.style.display = '';
+
+          // Esconder a linha de fonte (redundante para artigos editoriais)
+          document.querySelector('.article-source').style.display = 'none';
+        }
+      }
 
       const d = new Date(article.published_at);
       const opts = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };

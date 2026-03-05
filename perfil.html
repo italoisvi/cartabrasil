@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Perfil — Carta Brasil</title>
+  <link rel="icon" type="image/png" href="assets/images/cart.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #111111;
+      --ink-light: #555555;
+      --ink-muted: #999999;
+      --rule: #e0e0e0;
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --accent: #c0392b;
+      --green: #27ae60;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+    }
+
+    .logo {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-user {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--rule);
+      padding: 0.4rem 0.8rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* ── PROFILE ─────────────────────────────── */
+    .profile-wrap {
+      max-width: 600px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      flex: 1;
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .avatar-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 1.25rem;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--rule);
+      background: var(--bg);
+    }
+
+    .avatar-placeholder {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--rule);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Lora', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--ink-muted);
+    }
+
+    .avatar-upload {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--paper);
+      border: 2px solid var(--paper);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .avatar-upload:hover { opacity: 0.8; }
+
+    .avatar-upload svg { width: 16px; height: 16px; }
+
+    .avatar-upload input { display: none; }
+
+    .profile-name {
+      font-family: 'Lora', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .profile-role {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .profile-email {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+    }
+
+    /* ── ACTIONS ─────────────────────────────── */
+    .profile-actions {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .action-card {
+      flex: 1;
+      display: block;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 1.5rem;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .action-card:hover {
+      border-color: var(--ink-muted);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .action-card h3 {
+      font-family: 'Lora', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .action-card p {
+      font-size: 0.78rem;
+      color: var(--ink-light);
+    }
+
+    /* ── EDIT FORM ───────────────────────────── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-label::before,
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .section-label span {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      border: 1px solid var(--rule);
+      padding: 0.85rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--ink);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-message {
+      font-size: 0.78rem;
+      min-height: 1.2em;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .form-message.error { color: var(--accent); }
+    .form-message.success { color: var(--green); }
+
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-align: center;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-success { background: var(--green); color: var(--paper); }
+
+    .form-actions {
+      text-align: center;
+    }
+
+    /* ── FOOTER ──────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── LOADING ─────────────────────────────── */
+    .loading {
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+    }
+
+    /* ── ANIMATION ───────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .profile-wrap { animation: fadeUp 0.6s ease both; }
+
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 0.6rem; text-align: center; }
+      .profile-wrap { margin: 2rem auto; padding: 0 1.25rem; }
+      .profile-actions { flex-direction: column; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="perfil.html">Carta Brasil</a>
+    <div class="header-actions">
+      <span class="header-user" id="headerUser"></span>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <div class="profile-wrap">
+    <div class="loading" id="loadingState">Carregando perfil...</div>
+
+    <div id="profileContent" style="display:none;">
+      <!-- PROFILE HEADER -->
+      <div class="profile-header">
+        <div class="avatar-container">
+          <div id="avatarDisplay"></div>
+          <label class="avatar-upload" title="Alterar foto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <input type="file" id="avatarInput" accept="image/*" />
+          </label>
+        </div>
+        <h1 class="profile-name" id="profileName"></h1>
+        <p class="profile-role" id="profileRole"></p>
+        <p class="profile-email" id="profileEmail"></p>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="profile-actions">
+        <a class="action-card" href="admin.html">
+          <h3>Painel Editorial</h3>
+          <p>Criar e gerenciar artigos</p>
+        </a>
+        <a class="action-card" href="portal.html">
+          <h3>Portal</h3>
+          <p>Ver o site publicado</p>
+        </a>
+      </div>
+
+      <!-- EDIT PROFILE -->
+      <div class="section-label"><span>Editar perfil</span></div>
+
+      <form id="profileForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editFullName">Nome completo</label>
+            <input type="text" id="editFullName" required />
+          </div>
+          <div class="form-group">
+            <label for="editDisplayName">Nome de exibição</label>
+            <input type="text" id="editDisplayName" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editRole">Função</label>
+            <select id="editRole">
+              <option value="reporter">Repórter</option>
+              <option value="columnist">Colunista</option>
+              <option value="analyst">Analista</option>
+              <option value="editor">Editor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="editEmail" disabled />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editBio">Bio</label>
+          <textarea id="editBio" placeholder="Uma breve descrição sobre você..."></textarea>
+        </div>
+
+        <p class="form-message" id="formMessage"></p>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="btnSave">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Carta Brasil &middot; Todos os direitos reservados</p>
+    <p>Painel Editorial</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const roleLabels = {
+      reporter: 'Repórter',
+      columnist: 'Colunista',
+      analyst: 'Analista',
+      editor: 'Editor'
+    };
+
+    let currentProfile = null;
+    let currentSession = null;
+
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      currentSession = session;
+      document.getElementById('headerUser').textContent = session.user.email;
+
+      // Carregar perfil
+      const { data: profile } = await sb.from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('profileContent').style.display = 'block';
+
+      if (profile) {
+        currentProfile = profile;
+        renderProfile(profile, session.user.email);
+      } else {
+        // Perfil não existe ainda — criar a partir do user_metadata (cadastro) ou com dados básicos
+        const meta = session.user.user_metadata || {};
+        const fallback = {
+          id: session.user.id,
+          full_name: meta.full_name || session.user.email.split('@')[0],
+          display_name: meta.display_name || session.user.email.split('@')[0],
+          role: meta.role || 'reporter',
+          bio: meta.bio || null,
+          avatar_url: null
+        };
+        await sb.from('profiles').insert(fallback);
+        currentProfile = fallback;
+        renderProfile(fallback, session.user.email);
+      }
+    }
+
+    function renderProfile(profile, email) {
+      document.getElementById('profileName').textContent = profile.display_name;
+      document.getElementById('profileRole').textContent = roleLabels[profile.role] || profile.role;
+      document.getElementById('profileEmail').textContent = email;
+
+      // Avatar
+      const avatarDisplay = document.getElementById('avatarDisplay');
+      if (profile.avatar_url) {
+        avatarDisplay.innerHTML = '<img class="avatar" src="' + profile.avatar_url + '" alt="Avatar" />';
+      } else {
+        const initials = profile.display_name.charAt(0).toUpperCase();
+        avatarDisplay.innerHTML = '<div class="avatar-placeholder">' + initials + '</div>';
+      }
+
+      // Form
+      document.getElementById('editFullName').value = profile.full_name;
+      document.getElementById('editDisplayName').value = profile.display_name;
+      document.getElementById('editRole').value = profile.role;
+      document.getElementById('editEmail').value = email;
+      document.getElementById('editBio').value = profile.bio || '';
+    }
+
+    // Upload avatar
+    document.getElementById('avatarInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const ext = file.name.split('.').pop();
+      const filePath = currentSession.user.id + '/avatar.' + ext;
+
+      const { error: uploadError } = await sb.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        showMessage('Erro ao enviar foto: ' + uploadError.message, 'error');
+        return;
+      }
+
+      const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(filePath);
+
+      // Adiciona timestamp para forçar recarga do cache
+      const avatarUrl = publicUrl + '?t=' + Date.now();
+
+      await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', currentSession.user.id);
+
+      currentProfile.avatar_url = avatarUrl;
+      renderProfile(currentProfile, currentSession.user.email);
+      showMessage('Foto atualizada!', 'success');
+    });
+
+    // Salvar perfil
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSave');
+      btn.textContent = 'Salvando...';
+      btn.disabled = true;
+
+      const updates = {
+        full_name: document.getElementById('editFullName').value.trim(),
+        display_name: document.getElementById('editDisplayName').value.trim(),
+        role: document.getElementById('editRole').value,
+        bio: document.getElementById('editBio').value.trim() || null,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await sb.from('profiles')
+        .update(updates)
+        .eq('id', currentSession.user.id);
+
+      if (error) {
+        showMessage('Erro ao salvar: ' + error.message, 'error');
+      } else {
+        Object.assign(currentProfile, updates);
+        renderProfile(currentProfile, currentSession.user.email);
+        showMessage('Perfil atualizado!', 'success');
+      }
+
+      btn.textContent = 'Salvar alterações';
+      btn.disabled = false;
+    });
+
+    function showMessage(text, type) {
+      const el = document.getElementById('formMessage');
+      el.textContent = text;
+      el.className = 'form-message ' + type;
+      setTimeout(() => { el.textContent = ''; }, 3000);
+    }
+
+    async function logout() {
+      await sb.auth.signOut();
+      window.location.href = 'admin.html';
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
