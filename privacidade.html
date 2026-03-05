@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Política de Privacidade — Carta Brasil</title>
+  <link rel="icon" type="image/png" href="assets/images/cart.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #111111;
+      --ink-light: #555555;
+      --ink-muted: #999999;
+      --rule: #e0e0e0;
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --accent: #c0392b;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────── */
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-meta {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ── CONTENT ──────────────────────────────────────────────── */
+    .content {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 4rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .page-title {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .page-subtitle {
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── TABLE OF CONTENTS ────────────────────────────────────── */
+    .toc {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .toc h2 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-counter;
+    }
+
+    .toc ol li {
+      counter-increment: toc-counter;
+      padding: 0.3rem 0;
+    }
+
+    .toc ol li a {
+      font-size: 0.85rem;
+      color: var(--ink-light);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .toc ol li a::before {
+      content: counter(toc-counter) ". ";
+      color: var(--ink-muted);
+    }
+
+    .toc ol li a:hover {
+      color: var(--ink);
+    }
+
+    /* ── SECTIONS ─────────────────────────────────────────────── */
+    .policy-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .policy-section h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      padding-top: 1rem;
+    }
+
+    .policy-section h3 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin: 1.2rem 0 0.5rem;
+    }
+
+    .policy-section p {
+      font-family: 'Lora', serif;
+      font-size: 0.92rem;
+      color: var(--ink-light);
+      line-height: 1.85;
+      margin-bottom: 0.8rem;
+    }
+
+    .policy-section ul {
+      list-style: none;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .policy-section ul li {
+      font-family: 'Lora', serif;
+      font-size: 0.92rem;
+      color: var(--ink-light);
+      line-height: 1.85;
+      padding: 0.2rem 0 0.2rem 1.2rem;
+      position: relative;
+    }
+
+    .policy-section ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--ink-muted);
+    }
+
+    .policy-section a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .policy-section a:hover {
+      text-decoration: underline;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--rule);
+      margin: 2.5rem 0;
+    }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    .site-footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .footer-top {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    .footer-brand .footer-logo {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .footer-brand p {
+      margin-top: 0.8rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 1rem;
+    }
+
+    .footer-col a {
+      display: block;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.78rem;
+      padding: 0.25rem 0;
+      transition: color 0.15s;
+    }
+
+    .footer-col a:hover { color: #fff; }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.2rem 2rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-bottom p {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.06em;
+    }
+
+    .footer-bottom a {
+      color: rgba(255,255,255,0.35);
+      transition: color 0.15s;
+    }
+
+    .footer-bottom a:hover { color: rgba(255,255,255,0.7); }
+
+    /* ── ANIMATION ───────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .content { animation: fadeUp 0.6s ease both; }
+
+    /* ── RESPONSIVE ────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      .footer-top { grid-template-columns: 1fr; gap: 1.5rem; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <a class="logo" href="portal.html">Carta Brasil</a>
+    <p class="header-meta">Carta Brasil · Breaking news</p>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <h1 class="page-title">Política de Privacidade</h1>
+    <p class="page-subtitle">Última atualização: 5 de março de 2026</p>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+      <h2>Índice</h2>
+      <ol>
+        <li><a href="#informacoes-gerais">Informações gerais</a></li>
+        <li><a href="#dados-coletados">Dados coletados</a></li>
+        <li><a href="#finalidade">Finalidade do tratamento</a></li>
+        <li><a href="#base-legal">Base legal</a></li>
+        <li><a href="#compartilhamento">Compartilhamento de dados</a></li>
+        <li><a href="#cookies">Cookies e tecnologias similares</a></li>
+        <li><a href="#seguranca">Segurança dos dados</a></li>
+        <li><a href="#retencao">Retenção e exclusão</a></li>
+        <li><a href="#direitos">Seus direitos</a></li>
+        <li><a href="#menores">Menores de idade</a></li>
+        <li><a href="#alteracoes">Alterações nesta política</a></li>
+        <li><a href="#contato">Contato e encarregado de dados</a></li>
+        <li><a href="#foro">Foro competente</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. INFORMAÇÕES GERAIS -->
+    <div class="policy-section" id="informacoes-gerais">
+      <h2>1. Informações gerais</h2>
+      <p>A presente Política de Privacidade descreve como a <strong>Carta Brasil</strong> ("nós", "nosso" ou "plataforma") coleta, utiliza, armazena e protege os dados pessoais dos usuários e assinantes ("você"), em conformidade com a Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 — LGPD) e demais normas aplicáveis.</p>
+      <p>Ao acessar nosso site, assinar nossa newsletter ou utilizar qualquer de nossos serviços, você declara estar ciente e de acordo com as práticas aqui descritas.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 2. DADOS COLETADOS -->
+    <div class="policy-section" id="dados-coletados">
+      <h2>2. Dados coletados</h2>
+
+      <h3>Dados fornecidos por você</h3>
+      <ul>
+        <li><strong>E-mail</strong> — ao assinar a newsletter ou entrar em contato conosco.</li>
+        <li><strong>Nome</strong> — ao utilizar o formulário de contato.</li>
+        <li><strong>Preferências editoriais</strong> — categorias de notícias e frequência de recebimento selecionadas.</li>
+      </ul>
+
+      <h3>Dados coletados automaticamente</h3>
+      <ul>
+        <li><strong>Dados de navegação</strong> — endereço IP, tipo de navegador, sistema operacional, páginas visitadas, data e hora de acesso.</li>
+        <li><strong>Cookies</strong> — pequenos arquivos armazenados no seu dispositivo para melhorar a experiência de uso (veja seção 6).</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 3. FINALIDADE -->
+    <div class="policy-section" id="finalidade">
+      <h2>3. Finalidade do tratamento</h2>
+      <p>Utilizamos seus dados pessoais para as seguintes finalidades:</p>
+      <ul>
+        <li>Enviar edições da newsletter conforme suas preferências de categoria e frequência.</li>
+        <li>Personalizar o conteúdo editorial apresentado a você.</li>
+        <li>Responder mensagens enviadas pelo formulário de contato.</li>
+        <li>Manter a segurança e a estabilidade da plataforma.</li>
+        <li>Cumprir obrigações legais e regulatórias.</li>
+        <li>Gerar estatísticas agregadas e anônimas sobre o uso da plataforma.</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 4. BASE LEGAL -->
+    <div class="policy-section" id="base-legal">
+      <h2>4. Base legal</h2>
+      <p>O tratamento dos seus dados pessoais é realizado com fundamento nas seguintes bases legais previstas pela LGPD:</p>
+      <ul>
+        <li><strong>Consentimento</strong> (art. 7º, I) — ao fornecer seu e-mail e selecionar suas preferências para receber a newsletter.</li>
+        <li><strong>Execução de contrato</strong> (art. 7º, V) — para prestação do serviço de assinatura contratado.</li>
+        <li><strong>Legítimo interesse</strong> (art. 7º, IX) — para análise de métricas agregadas e melhoria contínua dos serviços.</li>
+        <li><strong>Cumprimento de obrigação legal</strong> (art. 7º, II) — quando exigido por legislação ou ordem judicial.</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 5. COMPARTILHAMENTO -->
+    <div class="policy-section" id="compartilhamento">
+      <h2>5. Compartilhamento de dados</h2>
+      <p>Seus dados pessoais poderão ser compartilhados exclusivamente com:</p>
+      <ul>
+        <li><strong>Provedores de infraestrutura</strong> — serviços de hospedagem (Supabase), envio de e-mails (Resend) e armazenamento, necessários para a operação da plataforma.</li>
+        <li><strong>Autoridades públicas</strong> — quando exigido por lei, regulamento ou ordem judicial.</li>
+      </ul>
+      <p>Não vendemos, alugamos ou comercializamos seus dados pessoais com terceiros para fins publicitários.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 6. COOKIES -->
+    <div class="policy-section" id="cookies">
+      <h2>6. Cookies e tecnologias similares</h2>
+      <p>Utilizamos cookies estritamente necessários para o funcionamento da plataforma. Não utilizamos cookies de rastreamento publicitário.</p>
+      <ul>
+        <li><strong>Cookies essenciais</strong> — necessários para o funcionamento básico do site, como autenticação de sessão.</li>
+        <li><strong>Cookies de preferência</strong> — armazenam suas escolhas de categoria e frequência para melhorar a experiência.</li>
+      </ul>
+      <p>Você pode gerenciar ou desabilitar cookies através das configurações do seu navegador. A desativação de cookies essenciais pode comprometer o funcionamento da plataforma.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 7. SEGURANÇA -->
+    <div class="policy-section" id="seguranca">
+      <h2>7. Segurança dos dados</h2>
+      <p>Adotamos medidas técnicas e organizacionais adequadas para proteger seus dados pessoais contra acessos não autorizados, destruição, perda, alteração ou qualquer forma de tratamento inadequado. Entre essas medidas estão:</p>
+      <ul>
+        <li>Criptografia de dados em trânsito (HTTPS/TLS).</li>
+        <li>Controle de acesso restrito ao banco de dados (Row Level Security).</li>
+        <li>Armazenamento seguro de credenciais e chaves de API.</li>
+        <li>Monitoramento contínuo da infraestrutura.</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 8. RETENÇÃO -->
+    <div class="policy-section" id="retencao">
+      <h2>8. Retenção e exclusão</h2>
+      <p>Seus dados pessoais são mantidos apenas pelo tempo necessário para cumprir as finalidades descritas nesta política ou conforme exigido por lei.</p>
+      <ul>
+        <li><strong>Dados de assinatura</strong> — mantidos enquanto sua assinatura estiver ativa. Após o cancelamento, seus dados são excluídos em até 30 dias, salvo obrigação legal de retenção.</li>
+        <li><strong>Mensagens de contato</strong> — mantidas por até 12 meses após o atendimento.</li>
+        <li><strong>Dados de navegação</strong> — mantidos por até 6 meses para fins de segurança.</li>
+      </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 9. DIREITOS -->
+    <div class="policy-section" id="direitos">
+      <h2>9. Seus direitos</h2>
+      <p>Nos termos da LGPD, você tem o direito de, a qualquer momento:</p>
+      <ul>
+        <li><strong>Confirmar</strong> a existência de tratamento dos seus dados pessoais.</li>
+        <li><strong>Acessar</strong> os dados pessoais que mantemos sobre você.</li>
+        <li><strong>Corrigir</strong> dados incompletos, inexatos ou desatualizados.</li>
+        <li><strong>Solicitar a anonimização, bloqueio ou eliminação</strong> de dados desnecessários ou tratados em desconformidade.</li>
+        <li><strong>Solicitar a portabilidade</strong> dos seus dados a outro fornecedor de serviço.</li>
+        <li><strong>Revogar o consentimento</strong> a qualquer momento, sem prejuízo da licitude do tratamento já realizado.</li>
+        <li><strong>Opor-se</strong> ao tratamento realizado com base em legítimo interesse, caso discorde.</li>
+      </ul>
+      <p>Para exercer seus direitos, entre em contato conosco através do e-mail <a href="mailto:privacidade@cartabrasil.com.br">privacidade@cartabrasil.com.br</a> ou pelo nosso <a href="contato.html">formulário de contato</a>.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 10. MENORES -->
+    <div class="policy-section" id="menores">
+      <h2>10. Menores de idade</h2>
+      <p>Nossos serviços não são direcionados a menores de 18 anos. Não coletamos intencionalmente dados pessoais de crianças ou adolescentes. Caso identifiquemos que dados foram fornecidos por menor de idade sem o consentimento dos responsáveis legais, procederemos à exclusão imediata.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 11. ALTERAÇÕES -->
+    <div class="policy-section" id="alteracoes">
+      <h2>11. Alterações nesta política</h2>
+      <p>Podemos atualizar esta Política de Privacidade periodicamente para refletir mudanças em nossas práticas ou na legislação aplicável. Sempre que houver alterações relevantes, notificaremos você por e-mail ou através de aviso destacado na plataforma. A data da última atualização será sempre indicada no topo desta página.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 12. CONTATO -->
+    <div class="policy-section" id="contato">
+      <h2>12. Contato e encarregado de dados</h2>
+      <p>Para dúvidas, solicitações ou reclamações relacionadas ao tratamento dos seus dados pessoais, entre em contato com nosso Encarregado de Proteção de Dados (DPO):</p>
+      <ul>
+        <li><strong>E-mail:</strong> <a href="mailto:privacidade@cartabrasil.com.br">privacidade@cartabrasil.com.br</a></li>
+        <li><strong>Formulário:</strong> <a href="contato.html">Página de contato</a></li>
+      </ul>
+      <p>Responderemos sua solicitação em até 15 (quinze) dias úteis, conforme previsto pela LGPD.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 13. FORO -->
+    <div class="policy-section" id="foro">
+      <h2>13. Foro competente</h2>
+      <p>Fica eleito o foro da Comarca de São Paulo, Estado de São Paulo, para dirimir quaisquer questões decorrentes desta Política de Privacidade, com renúncia expressa a qualquer outro, por mais privilegiado que seja.</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="footer-logo" href="portal.html">Carta Brasil</a>
+        <p>Notícias verificadas direto no seu e-mail. Curadoria editorial com fontes primárias da Agência Brasil.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Editorias</h4>
+        <a href="portal.html">Política</a>
+        <a href="portal.html">Economia</a>
+        <a href="portal.html">Mundo</a>
+        <a href="portal.html">Tecnologia</a>
+      </div>
+      <div class="footer-col">
+        <h4>Brasil</h4>
+        <a href="portal.html">Direitos Humanos</a>
+        <a href="portal.html">Educação</a>
+        <a href="portal.html">Esportes</a>
+        <a href="portal.html">Justiça</a>
+        <a href="portal.html">Saúde</a>
+        <a href="portal.html">Geral</a>
+      </div>
+      <div class="footer-col">
+        <h4>Institucional</h4>
+        <a href="index.html">Assinar</a>
+        <a href="#">Sobre</a>
+        <a href="contato.html">Contato</a>
+        <a href="privacidade.html">Privacidade</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Carta Brasil. Todos os direitos reservados.</p>
+      <p>Fonte editorial: <a href="https://agenciabrasil.ebc.com.br" target="_blank" rel="noopener">Agência Brasil (EBC)</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
