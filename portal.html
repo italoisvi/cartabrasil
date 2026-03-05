@@ -387,6 +387,8 @@
       font-size: 0.65rem;
       color: var(--ink-muted);
       white-space: nowrap;
+      display: block;
+      text-align: right;
     }
 
     /* ── HERO (FT-style 3-column) ─────────────────────────── */
@@ -455,9 +457,10 @@
     }
 
     .sidebar-item {
-      padding-bottom: 1rem;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid var(--rule);
+      display: block;
+      padding-bottom: 1.75rem;
+      margin-bottom: 1.75rem;
+      border-bottom: 2px solid var(--rule);
       transition: opacity 0.15s;
     }
 
@@ -634,7 +637,7 @@
       font-weight: 300;
     }
 
-    .cat-card-meta { margin-bottom: 0.35rem; }
+    .cat-card-meta { margin-bottom: 0.35rem; text-align: right; }
 
     /* ── PLACEHOLDER IMG ───────────────────────────────────── */
     .img-placeholder {
@@ -698,6 +701,7 @@
       color: rgba(255,255,255,0.6);
       font-size: 0.78rem;
       padding: 0.25rem 0;
+      text-decoration: none;
       transition: color 0.15s;
     }
 
@@ -939,14 +943,20 @@
     function formatTime(dateStr) {
       const dt = new Date(dateStr);
       const now = new Date();
-      const isToday = dt.toDateString() === now.toDateString();
-      const h = dt.getHours().toString().padStart(2, '0');
-      const m = dt.getMinutes().toString().padStart(2, '0');
-      const time = h + 'h' + m;
-      if (isToday) return time;
+      const diffMs = now - dt;
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffH = Math.floor(diffMs / 3600000);
+      const diffD = Math.floor(diffMs / 86400000);
+
+      if (diffMin < 1) return 'Agora';
+      if (diffMin < 60) return 'Há ' + diffMin + ' min';
+      if (diffH < 24) return 'Há ' + diffH + (diffH === 1 ? ' hora' : ' horas');
+      if (diffD === 1) return 'Há 1 dia';
+      if (diffD < 7) return 'Há ' + diffD + ' dias';
+
       const day = dt.getDate();
       const month = dt.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
-      return day + ' ' + month + ' · ' + time;
+      return day + ' ' + month;
     }
 
     function imgTag(url, cls) {
@@ -1136,6 +1146,7 @@
       // Left column: category + headline + description
       html += '<div class="hero-main">' +
         '<span class="cat cat-' + hero.category + '">' + (categoryLabels[hero.category] || hero.category) + '</span>' +
+        '<span class="time">' + formatTime(hero.published_at) + '</span>' +
         '<h1 class="hero-title"><a href="' + link(hero.id) + '">' + hero.title + '</a></h1>' +
         (hero.description ? '<p class="hero-desc">' + hero.description + '</p>' : '') +
       '</div>';
@@ -1144,6 +1155,7 @@
       if (mediaArticle) {
         html += '<div class="hero-media"><a href="' + link(mediaArticle.id) + '">' +
           imgTag(mediaArticle.image_url, 'hero-img') +
+          '<span class="time">' + formatTime(mediaArticle.published_at) + '</span>' +
           '<div class="hero-media-caption">' +
             '<span class="cat cat-' + mediaArticle.category + '">' + (categoryLabels[mediaArticle.category] || mediaArticle.category) + '</span>' +
             '<p class="hero-media-title">' + mediaArticle.title + '</p>' +
@@ -1157,6 +1169,7 @@
         sidebarArticles.forEach(a => {
           html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
             (a.image_url ? '<img class="sidebar-img" src="' + a.image_url + '" alt="" loading="lazy" />' : '') +
+            '<span class="time">' + formatTime(a.published_at) + '</span>' +
             '<p class="sidebar-title">' + a.title + '</p>' +
           '</a>';
         });
@@ -1184,6 +1197,7 @@
         if (featuredArticle) {
           html += '<div class="featured-center"><a href="' + link(featuredArticle.id) + '">' +
             imgTag(featuredArticle.image_url, 'featured-img') +
+            '<span class="time">' + formatTime(featuredArticle.published_at) + '</span>' +
             '<span class="cat cat-' + featuredArticle.category + '">' + (categoryLabels[featuredArticle.category] || featuredArticle.category) + '</span>' +
             '<p class="featured-title">' + featuredArticle.title + '</p>' +
             (featuredArticle.description ? '<p class="featured-desc">' + truncate(featuredArticle.description, 150) + '</p>' : '') +
@@ -1195,8 +1209,8 @@
           html += '<div class="sidebar-extra">';
           sidebarExtra.forEach(a => {
             html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
-              '<p class="sidebar-title">' + a.title + '</p>' +
               '<span class="time">' + formatTime(a.published_at) + '</span>' +
+              '<p class="sidebar-title">' + a.title + '</p>' +
             '</a>';
           });
           html += '</div>';
