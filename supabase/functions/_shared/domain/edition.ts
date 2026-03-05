@@ -52,8 +52,8 @@ export function buildSubject(
     case "realtime":
       return items[0].title;
     case "daily":
-      return "Carta de Notícia — Resumo do dia";
+      return "Carta Brasil — Resumo do dia";
     case "weekly":
-      return "Carta de Notícia — Resumo da semana";
+      return "Carta Brasil — Resumo da semana";
   }
 }

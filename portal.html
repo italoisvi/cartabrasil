@@ -24,6 +24,9 @@
     html { font-size: 16px; scroll-behavior: smooth; }
 
     body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       background: var(--bg);
       color: var(--ink);
       font-family: 'DM Sans', sans-serif;
@@ -71,7 +74,6 @@
       white-space: nowrap;
     }
 
-    .logo span { color: var(--accent); margin-left: -0.15em; }
 
     .icon-btn {
       background: none;
@@ -218,6 +220,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
     /* ── STICKY BAR (appears on scroll) ───────────────────── */
@@ -265,7 +268,6 @@
     .nav-links {
       display: flex;
       gap: 0;
-      flex: 1;
       justify-content: center;
     }
 
@@ -275,7 +277,8 @@
       text-transform: uppercase;
       color: var(--ink-muted);
       white-space: nowrap;
-      margin-left: auto;
+      position: absolute;
+      right: 2rem;
     }
 
     .nav-link {
@@ -296,11 +299,67 @@
       border-bottom-color: var(--accent);
     }
 
+    /* ── DROPDOWN (Brasil) ─────────────────────────────────── */
+    .nav-dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      min-width: 180px;
+      z-index: 60;
+      padding: 0.4rem 0;
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+
+    .nav-dropdown-item {
+      display: block;
+      padding: 0.55rem 1.2rem;
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--ink-light);
+      white-space: nowrap;
+      transition: all 0.12s;
+      cursor: pointer;
+    }
+
+    .nav-dropdown-item:hover {
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .nav-dropdown-item.active {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* Sticky dropdown */
+    .sticky-nav .nav-dropdown-menu {
+      top: 100%;
+    }
+
+    .sticky-nav .nav-dropdown-item {
+      padding: 0.45rem 1rem;
+      font-size: 0.68rem;
+    }
+
     /* ── CONTAINER ─────────────────────────────────────────── */
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 1.5rem 2rem;
+      flex: 1;
     }
 
     /* ── CATEGORY LABELS ───────────────────────────────────── */
@@ -313,10 +372,16 @@
     }
 
     .cat-politica { color: #c0392b; }
-    .cat-mercados { color: #2c3e50; }
+    .cat-economia, .cat-mercados { color: #2c3e50; }
     .cat-internacional { color: #d4a017; }
     .cat-tecnologia { color: #2980b9; }
     .cat-geral { color: #7f8c8d; }
+    .cat-direitos-humanos { color: #8e44ad; }
+    .cat-educacao { color: #27ae60; }
+    .cat-esportes { color: #e67e22; }
+    .cat-justica { color: #2c3e50; }
+    .cat-saude { color: #16a085; }
+    .cat-analise { color: #c0392b; }
 
     .time {
       font-size: 0.65rem;
@@ -585,20 +650,81 @@
     }
 
     /* ── FOOTER ────────────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--rule);
-      padding: 1.5rem 2rem;
+    .site-footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .footer-top {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    .footer-brand .footer-logo {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+    }
+
+
+    .footer-brand p {
+      margin-top: 0.8rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 1rem;
+    }
+
+    .footer-col a {
+      display: block;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.78rem;
+      padding: 0.25rem 0;
+      transition: color 0.15s;
+    }
+
+    .footer-col a:hover { color: #fff; }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.2rem 2rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--paper);
     }
 
-    footer p {
-      font-size: 0.65rem;
-      color: var(--ink-muted);
+    .footer-bottom p {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.25);
       letter-spacing: 0.06em;
     }
+
+    .footer-bottom a {
+      color: rgba(255,255,255,0.35);
+      transition: color 0.15s;
+    }
+
+    .footer-bottom a:hover { color: rgba(255,255,255,0.7); }
 
     /* ── LOADING ───────────────────────────────────────────── */
     .loading {
@@ -633,7 +759,10 @@
       .cat-grid { grid-template-columns: 1fr 1fr; }
       .nav-bar { overflow-x: auto; }
       .nav-link { white-space: nowrap; padding: 0.7rem 1rem; }
+      .nav-dropdown-menu { left: 0; transform: none; }
       .logo { font-size: 1.6rem; }
+      .footer-top { grid-template-columns: 1fr 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
       .sticky-bar { padding: 0 1rem; }
       .sticky-nav { overflow-x: auto; }
       .sticky-nav .nav-link { white-space: nowrap; padding: 0.6rem 0.8rem; font-size: 0.68rem; }
@@ -645,7 +774,9 @@
       .cat-grid { grid-template-columns: 1fr; }
       .hero-title { font-size: 1.4rem; }
       .nav-date { display: none; }
-      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      .footer-brand { grid-column: 1 / -1; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
       .sticky-right .btn-subscribe { display: none; }
       .search-overlay { padding-top: 20px; }
       .search-box { margin: 0 0.5rem; }
@@ -669,7 +800,7 @@
       </button>
     </div>
     <div class="header-center">
-      <a class="logo" href="portal.html">Carta Brasil<span>.</span></a>
+      <a class="logo" href="portal.html">Carta Brasil</a>
     </div>
     <div class="header-right">
       <a class="btn-subscribe" href="index.html">Assinar</a>
@@ -694,11 +825,22 @@
   <nav class="nav-bar">
     <div class="nav-links">
       <a class="nav-link active" data-section="home">Home</a>
+      <div class="nav-dropdown">
+        <a class="nav-link" data-section="brasil">Brasil</a>
+        <div class="nav-dropdown-menu">
+          <a class="nav-dropdown-item" data-section="direitos-humanos">Direitos Humanos</a>
+          <a class="nav-dropdown-item" data-section="educacao">Educação</a>
+          <a class="nav-dropdown-item" data-section="esportes">Esportes</a>
+          <a class="nav-dropdown-item" data-section="geral">Geral</a>
+          <a class="nav-dropdown-item" data-section="justica">Justiça</a>
+          <a class="nav-dropdown-item" data-section="saude">Saúde</a>
+        </div>
+      </div>
+      <a class="nav-link" data-section="internacional">Mundo</a>
+      <a class="nav-link" data-section="economia">Economia</a>
       <a class="nav-link" data-section="politica">Política</a>
-      <a class="nav-link" data-section="internacional">Internacional</a>
-      <a class="nav-link" data-section="mercados">Mercados</a>
       <a class="nav-link" data-section="tecnologia">Tecnologia</a>
-      <a class="nav-link" data-section="geral">Geral</a>
+      <a class="nav-link" data-section="analise">Análise</a>
     </div>
     <span class="nav-date" id="dateline"></span>
   </nav>
@@ -729,9 +871,41 @@
   </div>
 
   <!-- FOOTER -->
-  <footer>
-    <p>&copy; 2026 Carta Brasil &middot; Todos os direitos reservados</p>
-    <p>Privacidade &middot; Descadastrar</p>
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="footer-logo" href="portal.html">Carta Brasil</a>
+        <p>Notícias verificadas direto no seu e-mail. Curadoria editorial com fontes primárias da Agência Brasil.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Editorias</h4>
+        <a href="portal.html" onclick="setActiveSection('politica')">Política</a>
+        <a href="portal.html" onclick="setActiveSection('economia')">Economia</a>
+        <a href="portal.html" onclick="setActiveSection('internacional')">Mundo</a>
+        <a href="portal.html" onclick="setActiveSection('tecnologia')">Tecnologia</a>
+      </div>
+      <div class="footer-col">
+        <h4>Brasil</h4>
+        <a href="portal.html" onclick="setActiveSection('direitos-humanos')">Direitos Humanos</a>
+        <a href="portal.html" onclick="setActiveSection('educacao')">Educação</a>
+        <a href="portal.html" onclick="setActiveSection('esportes')">Esportes</a>
+        <a href="portal.html" onclick="setActiveSection('justica')">Justiça</a>
+        <a href="portal.html" onclick="setActiveSection('saude')">Saúde</a>
+        <a href="portal.html" onclick="setActiveSection('geral')">Geral</a>
+      </div>
+      <div class="footer-col">
+        <h4>Institucional</h4>
+        <a href="index.html">Assinar</a>
+        <a href="preferencias.html">Preferências</a>
+        <a href="#">Sobre</a>
+        <a href="#">Contato</a>
+        <a href="#">Privacidade</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Carta Brasil. Todos os direitos reservados.</p>
+      <p>Fonte editorial: <a href="https://agenciabrasil.ebc.com.br" target="_blank" rel="noopener">Agência Brasil (EBC)</a></p>
+    </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -742,11 +916,21 @@
 
     const categoryLabels = {
       politica: 'Política',
-      mercados: 'Mercados',
-      internacional: 'Internacional',
+      economia: 'Economia',
+      mercados: 'Economia',
+      internacional: 'Mundo',
       tecnologia: 'Tecnologia',
-      geral: 'Geral'
+      geral: 'Geral',
+      'direitos-humanos': 'Direitos Humanos',
+      educacao: 'Educação',
+      esportes: 'Esportes',
+      justica: 'Justiça',
+      saude: 'Saúde',
+      analise: 'Análise'
     };
+
+    // Categorias que pertencem ao grupo "Brasil"
+    const brasilCategories = ['direitos-humanos', 'educacao', 'esportes', 'geral', 'justica', 'saude'];
 
     let allArticles = [];
     let currentSection = 'home';
@@ -798,10 +982,9 @@
     const stickyNav = document.getElementById('stickyNav');
     const navBar = document.querySelector('.nav-bar');
 
-    // Clone nav links into sticky bar
-    document.querySelectorAll('.nav-bar .nav-link').forEach(link => {
-      const clone = link.cloneNode(true);
-      clone.classList.add('sticky-link');
+    // Clone nav structure into sticky bar
+    document.querySelectorAll('.nav-bar .nav-links > *').forEach(el => {
+      const clone = el.cloneNode(true);
       stickyNav.appendChild(clone);
     });
 
@@ -809,13 +992,25 @@
 
     function setActiveSection(section) {
       currentSection = section;
+      // Highlight main nav links
       document.querySelectorAll('.nav-link').forEach(b => {
+        const isBrasilSub = brasilCategories.includes(section);
+        const match = b.dataset.section === section || (b.dataset.section === 'brasil' && isBrasilSub);
+        b.classList.toggle('active', match);
+      });
+      // Highlight dropdown items
+      document.querySelectorAll('.nav-dropdown-item').forEach(b => {
         b.classList.toggle('active', b.dataset.section === section);
       });
       render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     document.querySelectorAll('.nav-link').forEach(btn => {
+      btn.addEventListener('click', () => setActiveSection(btn.dataset.section));
+    });
+
+    document.querySelectorAll('.nav-dropdown-item').forEach(btn => {
       btn.addEventListener('click', () => setActiveSection(btn.dataset.section));
     });
 
@@ -1012,7 +1207,7 @@
       }
 
       // ── Category sections ──
-      var catOrder = ['politica', 'mercados', 'internacional', 'tecnologia', 'geral'];
+      var catOrder = ['politica', 'economia', 'internacional', 'tecnologia', 'geral', 'direitos-humanos', 'educacao', 'esportes', 'justica', 'saude'];
       catOrder.forEach(function(catKey) {
         if (byCategory[catKey] && byCategory[catKey].length > 0) {
           var label = categoryLabels[catKey] || catKey;
@@ -1037,7 +1232,11 @@
     function render() {
       const container = document.getElementById('content');
       let filtered = allArticles;
-      if (currentSection !== 'home') {
+      if (currentSection === 'brasil') {
+        filtered = allArticles.filter(a => brasilCategories.includes(a.category));
+      } else if (currentSection === 'economia') {
+        filtered = allArticles.filter(a => a.category === 'mercados' || a.category === 'economia');
+      } else if (currentSection !== 'home') {
         filtered = allArticles.filter(a => a.category === currentSection);
       }
       container.innerHTML = renderPage(filtered);

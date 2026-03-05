@@ -24,6 +24,9 @@
     html { font-size: 16px; scroll-behavior: smooth; }
 
     body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       background: var(--bg);
       color: var(--ink);
       font-family: 'DM Sans', sans-serif;
@@ -64,10 +67,6 @@
       
     }
 
-    .logo span {
-      color: var(--accent);
-      margin-left: -0.4em;
-    }
 
     .header-meta {
       font-size: 0.7rem;
@@ -468,20 +467,26 @@
     }
 
     /* ── FOOTER ──────────────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--rule);
+    .site-footer-minimal {
+      background: #0a0a0a;
       padding: 1.5rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--paper);
     }
 
-    footer p {
-      font-size: 0.65rem;
-      color: var(--ink-muted);
+    .site-footer-minimal p {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.25);
       letter-spacing: 0.06em;
     }
+
+    .site-footer-minimal a {
+      color: rgba(255,255,255,0.35);
+      transition: color 0.15s;
+    }
+
+    .site-footer-minimal a:hover { color: rgba(255,255,255,0.7); }
 
     /* ── ANIMATION ───────────────────────────────────────────── */
     @keyframes fadeUp {
@@ -508,7 +513,7 @@
 
       .stat { margin: 0 1rem; }
 
-      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .site-footer-minimal { flex-direction: column; gap: 0.5rem; text-align: center; }
 
       .news-item { grid-template-columns: 1fr; }
     }
@@ -518,7 +523,7 @@
 
   <!-- HEADER -->
   <header>
-    <a class="logo" href="#">Carta Brasil<span>.</span></a>
+    <a class="logo" href="portal.html">Carta Brasil</a>
     <p class="header-meta">Carta Brasil · Breaking news</p>
   </header>
 
@@ -577,7 +582,7 @@
 
       <div class="news-item">
         <div>
-          <span class="news-category">Mercados</span>
+          <span class="news-category">Economia</span>
           <p class="news-headline">Banco Central eleva taxa básica de juros em 0,5 ponto percentual</p>
         </div>
         <span class="news-time">11h08</span>
@@ -585,7 +590,7 @@
 
       <div class="news-item">
         <div>
-          <span class="news-category">Internacional</span>
+          <span class="news-category">Mundo</span>
           <p class="news-headline">Negociações de cessar-fogo entram em colapso após ataque ao corredor humanitário</p>
         </div>
         <span class="news-time">09h47</span>
@@ -665,9 +670,9 @@
   </div>
 
   <!-- FOOTER -->
-  <footer>
-    <p>© 2026 Carta Brasil · Todos os direitos reservados</p>
-    <p>Privacidade · Descadastrar</p>
+  <footer class="site-footer-minimal">
+    <p>&copy; 2026 Carta Brasil. Todos os direitos reservados.</p>
+    <p><a href="#">Privacidade</a> &middot; <a href="portal.html">Portal</a> &middot; <a href="https://agenciabrasil.ebc.com.br" target="_blank" rel="noopener">Agência Brasil (EBC)</a></p>
   </footer>
 
   <script>

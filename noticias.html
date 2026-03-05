@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notícias — Carta de Notícia</title>
+  <title>Notícias — Carta Brasil</title>
   <link rel="icon" type="image/png" href="assets/images/cart.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +24,9 @@
     html { font-size: 16px; scroll-behavior: smooth; }
 
     body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       background: var(--bg);
       color: var(--ink);
       font-family: 'DM Sans', sans-serif;
@@ -63,7 +66,6 @@
       object-fit: contain;
     }
 
-    .logo span { color: var(--accent); margin-left: -0.4em; }
 
     .header-meta {
       font-size: 0.7rem;
@@ -89,6 +91,7 @@
       max-width: 720px;
       margin: 0 auto;
       padding: 2.5rem 2rem 4rem;
+      flex: 1;
     }
 
     .page-title {
@@ -167,10 +170,16 @@
     }
 
     .cat-politica { color: #c0392b; }
-    .cat-mercados { color: #2c3e50; }
+    .cat-economia, .cat-mercados { color: #2c3e50; }
     .cat-internacional { color: #d4a017; }
     .cat-tecnologia { color: #2980b9; }
     .cat-geral { color: #7f8c8d; }
+    .cat-direitos-humanos { color: #8e44ad; }
+    .cat-educacao { color: #27ae60; }
+    .cat-esportes { color: #e67e22; }
+    .cat-justica { color: #2c3e50; }
+    .cat-saude { color: #16a085; }
+    .cat-analise { color: #c0392b; }
 
     .news-time {
       font-size: 0.65rem;
@@ -234,25 +243,87 @@
     }
 
     /* ── FOOTER ────────────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--rule);
-      padding: 1.5rem 2rem;
+    .site-footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .footer-top {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    .footer-brand .footer-logo {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+    }
+
+
+    .footer-brand p {
+      margin-top: 0.8rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 1rem;
+    }
+
+    .footer-col a {
+      display: block;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.78rem;
+      padding: 0.25rem 0;
+      transition: color 0.15s;
+    }
+
+    .footer-col a:hover { color: #fff; }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.2rem 2rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--paper);
     }
 
-    footer p {
-      font-size: 0.65rem;
-      color: var(--ink-muted);
+    .footer-bottom p {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.25);
       letter-spacing: 0.06em;
     }
+
+    .footer-bottom a {
+      color: rgba(255,255,255,0.35);
+      transition: color 0.15s;
+    }
+
+    .footer-bottom a:hover { color: rgba(255,255,255,0.7); }
 
     /* ── RESPONSIVE ────────────────────────────────────────── */
     @media (max-width: 600px) {
       header { flex-direction: column; gap: 0.4rem; text-align: center; }
-      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .footer-top { grid-template-columns: 1fr; gap: 1.5rem; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
       .news-item-header { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
     }
   </style>
@@ -261,8 +332,8 @@
 
   <!-- HEADER -->
   <header>
-    <a class="logo" href="index.html">Carta de Notícia<span>.</span></a>
-    <p class="header-meta">Carta de Notícia · Breaking news</p>
+    <a class="logo" href="index.html">Carta Brasil</a>
+    <p class="header-meta">Carta Brasil · Breaking news</p>
   </header>
 
   <!-- DATELINE -->
@@ -276,8 +347,8 @@
     <div class="filters">
       <button class="filter-chip active" data-cat="todas">Todas</button>
       <button class="filter-chip" data-cat="politica">Política</button>
-      <button class="filter-chip" data-cat="mercados">Mercados</button>
-      <button class="filter-chip" data-cat="internacional">Internacional</button>
+      <button class="filter-chip" data-cat="mercados">Economia</button>
+      <button class="filter-chip" data-cat="internacional">Mundo</button>
       <button class="filter-chip" data-cat="tecnologia">Tecnologia</button>
       <button class="filter-chip" data-cat="geral">Geral</button>
     </div>
@@ -292,9 +363,41 @@
   </div>
 
   <!-- FOOTER -->
-  <footer>
-    <p>&copy; 2026 Carta de Notícia &middot; Todos os direitos reservados</p>
-    <p>Privacidade &middot; Descadastrar</p>
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="footer-logo" href="portal.html">Carta Brasil</a>
+        <p>Notícias verificadas direto no seu e-mail. Curadoria editorial com fontes primárias da Agência Brasil.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Editorias</h4>
+        <a href="portal.html">Política</a>
+        <a href="portal.html">Economia</a>
+        <a href="portal.html">Mundo</a>
+        <a href="portal.html">Tecnologia</a>
+      </div>
+      <div class="footer-col">
+        <h4>Brasil</h4>
+        <a href="portal.html">Direitos Humanos</a>
+        <a href="portal.html">Educação</a>
+        <a href="portal.html">Esportes</a>
+        <a href="portal.html">Justiça</a>
+        <a href="portal.html">Saúde</a>
+        <a href="portal.html">Geral</a>
+      </div>
+      <div class="footer-col">
+        <h4>Institucional</h4>
+        <a href="index.html">Assinar</a>
+        <a href="preferencias.html">Preferências</a>
+        <a href="#">Sobre</a>
+        <a href="#">Contato</a>
+        <a href="#">Privacidade</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Carta Brasil. Todos os direitos reservados.</p>
+      <p>Fonte editorial: <a href="https://agenciabrasil.ebc.com.br" target="_blank" rel="noopener">Agência Brasil (EBC)</a></p>
+    </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -305,10 +408,17 @@
 
     const categoryLabels = {
       politica: 'Política',
-      mercados: 'Mercados',
-      internacional: 'Internacional',
+      economia: 'Economia',
+      mercados: 'Economia',
+      internacional: 'Mundo',
       tecnologia: 'Tecnologia',
-      geral: 'Geral'
+      geral: 'Geral',
+      'direitos-humanos': 'Direitos Humanos',
+      educacao: 'Educação',
+      esportes: 'Esportes',
+      justica: 'Justiça',
+      saude: 'Saúde',
+      analise: 'Análise'
     };
 
     const PAGE_SIZE = 20;

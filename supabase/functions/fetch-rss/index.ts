@@ -13,6 +13,11 @@ const FEEDS: Record<string, Category> = {
   "http://agenciabrasil.ebc.com.br/rss/economia/feed.xml": "mercados",
   "http://agenciabrasil.ebc.com.br/rss/internacional/feed.xml": "internacional",
   "http://agenciabrasil.ebc.com.br/rss/geral/feed.xml": "geral",
+  "http://agenciabrasil.ebc.com.br/rss/direitos-humanos/feed.xml": "direitos-humanos",
+  "http://agenciabrasil.ebc.com.br/rss/educacao/feed.xml": "educacao",
+  "http://agenciabrasil.ebc.com.br/rss/esportes/feed.xml": "esportes",
+  "http://agenciabrasil.ebc.com.br/rss/justica/feed.xml": "justica",
+  "http://agenciabrasil.ebc.com.br/rss/saude/feed.xml": "saude",
 };
 
 Deno.serve(async (req) => {

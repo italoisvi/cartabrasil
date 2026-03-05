@@ -6,17 +6,31 @@ import type { NewsItem } from "../domain/ports.ts";
 const categoryColors: Record<string, string> = {
   politica: "#c0392b",
   mercados: "#2c3e50",
+  economia: "#2c3e50",
   internacional: "#d4a017",
   tecnologia: "#2980b9",
   geral: "#7f8c8d",
+  "direitos-humanos": "#8e44ad",
+  educacao: "#27ae60",
+  esportes: "#e67e22",
+  justica: "#2c3e50",
+  saude: "#16a085",
+  analise: "#c0392b",
 };
 
 const categoryLabels: Record<string, string> = {
   politica: "POLÍTICA",
-  mercados: "MERCADOS",
-  internacional: "INTERNACIONAL",
+  mercados: "ECONOMIA",
+  economia: "ECONOMIA",
+  internacional: "MUNDO",
   tecnologia: "TECNOLOGIA",
   geral: "GERAL",
+  "direitos-humanos": "DIREITOS HUMANOS",
+  educacao: "EDUCAÇÃO",
+  esportes: "ESPORTES",
+  justica: "JUSTIÇA",
+  saude: "SAÚDE",
+  analise: "ANÁLISE",
 };
 
 export function buildNewsletterHtml(
@@ -70,7 +84,7 @@ export function buildNewsletterHtml(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Carta de Notícia</title>
+  <title>Carta Brasil</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #fafaf8; -webkit-font-smoothing: antialiased;">
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #fafaf8;">
@@ -82,7 +96,7 @@ export function buildNewsletterHtml(
               <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
                   <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #111111; letter-spacing: 0.03em;">
-                    Carta de Notícia<span style="color: #c0392b; margin-left: -3px;">.</span>
+                    Carta Brasil
                   </td>
                   <td align="right" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #999999; letter-spacing: 0.1em; text-transform: uppercase;">
                     Breaking news
@@ -126,7 +140,7 @@ export function buildNewsletterHtml(
           <tr>
             <td style="padding: 20px 32px; border-top: 1px solid #e0e0e0; text-align: center;">
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #999999; margin: 0 0 6px;">
-                &copy; 2026 Carta de Notícia &middot; Todos os direitos reservados
+                &copy; 2026 Carta Brasil &middot; Todos os direitos reservados
               </p>
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; margin: 0;">
                 <a href="${unsubscribeUrl}" style="color: #999999; text-decoration: underline;">Alterar preferências</a>

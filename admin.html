@@ -59,7 +59,6 @@
       white-space: nowrap;
     }
 
-    .logo span { color: var(--accent); margin-left: -0.4em; }
 
     .header-meta {
       font-size: 0.7rem;
@@ -334,10 +333,16 @@
     }
 
     .cat-politica { color: #c0392b; }
-    .cat-mercados { color: #2c3e50; }
+    .cat-economia, .cat-mercados { color: #2c3e50; }
     .cat-internacional { color: #d4a017; }
     .cat-tecnologia { color: #2980b9; }
     .cat-geral { color: #7f8c8d; }
+    .cat-direitos-humanos { color: #8e44ad; }
+    .cat-educacao { color: #27ae60; }
+    .cat-esportes { color: #e67e22; }
+    .cat-justica { color: #2c3e50; }
+    .cat-saude { color: #16a085; }
+    .cat-analise { color: #c0392b; }
 
     .empty-state {
       text-align: center;
@@ -888,7 +893,7 @@
 <body>
 
   <header>
-    <a class="logo" href="index.html">Carta Brasil<span>.</span></a>
+    <a class="logo" href="index.html">Carta Brasil</a>
     <div class="header-actions" id="headerActions" style="display:none;">
       <span class="header-meta">Painel editorial</span>
       <span class="header-user" id="headerUser"></span>
@@ -927,10 +932,16 @@
         <select id="dashCategory" onchange="loadArticles()">
           <option value="">Todas categorias</option>
           <option value="politica">Política</option>
-          <option value="mercados">Mercados</option>
-          <option value="internacional">Internacional</option>
+          <option value="mercados">Economia</option>
+          <option value="internacional">Mundo</option>
           <option value="tecnologia">Tecnologia</option>
           <option value="geral">Geral</option>
+          <option value="direitos-humanos">Direitos Humanos</option>
+          <option value="educacao">Educação</option>
+          <option value="esportes">Esportes</option>
+          <option value="justica">Justiça</option>
+          <option value="saude">Saúde</option>
+          <option value="analise">Análise</option>
         </select>
       </div>
       <div id="articleList"></div>
@@ -964,10 +975,16 @@
           <label class="form-label">Categoria</label>
           <select class="form-select" id="edCategory">
             <option value="politica">Política</option>
-            <option value="mercados">Mercados</option>
-            <option value="internacional">Internacional</option>
+            <option value="mercados">Economia</option>
+            <option value="internacional">Mundo</option>
             <option value="tecnologia">Tecnologia</option>
             <option value="geral">Geral</option>
+            <option value="direitos-humanos">Direitos Humanos</option>
+            <option value="educacao">Educação</option>
+            <option value="esportes">Esportes</option>
+            <option value="justica">Justiça</option>
+            <option value="saude">Saúde</option>
+            <option value="analise">Análise</option>
           </select>
         </div>
 
@@ -1048,8 +1065,10 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const categoryLabels = {
-      politica: 'Política', mercados: 'Mercados',
-      internacional: 'Internacional', tecnologia: 'Tecnologia', geral: 'Geral'
+      politica: 'Política', mercados: 'Economia', economia: 'Economia',
+      internacional: 'Mundo', tecnologia: 'Tecnologia', geral: 'Geral',
+      'direitos-humanos': 'Direitos Humanos', educacao: 'Educação',
+      esportes: 'Esportes', justica: 'Justiça', saude: 'Saúde', analise: 'Análise'
     };
 
     let currentFilter = 'all';

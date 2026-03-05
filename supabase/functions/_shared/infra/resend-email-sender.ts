@@ -14,7 +14,7 @@ export class ResendEmailSender implements EmailSender {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Carta de Notícia <onboarding@resend.dev>",
+        from: "Carta Brasil <onboarding@resend.dev>",
         to: [to],
         subject,
         html,

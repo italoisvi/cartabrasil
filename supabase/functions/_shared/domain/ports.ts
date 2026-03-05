@@ -6,7 +6,14 @@ export type Category =
   | "mercados"
   | "internacional"
   | "tecnologia"
-  | "geral";
+  | "geral"
+  | "direitos-humanos"
+  | "educacao"
+  | "esportes"
+  | "justica"
+  | "saude"
+  | "economia"
+  | "analise";
 
 export type Frequency = "realtime" | "daily" | "weekly";
 
