@@ -900,6 +900,7 @@
       <div class="footer-col">
         <h4>Institucional</h4>
         <a href="index.html">Assinar</a>
+        <a href="acervo.html">Acervo</a>
         <a href="#">Sobre</a>
         <a href="contato.html">Contato</a>
         <a href="privacidade.html">Privacidade</a>
@@ -999,7 +1000,7 @@
 
     // ── NAV (handle clicks on both nav-bar and sticky-bar) ──
 
-    function setActiveSection(section) {
+    async function setActiveSection(section) {
       currentSection = section;
       // Highlight main nav links
       document.querySelectorAll('.nav-link').forEach(b => {
@@ -1011,7 +1012,7 @@
       document.querySelectorAll('.nav-dropdown-item').forEach(b => {
         b.classList.toggle('active', b.dataset.section === section);
       });
-      render();
+      await render();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1242,8 +1243,27 @@
       return html;
     }
 
-    function render() {
+    async function render() {
       const container = document.getElementById('content');
+
+      // Análise busca direto do banco (sem depender do limit da home)
+      if (currentSection === 'analise') {
+        const { data: analiseArticles, error } = await sb
+          .from('articles')
+          .select('id, title, description, category, image_url, published_at')
+          .eq('status', 'published')
+          .eq('category', 'analise')
+          .order('published_at', { ascending: false })
+          .limit(50);
+
+        if (error || !analiseArticles || analiseArticles.length === 0) {
+          container.innerHTML = '<div class="loading">Nenhuma notícia de análise disponível.</div>';
+          return;
+        }
+        container.innerHTML = renderPage(analiseArticles);
+        return;
+      }
+
       let filtered = allArticles;
       if (currentSection === 'brasil') {
         filtered = allArticles.filter(a => brasilCategories.includes(a.category));
