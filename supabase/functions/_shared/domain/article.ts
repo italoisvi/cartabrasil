@@ -68,6 +68,12 @@ function removeJunk(html: string): string {
     "",
   );
 
+  // Placeholders de lazy-loading da EBC (loading_v2.gif)
+  clean = clean.replace(
+    /<img[^>]*src="[^"]*loading_v2\.gif"[^>]*\/?>/gi,
+    "",
+  );
+
   // Promoção WhatsApp — parágrafo inteiro ou link
   clean = clean.replace(
     /<p[^>]*>[\s\S]*?Siga o canal da Ag[eê]ncia Brasil no WhatsApp[\s\S]*?<\/p>/gi,

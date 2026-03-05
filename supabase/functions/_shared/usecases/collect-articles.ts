@@ -46,7 +46,8 @@ export class CollectArticlesUseCase {
         imageUrl = await this.imageStorage.upload(item.imageUrl, articleId);
       }
 
-      const body = normalizeBody(item.description);
+      let body = normalizeBody(item.description);
+      body = await this.imageStorage.uploadBodyImages(body, articleId);
       const description = extractDescription(item.description, body);
 
       try {

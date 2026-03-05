@@ -73,6 +73,7 @@ export interface RSSFetcher {
 
 export interface ImageStorage {
   upload(imageUrl: string, articleId: string): Promise<string | null>;
+  uploadBodyImages(bodyHtml: string, articleId: string): Promise<string>;
 }
 
 export interface EmailSender {
