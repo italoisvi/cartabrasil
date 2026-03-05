@@ -289,7 +289,11 @@
     }
 
     .article-body figure img {
+      display: block;
+      width: 92%;
+      max-width: 100%;
       margin: 0 auto;
+      border-radius: 6px;
     }
 
     .article-body figure figcaption {
@@ -331,7 +335,7 @@
       gap: 1rem;
       max-width: 720px;
       margin: 0 auto;
-      padding: 0 2rem 3rem;
+      padding: 2rem 2rem 3rem;
     }
 
     .article-end::before,
@@ -502,10 +506,117 @@
     .related-link.no-link { color: var(--ink-light); cursor: default; }
     .related-link.no-link:hover { color: var(--ink-light); }
 
+    /* ── Mais Notícias ────────────────────────── */
+
+    .more-news {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+    }
+
+    .more-news-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .more-news-title {
+      font-family: 'Lora', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .more-news-link {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .more-news-link:hover { color: var(--accent); }
+
+    .more-news-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .more-news-card {
+      display: block;
+      text-decoration: none;
+      transition: opacity 0.15s;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .more-news-card:nth-child(2) { animation-delay: 0.06s; }
+    .more-news-card:nth-child(3) { animation-delay: 0.12s; }
+
+    .more-news-card:hover { opacity: 0.7; }
+
+    .more-news-card-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      margin-bottom: 0.7rem;
+      border-radius: 4px;
+    }
+
+    .more-news-card-placeholder {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background: var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      margin-bottom: 0.7rem;
+    }
+
+    .more-news-card-cat {
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .more-news-card-title {
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .more-news-card-date {
+      font-size: 0.68rem;
+      color: var(--ink-muted);
+    }
+
+    @media (max-width: 768px) {
+      .more-news-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
     @media (max-width: 600px) {
       header { flex-direction: column; gap: 0.4rem; text-align: center; }
       article { padding: 0 1.25rem; }
-      .article-end { padding: 0 1.25rem 3rem; }
+      .article-end { padding: 2rem 1.25rem 3rem; }
+      .more-news { padding: 0 1.25rem 3rem; }
+      .more-news-grid { grid-template-columns: 1fr; }
       .footer-top { grid-template-columns: 1fr; gap: 1.5rem; }
       .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
     }
@@ -574,6 +685,14 @@
     <span>&#9830;</span>
   </div>
 
+  <section class="more-news" id="moreNews" style="display:none;">
+    <div class="more-news-header">
+      <h2 class="more-news-title">Mais notícias</h2>
+      <a class="more-news-link" href="portal.html">Ver todas &rarr;</a>
+    </div>
+    <div class="more-news-grid" id="moreNewsGrid"></div>
+  </section>
+
   <footer class="site-footer">
     <div class="footer-top">
       <div class="footer-brand">
@@ -582,19 +701,19 @@
       </div>
       <div class="footer-col">
         <h4>Editorias</h4>
-        <a href="portal.html">Política</a>
-        <a href="portal.html">Economia</a>
-        <a href="portal.html">Mundo</a>
-        <a href="portal.html">Tecnologia</a>
+        <a href="portal.html?section=politica">Política</a>
+        <a href="portal.html?section=economia">Economia</a>
+        <a href="portal.html?section=internacional">Mundo</a>
+        <a href="portal.html?section=tecnologia">Tecnologia</a>
       </div>
       <div class="footer-col">
         <h4>Brasil</h4>
-        <a href="portal.html">Direitos Humanos</a>
-        <a href="portal.html">Educação</a>
-        <a href="portal.html">Esportes</a>
-        <a href="portal.html">Justiça</a>
-        <a href="portal.html">Saúde</a>
-        <a href="portal.html">Geral</a>
+        <a href="portal.html?section=direitos-humanos">Direitos Humanos</a>
+        <a href="portal.html?section=educacao">Educação</a>
+        <a href="portal.html?section=esportes">Esportes</a>
+        <a href="portal.html?section=justica">Justiça</a>
+        <a href="portal.html?section=saude">Saúde</a>
+        <a href="portal.html?section=geral">Geral</a>
       </div>
       <div class="footer-col">
         <h4>Institucional</h4>
@@ -727,19 +846,31 @@
       const relatedEl = document.getElementById('relatedSection');
 
       if (article.body) {
+        // Limpar legendas de foto soltas (artigos coletados antes do fix do transformInlineImages).
+        // Padrão 1: <p> contendo apenas "Foto: ..." (com possível <strong> dentro)
+        // Padrão 2: texto "Foto: ..." solto entre tags (fora de <p>)
+        var cleanBody = article.body
+          .replace(/<p>\s*Foto:\s*[\s\S]*?<\/p>/gi, '')
+          .replace(/<p>[^<]{0,80}<strong>[^<]{0,40}<\/strong>[^<]{0,20}<\/p>/gi, function(m) {
+            // Remover parágrafos curtos que são só legenda (ex: "Caption - <strong>Credit</strong>")
+            var text = m.replace(/<[^>]*>/g, '').trim();
+            if (text.length < 80 && /[-–—]/.test(text)) return '';
+            return m;
+          });
+
         // Detectar se o body já é HTML rico (sanitizado no backend)
         // vs texto plano legado (artigos antigos com \n e <strong>)
-        var isRichHtml = /<(p|blockquote|h2|figure)[\s>]/i.test(article.body);
+        var isRichHtml = /<(p|blockquote|h2|figure)[\s>]/i.test(cleanBody);
 
         if (isRichHtml) {
           // Detectar bloco de notícias relacionadas inserido pelo CMS
           var relatedBlockRegex = /<h3>Not[ií]cias?\s+relacionadas?<\/h3>\s*<(?:ul|ol)>([\s\S]*?)<\/(?:ul|ol)>/i;
-          var relatedBlockMatch = article.body.match(relatedBlockRegex);
+          var relatedBlockMatch = cleanBody.match(relatedBlockRegex);
 
           if (relatedBlockMatch) {
             // Remover o bloco do body
-            var cleanBody = article.body.replace(relatedBlockRegex, '');
-            bodyEl.innerHTML = cleanBody;
+            var bodyWithoutRelated = cleanBody.replace(relatedBlockRegex, '');
+            bodyEl.innerHTML = bodyWithoutRelated;
 
             // Extrair links do <ul>
             var linkRegex = /<li[^>]*><a[^>]*href="noticia\.html\?id=([^"]+)"[^>]*>([^<]+)<\/a><\/li>/gi;
@@ -758,20 +889,20 @@
               relatedEl.innerHTML = relHtml;
             }
           } else {
-            bodyEl.innerHTML = article.body;
+            bodyEl.innerHTML = cleanBody;
           }
         } else {
           // Legado: texto plano com heurística de formatação
           const relatedRegex = /Notícias?\s+relacionadas?\s*:\s*/i;
-          const hasRelated = relatedRegex.test(article.body);
+          const hasRelated = relatedRegex.test(cleanBody);
 
-          let mainText = article.body;
+          let mainText = cleanBody;
           let relatedFragments = [];
 
           if (hasRelated) {
-            const idx = article.body.search(relatedRegex);
-            mainText = article.body.slice(0, idx).trim();
-            const afterText = article.body.slice(idx).replace(relatedRegex, '').trim();
+            const idx = cleanBody.search(relatedRegex);
+            mainText = cleanBody.slice(0, idx).trim();
+            const afterText = cleanBody.slice(idx).replace(relatedRegex, '').trim();
             relatedFragments = afterText
               .split(/\.\s+/)
               .map(t => t.replace(/\.\s*$/, '').trim())
@@ -791,6 +922,9 @@
       document.getElementById('articleContent').style.display = '';
       document.getElementById('articleEnd').style.display = '';
       document.querySelector('article').classList.add('loaded');
+
+      // Carregar mais notícias
+      loadMoreNews(articleId);
     }
 
     // Remove todas as tags HTML — usado para inspecionar só o texto da linha
@@ -920,6 +1054,40 @@
         html += '</ul></div>';
         container.innerHTML = html;
       }
+    }
+
+    async function loadMoreNews(excludeId) {
+      var query = sb.from('articles')
+        .select('id, title, category, image_url, published_at')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false })
+        .limit(7);
+
+      var { data, error } = await query;
+      if (error || !data || data.length === 0) return;
+
+      // Excluir o artigo atual e limitar a 6
+      var articles = data.filter(function(a) { return a.id !== excludeId; }).slice(0, 6);
+      if (articles.length === 0) return;
+
+      var grid = document.getElementById('moreNewsGrid');
+      grid.innerHTML = articles.map(function(a) {
+        var imgHtml = a.image_url
+          ? '<img class="more-news-card-img" src="' + a.image_url + '" alt="" loading="lazy" />'
+          : '<div class="more-news-card-placeholder">Sem imagem</div>';
+        var cat = categoryLabels[a.category] || a.category;
+        var d = new Date(a.published_at);
+        var dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+        return '<a class="more-news-card" href="noticia.html?id=' + a.id + '">' +
+          imgHtml +
+          '<p class="more-news-card-cat">' + cat + '</p>' +
+          '<p class="more-news-card-title">' + a.title + '</p>' +
+          '<p class="more-news-card-date">' + dateStr + '</p>' +
+        '</a>';
+      }).join('');
+
+      document.getElementById('moreNews').style.display = '';
     }
 
     loadArticle();

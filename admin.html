@@ -494,6 +494,26 @@
       margin: 1.5rem 0 0.5rem;
     }
 
+    .quill-wrap .ql-editor figure {
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    .quill-wrap .ql-editor figure img {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto;
+      border-radius: 6px;
+    }
+
+    .quill-wrap .ql-editor figure figcaption {
+      margin-top: 0.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+
     .quill-wrap .ql-editor blockquote {
       border-left: 3px solid var(--accent);
       padding-left: 1.5rem;
@@ -1047,7 +1067,7 @@
           <div class="related-selected" id="relatedSelectedWrap" style="display:none;">
             <p class="related-selected-label">Selecionadas</p>
             <div id="relatedSelectedList"></div>
-            <button class="related-insert-btn" onclick="insertRelatedInBody()">Inserir no artigo</button>
+            <button class="related-insert-btn" onclick="insertRelatedInBody()">Vincular ao artigo</button>
           </div>
         </div>
       </div>
@@ -1221,6 +1241,42 @@
       return url;
     };
 
+    // ── Blot customizado: <figure> com <img> e <figcaption> ─────
+    // Sem isso o Quill desmonta o <figure> e perde a legenda.
+    var BlockEmbed = Quill.import('blots/block/embed');
+
+    class FigureBlot extends BlockEmbed {
+      static blotName = 'figure';
+      static tagName = 'figure';
+
+      static create(value) {
+        var node = super.create();
+        var img = document.createElement('img');
+        img.setAttribute('src', value.src || '');
+        if (value.alt) img.setAttribute('alt', value.alt);
+        node.appendChild(img);
+        if (value.caption) {
+          var figcaption = document.createElement('figcaption');
+          figcaption.textContent = value.caption;
+          node.appendChild(figcaption);
+        }
+        node.setAttribute('contenteditable', 'false');
+        return node;
+      }
+
+      static value(node) {
+        var img = node.querySelector('img');
+        var figcaption = node.querySelector('figcaption');
+        return {
+          src: img ? img.getAttribute('src') : '',
+          alt: img ? (img.getAttribute('alt') || '') : '',
+          caption: figcaption ? figcaption.textContent : ''
+        };
+      }
+    }
+
+    Quill.register(FigureBlot);
+
     function initQuill() {
       if (quill) return;
       quill = new Quill('#quillEditor', {
@@ -1267,8 +1323,17 @@
         if (error) { toast('Erro no upload: ' + error.message); return; }
 
         var { data: urlData } = sb.storage.from('article-images').getPublicUrl(path);
+
+        // Pedir legenda ao usuário
+        var caption = prompt('Legenda da imagem (deixe vazio para sem legenda):') || '';
+
+        // Inserir como blot <figure> registrado
         var range = quill.getSelection(true);
-        quill.insertEmbed(range.index, 'image', urlData.publicUrl);
+        quill.insertEmbed(range.index, 'figure', {
+          src: urlData.publicUrl,
+          alt: caption.trim(),
+          caption: caption.trim()
+        });
         quill.setSelection(range.index + 1);
         toast('Imagem inserida');
       };
@@ -1286,7 +1351,25 @@
       document.getElementById('edLocation').value = articleData ? (articleData.location || '') : '';
       document.getElementById('edImageCaption').value = articleData ? (articleData.image_caption || '') : '';
 
-      quill.root.innerHTML = articleData ? (articleData.body || '') : '';
+      // Extrair relacionadas existentes do body antes de carregar no Quill
+      var bodyToLoad = articleData ? (articleData.body || '') : '';
+      selectedRelated = [];
+      pendingRelated = [];
+
+      var relRegex = /<h3>Not[ií]cias?\s+relacionadas?<\/h3>\s*<(?:ul|ol)>([\s\S]*?)<\/(?:ul|ol)>/i;
+      var relMatch = bodyToLoad.match(relRegex);
+      if (relMatch) {
+        // Extrair links existentes
+        var linkRx = /<li[^>]*><a[^>]*href="noticia\.html\?id=([^"]+)"[^>]*>([^<]+)<\/a><\/li>/gi;
+        var m;
+        while ((m = linkRx.exec(relMatch[1])) !== null) {
+          pendingRelated.push({ id: m[1], title: m[2] });
+        }
+        // Remover do body para o Quill não destruir
+        bodyToLoad = bodyToLoad.replace(relRegex, '');
+      }
+
+      quill.root.innerHTML = bodyToLoad;
 
       var preview = document.getElementById('coverPreview');
       if (articleData && articleData.image_url) {
@@ -1300,12 +1383,23 @@
 
       document.getElementById('edCoverFile').value = '';
 
-      // Limpar painel de notícias relacionadas
-      selectedRelated = [];
+      // Mostrar/limpar painel de notícias relacionadas
       renderSelectedRelated();
       document.getElementById('relatedResults').innerHTML = '<p class="related-empty">Digite um termo para buscar artigos.</p>';
       document.getElementById('relatedSearch').value = '';
       document.getElementById('relatedPanel').classList.remove('open');
+      var indicator = document.getElementById('relatedIndicator');
+      if (indicator) indicator.remove();
+
+      // Se já existem relacionadas, mostrar indicador
+      if (pendingRelated.length > 0) {
+        indicator = document.createElement('div');
+        indicator.id = 'relatedIndicator';
+        indicator.style.cssText = 'margin-top:1rem;padding:1rem;border:1px dashed var(--rule);border-radius:4px;font-size:0.8rem;color:var(--ink-muted);';
+        var titles = pendingRelated.map(function(s) { return '• ' + s.title; }).join('<br>');
+        indicator.innerHTML = '<strong style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Notícias relacionadas (será inserido ao salvar)</strong><br>' + titles;
+        document.querySelector('.quill-wrap').after(indicator);
+      }
 
       showView('editorView');
     }
@@ -1368,6 +1462,22 @@
           }
           return '<ol>' + inner.replace(/ data-list="ordered"/g, '') + '</ol>';
         });
+        // Quill pode envolver conteúdo em <p> extras — limpar parágrafos vazios
+        body = body.replace(/<p><br><\/p>/g, '');
+        // Garantir que <figure> gerado pelo blot esteja limpo
+        body = body.replace(/ contenteditable="false"/g, '');
+
+        // Injetar bloco de notícias relacionadas (HTML limpo, fora do Quill)
+        if (pendingRelated.length > 0) {
+          // Remover bloco de relacionadas anterior, se existir
+          body = body.replace(/<h3>Not[ií]cias?\s+relacionadas?<\/h3>\s*<(?:ul|ol)>[\s\S]*?<\/(?:ul|ol)>/gi, '');
+          var relHtml = '<h3>Notícias relacionadas</h3><ul>';
+          pendingRelated.forEach(function(s) {
+            relHtml += '<li><a href="noticia.html?id=' + s.id + '">' + s.title + '</a></li>';
+          });
+          relHtml += '</ul>';
+          body += relHtml;
+        }
       }
 
       var record = {
@@ -1492,30 +1602,28 @@
       }).join('');
     }
 
+    // As relacionadas são armazenadas aqui e injetadas no body no momento do save,
+    // para evitar que o Quill destrua o HTML limpo.
+    var pendingRelated = [];
+
     function insertRelatedInBody() {
       if (selectedRelated.length === 0) return;
 
-      // Usar a Delta API do Quill para inserir corretamente
-      var len = quill.getLength();
+      // Armazenar para injetar no save (fora do Quill)
+      pendingRelated = selectedRelated.slice();
 
-      // Quebra de linha antes do bloco
-      quill.insertText(len - 1, '\n');
+      // Mostrar indicação visual no editor
+      var indicator = document.getElementById('relatedIndicator');
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'relatedIndicator';
+        indicator.style.cssText = 'margin-top:1rem;padding:1rem;border:1px dashed var(--rule);border-radius:4px;font-size:0.8rem;color:var(--ink-muted);';
+        document.querySelector('.quill-wrap').after(indicator);
+      }
+      var titles = pendingRelated.map(function(s) { return '• ' + s.title; }).join('<br>');
+      indicator.innerHTML = '<strong style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;">Notícias relacionadas (será inserido ao salvar)</strong><br>' + titles;
 
-      // Header "Notícias relacionadas" como h3
-      len = quill.getLength();
-      quill.insertText(len - 1, 'Notícias relacionadas');
-      quill.formatLine(len - 1, 1, 'header', 3);
-
-      // Cada notícia como item de lista com link
-      selectedRelated.forEach(function(s) {
-        len = quill.getLength();
-        quill.insertText(len - 1, '\n');
-        len = quill.getLength();
-        quill.insertText(len - 1, s.title, { link: 'noticia.html?id=' + s.id });
-        quill.formatLine(len - 1, 1, 'list', 'bullet');
-      });
-
-      toast('Notícias relacionadas inseridas');
+      toast(pendingRelated.length + ' notícia(s) relacionada(s) vinculada(s)');
       selectedRelated = [];
       renderSelectedRelated();
       document.getElementById('relatedResults').innerHTML = '<p class="related-empty">Digite um termo para buscar artigos.</p>';

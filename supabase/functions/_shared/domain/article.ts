@@ -18,36 +18,56 @@ function decodeHtmlEntities(raw: string): string {
 /**
  * Transforma blocos de imagem inline da EBC (div.dnd-widget-wrapper)
  * em <figure><img><figcaption> semânticos.
+ *
+ * Estrutura real da EBC (após decodeHtmlEntities):
+ *   <div class="dnd-widget-wrapper ...">
+ *     <div class="dnd-atom-rendered">
+ *       <img src=".../loading_v2.gif" data-echo="REAL_URL" alt="..." title="...">
+ *       <noscript><img src="REAL_URL" ...></noscript>
+ *     </div>
+ *     <div class="dnd-caption-wrapper">
+ *       <h6 class="meta">CAPTION - <strong>CREDIT</strong></h6>
+ *     </div>
+ *   </div>
+ *
+ * O bloco termina com </div></div> (caption-wrapper + widget-wrapper).
+ * O regex anterior esperava 3 </div> consecutivos, por isso nunca batia.
  */
 function transformInlineImages(html: string): string {
-  return html.replace(
-    /<div[^>]*class="[^"]*dnd-widget-wrapper[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/gi,
-    (_match, inner: string) => {
-      // Extrair URL real: data-echo tem prioridade, senão pega do <noscript><img src>
-      const dataEchoMatch = inner.match(/data-echo="([^"]+)"/i);
-      const noscriptMatch = inner.match(/<noscript>\s*<img[^>]*src="([^"]+)"/i);
-      const imgUrl = dataEchoMatch?.[1] || noscriptMatch?.[1] || "";
-      if (!imgUrl) return "";
+  // Matches opening dnd-widget-wrapper até o fechamento duplo </div></div>
+  // que corresponde a caption-wrapper + widget-wrapper.
+  const widgetRegex =
+    /<div[^>]*class="[^"]*dnd-widget-wrapper[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/gi;
 
-      // Extrair alt text
-      const altMatch = inner.match(/alt="([^"]+)"/i);
-      const alt = altMatch?.[1] || "";
+  return html.replace(widgetRegex, (_match, inner: string) => {
+    // Extrair URL real: data-echo tem prioridade, senão pega do <noscript><img src>
+    const dataEchoMatch = inner.match(/data-echo="([^"]+)"/i);
+    const noscriptMatch = inner.match(
+      /<noscript>\s*<img[^>]*src="([^"]+)"/i,
+    );
+    const imgUrl = dataEchoMatch?.[1] || noscriptMatch?.[1] || "";
+    if (!imgUrl) return "";
 
-      // Extrair legenda do .dnd-caption-wrapper > .meta
-      const captionMatch = inner.match(
-        /<div[^>]*class="[^"]*meta[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
-      );
-      let caption = "";
-      if (captionMatch) {
-        caption = captionMatch[1].replace(/<[^>]*>/g, "").trim();
-      }
+    // Extrair alt text (do primeiro img que não seja loading_v2)
+    const altMatch = inner.match(/alt="([^"]+)"/i);
+    const alt = altMatch?.[1] || "";
 
-      const figcaption = caption
-        ? `<figcaption>${caption}</figcaption>`
-        : "";
-      return `<figure><img src="${imgUrl}" alt="${alt}">${figcaption}</figure>`;
-    },
-  );
+    // Extrair legenda do <h6 class="meta"> dentro de dnd-caption-wrapper
+    const captionMatch = inner.match(
+      /<h6[^>]*class="[^"]*meta[^"]*"[^>]*>([\s\S]*?)<\/h6>/i,
+    );
+    let caption = "";
+    if (captionMatch) {
+      caption = captionMatch[1]
+        .replace(/<!--[\s\S]*?-->/g, "") // remove HTML comments
+        .replace(/<[^>]*>/g, "") // remove tags
+        .replace(/\s*-\s*$/, "") // remove trailing " - " antes do crédito
+        .trim();
+    }
+
+    const figcaption = caption ? `<figcaption>${caption}</figcaption>` : "";
+    return `<figure><img src="${imgUrl}" alt="${alt}">${figcaption}</figure>`;
+  });
 }
 
 /**
