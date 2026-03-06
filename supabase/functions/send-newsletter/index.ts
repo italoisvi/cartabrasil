@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     articleRepo: new SupabaseArticleRepo(supabase),
     emailSender: new ResendEmailSender(Deno.env.get("RESEND_API_KEY")!),
     buildEmailHtml: buildNewsletterHtml,
-    siteUrl: Deno.env.get("SITE_URL") || "https://cartadenoticia.com.br",
+    siteUrl: Deno.env.get("SITE_URL") || "https://cartabrasil.com.br",
   });
 
   const result = await useCase.execute(frequency);

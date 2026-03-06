@@ -1,5 +1,5 @@
 -- =============================================
--- Carta de Notícia — Schema Inicial
+-- Carta Brasil — Schema Inicial
 -- =============================================
 
 -- Assinantes

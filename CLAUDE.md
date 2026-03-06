@@ -1,4 +1,4 @@
-# Carta de Notícia — Arquitetura
+# Carta Brasil — Arquitetura
 
 > Guiado por **Arquitetura Limpa** (Robert C. Martin) e **Implementing DDD** (Vaughn Vernon).
 > "As dependências de código-fonte apontam apenas para dentro, na direção das políticas de nível mais alto."
@@ -7,7 +7,7 @@
 
 ## Visão Geral
 
-**Carta de Notícia** é uma plataforma de newsletter automatizada que coleta notícias de fontes RSS, curadoria o conteúdo por categorias e distribui edições personalizadas para assinantes via email.
+**Carta Brasil** é uma plataforma de newsletter automatizada que coleta notícias de fontes RSS, curadoria o conteúdo por categorias e distribui edições personalizadas para assinantes via email.
 
 **Stack tecnológico:**
 - **Backend**: Supabase (PostgreSQL, Edge Functions em Deno/TypeScript, Storage, pg_cron)
@@ -156,7 +156,7 @@ Orquestram o fluxo de dados entre Entidades. Definem interfaces (portas) para o 
 ## Estrutura de Diretórios (objetivo)
 
 ```
-cartadenoticia/
+cartabrasil/
 │
 ├── CLAUDE.md                          # Este arquivo
 │
@@ -388,7 +388,7 @@ geral:          #7f8c8d    (cinza)
 ```
 
 ### Identidade Visual
-- Logo: "Carta de Notícia" + ponto vermelho (Lora serif)
+- Logo: "Carta Brasil" + ponto vermelho (Lora serif)
 - Estética editorial/jornalística: bordas finas, separadores, layout em grid
 - Animações sutis: fadeUp 0.6s ease com delay escalonado
 - Mobile-first responsivo com breakpoint em 600px

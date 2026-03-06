@@ -777,8 +777,8 @@
       document.getElementById('articleDescription').textContent = article.description || '';
       document.getElementById('articleAuthor').textContent = article.author || '';
 
-      // Byline editorial (apenas para artigos do Carta de Notícia)
-      if (article.source_name === 'Carta de Notícia' && article.author) {
+      // Byline editorial (apenas para artigos do Carta Brasil)
+      if (article.source_name === 'Carta Brasil' && article.author) {
         const { data: authorProfile } = await sb
           .from('profiles')
           .select('display_name, role, avatar_url')

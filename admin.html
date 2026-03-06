@@ -1163,7 +1163,7 @@
     async function loadArticles() {
       var query = sb.from('articles')
         .select('id, title, category, status, published_at, source_name, author, location, updated_at')
-        .eq('source_name', 'Carta de Notícia')
+        .eq('source_name', 'Carta Brasil')
         .order('created_at', { ascending: false });
 
       if (currentFilter !== 'all') {
@@ -1489,7 +1489,7 @@
         author: document.getElementById('edAuthor').value.trim() || null,
         location: document.getElementById('edLocation').value.trim() || null,
         image_caption: document.getElementById('edImageCaption').value.trim() || null,
-        source_name: 'Carta de Notícia',
+        source_name: 'Carta Brasil',
         status: status
       };
 

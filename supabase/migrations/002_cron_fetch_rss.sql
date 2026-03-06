@@ -1,5 +1,5 @@
 -- =============================================
--- Carta de Notícia — CRON para buscar RSS
+-- Carta Brasil — CRON para buscar RSS
 -- =============================================
 -- Requer a extensão pg_cron (já habilitada no Supabase)
 
