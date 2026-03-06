@@ -50,10 +50,12 @@
     .logo {
       font-family: 'Lora', serif;
       font-size: 1.1rem;
-      font-weight: 600;
+      font-weight: 400;
       letter-spacing: 0.04em;
       color: var(--ink);
     }
+
+    .logo strong { font-weight: 700; }
 
     .header-actions {
       display: flex;
@@ -351,7 +353,7 @@
 <body>
 
   <header>
-    <a class="logo" href="perfil.html">CartaBrasil</a>
+    <a class="logo" href="perfil.html">Carta<strong>Brasil</strong></a>
     <div class="header-actions">
       <span class="header-user" id="headerUser"></span>
       <button class="btn-logout" onclick="logout()">Sair</button>
@@ -437,7 +439,7 @@
   </div>
 
   <footer>
-    <p>&copy; 2026 CartaBrasil &middot; Todos os direitos reservados</p>
+    <p>&copy; 2026 Carta<strong>Brasil</strong> &middot; Todos os direitos reservados</p>
     <p>Painel Editorial</p>
   </footer>
 
