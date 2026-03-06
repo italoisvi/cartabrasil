@@ -35,158 +35,585 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    a { text-decoration: none; color: inherit; }
+
     /* ── HEADER ─────────────────────────────────────────────── */
     header {
       border-bottom: 1px solid var(--rule);
-      padding: 1.25rem 2rem;
+      padding: 0.8rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      background: var(--paper);
+    }
+
+    .header-left {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      background: var(--paper);
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      gap: 1.2rem;
+    }
+
+    .header-center {
+      text-align: center;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.8rem;
     }
 
     .logo {
       font-family: 'Lora', serif;
-      font-size: 1.1rem;
+      font-size: 2rem;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.02em;
       color: var(--ink);
       text-decoration: none;
+      white-space: nowrap;
+    }
+
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.4rem;
+      color: var(--ink);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      transition: opacity 0.15s;
     }
 
-    .logo-mascot {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      
-    }
+    .icon-btn:hover { opacity: 0.6; }
 
+    .icon-btn svg { width: 20px; height: 20px; }
 
-    .header-meta {
-      font-size: 0.7rem;
-      color: var(--ink-muted);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    /* ── DATELINE ────────────────────────────────────────────── */
-    .dateline {
-      text-align: center;
-      padding: 0.6rem 2rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      border-bottom: 1px solid var(--rule);
-      background: var(--paper);
-    }
-
-    /* ── HERO ────────────────────────────────────────────────── */
-    .hero {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 5rem 2rem 3.5rem;
-      text-align: center;
-      animation: fadeUp 0.8s ease both;
-    }
-
-    .tag {
-      display: inline-block;
-      font-size: 0.65rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
+    .btn-subscribe {
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      padding: 0.45rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
       font-weight: 500;
-      margin-bottom: 1.5rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: opacity 0.15s;
     }
 
-    .hero h1 {
-      font-family: 'Lora', serif;
-      font-size: clamp(2.2rem, 5vw, 3.2rem);
-      font-weight: 600;
-      line-height: 1.22;
-      letter-spacing: -0.01em;
-      color: var(--ink);
-      margin-bottom: 1.4rem;
+    .btn-subscribe:hover { opacity: 0.8; }
+
+    /* ── SEARCH OVERLAY ───────────────────────────────────────── */
+    .search-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 80px;
     }
 
-    .hero h1 em {
-      font-style: italic;
-      font-weight: 400;
-    }
+    .search-overlay.active { display: flex; }
 
-    .hero p {
-      font-size: 1rem;
-      color: var(--ink-light);
-      line-height: 1.75;
-      max-width: 500px;
-      margin: 0 auto 2.5rem;
-      font-weight: 300;
-    }
-
-    /* ── FORM ────────────────────────────────────────────────── */
-    .form-wrap {
-      display: flex;
-      gap: 0;
-      max-width: 420px;
-      margin: 0 auto 0.75rem;
-      border: 1px solid var(--ink);
+    .search-box {
       background: var(--paper);
+      width: 100%;
+      max-width: 640px;
+      border-radius: 8px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+      animation: fadeDown 0.25s ease;
     }
 
-    .form-wrap input {
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--rule);
+      gap: 0.8rem;
+    }
+
+    .search-input-wrap svg { width: 20px; height: 20px; color: var(--ink-muted); flex-shrink: 0; }
+
+    .search-input {
       flex: 1;
       border: none;
       outline: none;
-      padding: 0.85rem 1rem;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 300;
+      font-size: 1rem;
       color: var(--ink);
       background: transparent;
     }
 
-    .form-wrap input::placeholder {
+    .search-input::placeholder { color: var(--ink-muted); }
+
+    .search-close {
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.65rem;
       color: var(--ink-muted);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
     }
 
-    .form-wrap button {
-      border: none;
-      background: var(--ink);
-      color: white;
-      padding: 0.85rem 1.4rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.75rem;
+    .search-results {
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .search-result-item {
+      display: block;
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--rule);
+      transition: background 0.12s;
+    }
+
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: var(--bg); }
+
+    .search-result-cat {
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .search-result-title {
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--ink);
+    }
+
+    .search-result-time {
+      font-size: 0.62rem;
+      color: var(--ink-muted);
+      margin-top: 0.2rem;
+    }
+
+    .search-empty {
+      padding: 2rem 1.2rem;
+      text-align: center;
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+    }
+
+    /* ── NAV ────────────────────────────────────────────────── */
+    .nav-bar {
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* ── STICKY BAR (appears on scroll) ───────────────────── */
+    .sticky-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      transform: translateY(-100%);
+      transition: transform 0.25s ease;
+    }
+
+    .sticky-bar.visible { transform: translateY(0); }
+
+    .sticky-left {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .sticky-nav {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .sticky-nav .nav-link {
+      padding: 0.65rem 1.2rem;
+      font-size: 0.72rem;
+    }
+
+    .sticky-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+    }
+
+    .nav-date {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      position: absolute;
+      right: 2rem;
+    }
+
+    .nav-link {
+      padding: 0.7rem 1.4rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--ink-light);
+      transition: all 0.15s;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .nav-link:hover { color: var(--ink); }
+
+    .nav-link.active {
+      color: var(--ink);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ── DROPDOWN (Brasil) ─────────────────────────────────── */
+    .nav-dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      min-width: 180px;
+      z-index: 60;
+      padding: 0.4rem 0;
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+
+    .nav-dropdown-item {
+      display: block;
+      padding: 0.55rem 1.2rem;
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--ink-light);
+      white-space: nowrap;
+      transition: all 0.12s;
+      cursor: pointer;
+    }
+
+    .nav-dropdown-item:hover {
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .nav-dropdown-item.active {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* Sticky dropdown */
+    .sticky-nav .nav-dropdown-menu {
+      top: 100%;
+    }
+
+    .sticky-nav .nav-dropdown-item {
+      padding: 0.45rem 1rem;
+      font-size: 0.68rem;
+    }
+
+    /* ── CONTAINER ─────────────────────────────────────────── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      flex: 1;
+    }
+
+    /* ── CATEGORY LABELS ───────────────────────────────────── */
+    .cat {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    .cat-politica { color: #c0392b; }
+    .cat-economia, .cat-mercados { color: #2c3e50; }
+    .cat-internacional { color: #d4a017; }
+    .cat-tecnologia { color: #2980b9; }
+    .cat-geral { color: #7f8c8d; }
+    .cat-direitos-humanos { color: #8e44ad; }
+    .cat-educacao { color: #27ae60; }
+    .cat-esportes { color: #e67e22; }
+    .cat-justica { color: #2c3e50; }
+    .cat-saude { color: #16a085; }
+    .cat-analise { color: #c0392b; }
+
+    .time {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      display: block;
+      text-align: right;
+    }
+
+    /* ── HERO (FT-style 3-column) ─────────────────────────── */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr 0.7fr;
+      gap: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-main { padding-right: 1.5rem; border-right: 1px solid var(--rule); display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .hero-main-item { display: block; transition: opacity 0.15s; }
+    .hero-main-item:hover { opacity: 0.7; }
+
+    .hero-main-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      border-radius: 4px;
+      margin-bottom: 0.7rem;
+    }
+
+    .hero-main .cat { margin-bottom: 0.3rem; }
+
+    .hero-title {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-title a { transition: opacity 0.15s; }
+    .hero-title a:hover { opacity: 0.7; }
+
+    .hero-desc {
+      font-size: 0.82rem;
+      color: var(--ink-light);
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .hero-media { position: relative; }
+
+    .hero-media a { display: block; transition: opacity 0.15s; }
+    .hero-media a:hover { opacity: 0.85; }
+
+    .hero-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .hero-media-caption {
+      margin-top: 0.8rem;
+    }
+
+    .hero-media-title {
+      font-family: 'Lora', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--ink);
+      margin-top: 0.3rem;
+    }
+
+    .hero-media-desc {
+      font-family: 'Lora', serif;
+      font-size: 0.88rem;
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--ink-light);
+      margin-top: 0.5rem;
+    }
+
+    .hero-media-body {
+      font-family: 'Lora', serif;
+      font-size: 1.08rem;
+      font-weight: 400;
+      line-height: 1.85;
+      color: var(--ink);
+      margin-top: 0.5rem;
+    }
+
+    .hero-sidebar {
+      padding-left: 1.5rem;
+      border-left: 1px solid var(--rule);
+    }
+
+    .sidebar-item {
+      display: block;
+      padding-bottom: 1.75rem;
+      margin-bottom: 1.75rem;
+      border-bottom: 2px solid var(--rule);
+      transition: opacity 0.15s;
+    }
+
+    .sidebar-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .sidebar-item:hover { opacity: 0.7; }
+
+    .sidebar-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-cat {
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .sidebar-title {
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--ink);
+    }
+
+    /* ── HEADLINES LIST (below hero, left column) ─────────── */
+    .below-hero {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr 0.7fr;
+      gap: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 2rem;
+    }
+
+    .headlines-col {
+      padding-right: 1.5rem;
+      border-right: 1px solid var(--rule);
+    }
+
+    .headline-item {
+      display: block;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--rule);
+      transition: opacity 0.15s;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .headline-item:last-child { border-bottom: none; }
+    .headline-item:hover { opacity: 0.65; }
+
+    .headline-title {
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--ink);
+      margin-top: 0.15rem;
+    }
+
+    .badge-new {
+      display: inline-block;
+      font-size: 0.55rem;
       font-weight: 500;
       letter-spacing: 0.1em;
+      color: var(--accent);
       text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
+      margin-top: 0.2rem;
     }
 
-    .form-wrap button:hover { background: #333; }
-
-    .form-note {
-      font-size: 0.7rem;
-      color: var(--ink-muted);
-      letter-spacing: 0.04em;
+    /* center column - featured article below hero */
+    .featured-center {
+      animation: fadeUp 0.5s ease 0.1s both;
     }
 
-    /* ── DIVIDER ─────────────────────────────────────────────── */
+    .featured-center a { display: block; transition: opacity 0.15s; }
+    .featured-center a:hover { opacity: 0.8; }
+
+    .featured-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      border-radius: 4px;
+      margin-bottom: 0.7rem;
+    }
+
+    .featured-title {
+      font-family: 'Lora', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-top: 0.3rem;
+    }
+
+    .featured-desc {
+      font-size: 0.82rem;
+      color: var(--ink-light);
+      line-height: 1.55;
+      font-weight: 300;
+      margin-top: 0.3rem;
+    }
+
+    /* right column - more sidebar */
+    .sidebar-extra {
+      padding-left: 1.5rem;
+      border-left: 1px solid var(--rule);
+    }
+
+    /* ── SECTION RULE ──────────────────────────────────────── */
     .section-rule {
       display: flex;
       align-items: center;
       gap: 1rem;
-      max-width: 680px;
-      margin: 3rem auto 0;
-      padding: 0 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .section-rule::before,
@@ -205,483 +632,729 @@
       white-space: nowrap;
     }
 
-    /* ── PILLARS ─────────────────────────────────────────────── */
-    .pillars {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 2.5rem 2rem;
+    /* ── CATEGORY SECTIONS ─────────────────────────────────── */
+    .cat-section { margin-bottom: 2.5rem; }
+
+    .cat-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0;
+      gap: 1.5rem;
     }
 
-    .pillar {
-      padding: 1.5rem;
-      border-right: 1px solid var(--rule);
-      animation: fadeUp 0.8s ease both;
-    }
-
-    .pillar:first-child { padding-left: 0; }
-    .pillar:last-child { border-right: none; padding-right: 0; }
-
-    .pillar-num {
+    .cat-card {
       display: block;
-      font-family: 'Lora', serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      color: var(--rule);
-      line-height: 1;
-      margin-bottom: 0.75rem;
-    }
-
-    .pillar h3 {
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--ink);
-      margin-bottom: 0.4rem;
-    }
-
-    .pillar p {
-      font-size: 0.8rem;
-      color: var(--ink-light);
-      line-height: 1.6;
-    }
-
-    /* ── PREVIEW ─────────────────────────────────────────────── */
-    .preview-section {
-      background: var(--paper);
-      border-top: 1px solid var(--rule);
-      border-bottom: 1px solid var(--rule);
-      padding: 3rem 2rem;
-    }
-
-    .preview-inner {
-      max-width: 680px;
-      margin: 0 auto;
-    }
-
-    .preview-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      margin-bottom: 1.5rem;
-    }
-
-    .news-item {
-      padding: 1.25rem 0;
-      border-bottom: 1px solid var(--rule);
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 1rem;
-      align-start: start;
-      cursor: default;
       transition: opacity 0.15s;
+      animation: fadeUp 0.5s ease both;
     }
 
-    .news-item:hover { opacity: 0.65; }
-    .news-item:last-child { border-bottom: none; }
+    .cat-card:nth-child(2) { animation-delay: 0.06s; }
+    .cat-card:nth-child(3) { animation-delay: 0.12s; }
+    .cat-card:hover { opacity: 0.7; }
 
-    .news-category {
-      font-size: 0.6rem;
-      font-weight: 500;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.3rem;
-      display: block;
-    }
-
-    .news-headline {
-      font-family: 'Lora', serif;
-      font-size: 1rem;
-      font-weight: 400;
-      line-height: 1.4;
-      color: var(--ink);
-    }
-
-    .news-time {
-      font-size: 0.65rem;
-      color: var(--ink-muted);
-      white-space: nowrap;
-      padding-top: 0.2rem;
-    }
-
-    /* ── FLOW ────────────────────────────────────────────────── */
-    .flow-section {
-      background: var(--bg);
-      padding: 3rem 2rem;
-    }
-
-    .flow-inner {
-      max-width: 680px;
-      margin: 0 auto;
-    }
-
-    .flow-steps {
-      display: flex;
-      align-items: flex-start;
-      gap: 0;
-    }
-
-    .flow-step {
-      flex: 1;
-      text-align: center;
-      padding: 0 1.5rem;
-    }
-
-    .flow-icon {
-      width: 28px;
-      height: 28px;
-      margin: 0 auto 0.85rem;
-      opacity: 0.35;
-    }
-
-    .flow-icon svg {
+    .cat-card-img {
       width: 100%;
-      height: 100%;
-      fill: var(--ink);
-    }
-
-    .flow-step h4 {
-      font-size: 0.72rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink);
-      margin-bottom: 0.4rem;
-    }
-
-    .flow-step p {
-      font-size: 0.78rem;
-      color: var(--ink-light);
-      line-height: 1.6;
-    }
-
-    .flow-arrow {
-      font-size: 1rem;
-      color: var(--rule);
-      padding-top: 0.2rem;
-      flex-shrink: 0;
-    }
-
-    @media (max-width: 600px) {
-      .flow-steps { flex-direction: column; align-items: center; gap: 1rem; }
-      .flow-arrow { transform: rotate(90deg); }
-      .flow-step { padding: 0; }
-    }
-
-    /* ── SOCIAL PROOF ────────────────────────────────────────── */
-    .proof-wrapper {
-      background: var(--paper);
-      border-top: 1px solid var(--rule);
-      border-bottom: 1px solid var(--rule);
-    }
-
-    .proof {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 3.5rem 2rem;
-      text-align: center;
-    }
-
-    .stat {
-      display: inline-block;
-      margin: 0 2rem;
-    }
-
-    .stat-num {
-      font-family: 'Lora', serif;
-      font-size: 2rem;
-      font-weight: 400;
-      color: var(--ink);
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
       display: block;
-      line-height: 1;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.7rem;
+      border-radius: 4px;
     }
 
-    .stat-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-    }
-
-    .proof-quote {
-      margin-top: 2.5rem;
+    .cat-card-title {
       font-family: 'Lora', serif;
       font-size: 1.05rem;
-      font-style: italic;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .cat-card-desc {
+      font-size: 0.78rem;
       color: var(--ink-light);
-      line-height: 1.7;
-      max-width: 460px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* ── FOOTER CTA ──────────────────────────────────────────── */
-    .footer-cta {
-      background: var(--ink);
-      padding: 4rem 2rem;
-      text-align: center;
-    }
-
-    .footer-cta h2 {
-      font-family: 'Lora', serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      color: white;
-      margin-bottom: 0.6rem;
-    }
-
-    .footer-cta p {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 2rem;
+      line-height: 1.5;
       font-weight: 300;
     }
 
-    .footer-cta .form-wrap {
-      border-color: rgba(255,255,255,0.2);
-      background: transparent;
-      max-width: 380px;
+    .cat-card-meta { margin-bottom: 0.35rem; text-align: right; }
+
+    /* ── PLACEHOLDER IMG ───────────────────────────────────── */
+    .img-placeholder {
+      background: var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 4px;
     }
 
-    .footer-cta .form-wrap input {
-      color: white;
+    /* ── FOOTER ────────────────────────────────────────────── */
+    .site-footer {
+      background: var(--ink);
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      line-height: 1.6;
     }
 
-    .footer-cta .form-wrap input::placeholder {
-      color: rgba(255,255,255,0.35);
+    .footer-top {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 2.5rem;
     }
 
-    .footer-cta .form-wrap button {
-      background: white;
-      color: var(--ink);
+    .footer-brand .footer-logo {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
     }
 
-    .footer-cta .form-wrap button:hover {
-      background: #eee;
+
+    .footer-brand p {
+      margin-top: 0.8rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.75rem;
+      line-height: 1.7;
+      max-width: 280px;
     }
 
-    /* ── FOOTER ──────────────────────────────────────────────── */
-    .site-footer-minimal {
-      background: #0a0a0a;
-      padding: 1.5rem 2rem;
+    .footer-col h4 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 1rem;
+    }
+
+    .footer-col a {
+      display: block;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.78rem;
+      padding: 0.25rem 0;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-col a:hover { color: #fff; }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.2rem 2rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .site-footer-minimal p {
+    .footer-bottom p {
       font-size: 0.62rem;
       color: rgba(255,255,255,0.25);
       letter-spacing: 0.06em;
     }
 
-    .site-footer-minimal a {
+    .footer-bottom a {
       color: rgba(255,255,255,0.35);
       transition: color 0.15s;
     }
 
-    .site-footer-minimal a:hover { color: rgba(255,255,255,0.7); }
+    .footer-bottom a:hover { color: rgba(255,255,255,0.7); }
 
-    /* ── ANIMATION ───────────────────────────────────────────── */
+    /* ── LOADING ───────────────────────────────────────────── */
+    .loading {
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--ink-muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── ANIMATION ─────────────────────────────────────────── */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
+      from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .pillar:nth-child(2) { animation-delay: 0.1s; }
-    .pillar:nth-child(3) { animation-delay: 0.2s; }
+    /* ── RESPONSIVE ────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr 1.2fr; }
+      .hero-sidebar { display: none; }
+      .below-hero { grid-template-columns: 1fr 1.2fr; }
+      .sidebar-extra { display: none; }
+    }
 
-    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-main { padding-right: 0; border-right: none; }
+      .hero-media { order: -1; }
+      .below-hero { grid-template-columns: 1fr; }
+      .headlines-col { padding-right: 0; border-right: none; }
+      .featured-center { margin-top: 1rem; }
+      .cat-grid { grid-template-columns: 1fr 1fr; }
+      .nav-bar { overflow-x: auto; }
+      .nav-link { white-space: nowrap; padding: 0.7rem 1rem; }
+      .nav-dropdown-menu { left: 0; transform: none; }
+      .logo { font-size: 1.6rem; }
+      .footer-top { grid-template-columns: 1fr 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+      .sticky-bar { padding: 0 1rem; }
+      .sticky-nav { overflow-x: auto; }
+      .sticky-nav .nav-link { white-space: nowrap; padding: 0.6rem 0.8rem; font-size: 0.68rem; }
+    }
+
     @media (max-width: 600px) {
-      .pillars {
-        grid-template-columns: 1fr;
-      }
-      .pillar {
-        border-right: none;
-        border-bottom: 1px solid var(--rule);
-        padding: 1.25rem 0;
-      }
-      .pillar:last-child { border-bottom: none; }
-
-      header { flex-direction: column; gap: 0.4rem; text-align: center; }
-
-      .stat { margin: 0 1rem; }
-
-      .site-footer-minimal { flex-direction: column; gap: 0.5rem; text-align: center; }
-
-      .news-item { grid-template-columns: 1fr; }
+      header { padding: 0.8rem 1rem; }
+      .container { padding: 1.2rem 1rem; }
+      .cat-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 1.4rem; }
+      .nav-date { display: none; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      .footer-brand { grid-column: 1 / -1; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .sticky-right .btn-subscribe { display: none; }
+      .search-overlay { padding-top: 20px; }
+      .search-box { margin: 0 0.5rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- HEADER (FT-style) -->
   <header>
-    <a class="logo" href="portal.html">Carta Brasil</a>
-    <p class="header-meta">Carta Brasil · Breaking news</p>
+    <div class="header-left">
+      <button class="icon-btn" id="menuBtn" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="searchBtn" aria-label="Pesquisar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </div>
+    <div class="header-center">
+      <a class="logo" href="/">Carta Brasil</a>
+    </div>
+    <div class="header-right">
+      <a class="btn-subscribe" href="/newsletter">Assinar</a>
+    </div>
   </header>
 
-  <!-- DATELINE -->
-  <div class="dateline" id="dateline"></div>
-
-  <!-- HERO -->
-  <section class="hero">
-    <span class="tag">Acesso exclusivo para assinantes</span>
-    <h1>Carta Brasil —<br><em>breaking news sem espera.</em></h1>
-    <p>Você não precisa ficar abrindo portal o dia todo. A Carta Brasil resolve isso: um alerta no seu e-mail assim que o fato se confirma, com fontes verificadas. Um clique abre a íntegra em página privada, exclusiva para assinantes.</p>
-
-    <form class="form-wrap" action="preferencias.html" method="GET">
-      <input type="email" name="email" placeholder="seu@email.com" required />
-      <button type="submit">Assinar por R$&nbsp;10,45/mês</button>
-    </form>
-    <p class="form-note">Cancele quando quiser. Sem fidelidade.</p>
-  </section>
-
-  <!-- DIVIDER -->
-  <div class="section-rule">
-    <span>Como funciona</span>
-  </div>
-
-  <!-- PILLARS -->
-  <div class="pillars">
-    <div class="pillar">
-      <span class="pillar-num">01</span>
-      <h3>Alerta imediato</h3>
-      <p>Assim que a notícia se confirma, você recebe um e-mail — sem hora marcada, sem esperar a próxima edição.</p>
-    </div>
-    <div class="pillar">
-      <span class="pillar-num">02</span>
-      <h3>Página exclusiva</h3>
-      <p>Cada alerta abre uma página completa, acessível somente por assinantes. Sem portal público, sem anúncios.</p>
-    </div>
-    <div class="pillar">
-      <span class="pillar-num">03</span>
-      <h3>Fontes primárias</h3>
-      <p>Publicamos apenas com confirmação de ao menos duas fontes independentes. Nada de especulação.</p>
+  <!-- SEARCH OVERLAY -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="Pesquisar notícias..." autocomplete="off" />
+        <button class="search-close" id="searchClose">ESC</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
     </div>
   </div>
 
-  <!-- PREVIEW -->
-  <div class="preview-section">
-    <div class="preview-inner">
-      <p class="preview-label">O que os assinantes recebem — exemplo</p>
-
-      <div class="news-item">
-        <div>
-          <span class="news-category">Política</span>
-          <p class="news-headline">Presidente sanciona pacote de medidas fiscais após votação no Senado</p>
-        </div>
-        <span class="news-time">14h32</span>
-      </div>
-
-      <div class="news-item">
-        <div>
-          <span class="news-category">Economia</span>
-          <p class="news-headline">Banco Central eleva taxa básica de juros em 0,5 ponto percentual</p>
-        </div>
-        <span class="news-time">11h08</span>
-      </div>
-
-      <div class="news-item">
-        <div>
-          <span class="news-category">Mundo</span>
-          <p class="news-headline">Negociações de cessar-fogo entram em colapso após ataque ao corredor humanitário</p>
-        </div>
-        <span class="news-time">09h47</span>
-      </div>
-
-      <div class="news-item">
-        <div>
-          <span class="news-category">Tecnologia</span>
-          <p class="news-headline">Autoridade antitruste da UE abre investigação formal contra plataforma de IA</p>
-        </div>
-        <span class="news-time">08h15</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- FLOW -->
-  <div class="flow-section">
-    <div class="flow-inner">
-      <p class="preview-label" style="text-align:center; margin-bottom: 2rem;">Como funciona na prática</p>
-      <div class="flow-steps">
-        <div class="flow-step">
-          <div class="flow-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12,0C5.383,0,0,5.383,0,12s5.383,12,12,12c2.447,0,4.793-.722,6.783-2.088.228-.156.286-.467.129-.695-.156-.229-.466-.286-.695-.129-1.823,1.251-3.973,1.912-6.217,1.912-6.065,0-11-4.935-11-11S5.935,1,12,1s11,4.935,11,11v2.5c0,1.378-1.122,2.5-2.5,2.5s-2.5-1.122-2.5-2.5v-2.5c0-3.309-2.691-6-6-6s-6,2.691-6,6,2.691,6,6,6c2.131,0,4.006-1.117,5.071-2.796.327,1.594,1.74,2.796,3.429,2.796,1.93,0,3.5-1.57,3.5-3.5v-2.5C24,5.383,18.617,0,12,0Zm0,17c-2.757,0-5-2.243-5-5s2.243-5,5-5,5,2.243,5,5-2.243,5-5,5Z"/></svg>
-          </div>
-          <h4>Notícia confirmada</h4>
-          <p>Um e-mail chega na sua caixa em tempo real, com o título e o contexto essencial.</p>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="flow-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m12 4.5v-4c0-.276.224-.5.5-.5s.5.224.5.5v4c0 .276-.224.5-.5.5s-.5-.224-.5-.5zm4.743 2.257c.128 0 .256-.049.354-.146l2.829-2.829c.195-.195.195-.512 0-.707s-.512-.195-.707 0l-2.829 2.829c-.195.195-.195.512 0 .707.098.098.226.146.354.146zm-10.961-3.682c-.195-.195-.512-.195-.707 0s-.195.512 0 .707l2.829 2.829c.195.195.512.195.707 0s.195-.512 0-.707zm.718 6.925h-4c-.276 0-.5.224-.5.5s.224.5.5.5h4c.276 0 .5-.224.5-.5s-.224-.5-.5-.5zm15.433 7.35c-.169.526-.615.892-1.165.953l-2.79.31 1.381 2.64c.501.888.111 2.114-.813 2.55-.889.45-1.998.118-2.482-.787l-1.489-2.836-2.217 2.418c-.437.411-1.01.509-1.524.285-.514-.223-.833-.71-.833-1.27v-11.657c0-.726.41-1.365 1.069-1.668.659-.304 1.412-.198 1.963.275l8.501 7.328s.005.005.008.007c.411.37.561.926.392 1.452zm-1.058-.706-8.495-7.323c-.253-.218-.588-.264-.893-.125-.305.14-.487.424-.487.76v11.658c0 .228.162.323.231.353.07.032.25.085.416-.072l2.671-2.915c.221-.254.664-.195.812.105l1.817 3.461c.222.412.729.574 1.152.362.43-.204.611-.773.377-1.188l-1.722-3.292c-.167-.298.048-.701.388-.729l3.516-.39c.223-.025.3-.193.323-.265.023-.071.058-.251-.105-.4z"/></svg>
-          </div>
-          <h4>Um clique</h4>
-          <p>Você abre a íntegra da notícia numa página segura e exclusiva para assinantes.</p>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="flow-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,8.276v-1.276c0-3.86-3.141-7-7-7S5,3.14,5,7v1.276c-1.742,.621-3,2.271-3,4.224v7c0,2.481,2.019,4.5,4.5,4.5h11c2.481,0,4.5-2.019,4.5-4.5v-7c0-1.953-1.258-3.602-3-4.224Zm-13-1.276c0-3.309,2.691-6,6-6s6,2.691,6,6v1.051c-.166-.019-.329-.051-.5-.051H6.5c-.171,0-.334,.032-.5,.051v-1.051Zm15,12.5c0,1.93-1.57,3.5-3.5,3.5H6.5c-1.93,0-3.5-1.57-3.5-3.5v-7c0-1.93,1.57-3.5,3.5-3.5h11c1.93,0,3.5,1.57,3.5,3.5v7Zm-8.5-5v3c0,.276-.224,.5-.5,.5s-.5-.224-.5-.5v-3c0-.276,.224-.5,.5-.5s.5,.224,.5,.5Z"/></svg>
-          </div>
-          <h4>Acesso privado</h4>
-          <p>Sem portal público. Sem anúncios. Sem conteúdo irrelevante ao redor.</p>
+  <!-- NAV -->
+  <nav class="nav-bar">
+    <div class="nav-links">
+      <a class="nav-link active" data-section="home">Home</a>
+      <div class="nav-dropdown">
+        <a class="nav-link" data-section="brasil">Brasil</a>
+        <div class="nav-dropdown-menu">
+          <a class="nav-dropdown-item" data-section="direitos-humanos">Direitos Humanos</a>
+          <a class="nav-dropdown-item" data-section="educacao">Educação</a>
+          <a class="nav-dropdown-item" data-section="esportes">Esportes</a>
+          <a class="nav-dropdown-item" data-section="geral">Geral</a>
+          <a class="nav-dropdown-item" data-section="justica">Justiça</a>
+          <a class="nav-dropdown-item" data-section="saude">Saúde</a>
         </div>
       </div>
+      <a class="nav-link" data-section="internacional">Mundo</a>
+      <a class="nav-link" data-section="economia">Economia</a>
+      <a class="nav-link" data-section="politica">Política</a>
+      <a class="nav-link" data-section="tecnologia">Tecnologia</a>
+      <a class="nav-link" data-section="analise">Análise</a>
+    </div>
+    <span class="nav-date" id="dateline"></span>
+  </nav>
+
+  <!-- STICKY BAR (appears on scroll) -->
+  <div class="sticky-bar" id="stickyBar">
+    <div class="sticky-left">
+      <button class="icon-btn" id="menuBtn2" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="searchBtn2" aria-label="Pesquisar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </div>
+    <div class="sticky-nav" id="stickyNav"></div>
+    <div class="sticky-right">
+      <a class="btn-subscribe" href="/newsletter">Assinar</a>
     </div>
   </div>
 
-
-  <div class="proof-wrapper">
-  <div class="proof">
-    <div>
-      <span class="stat">
-        <span class="stat-num">12k</span>
-        <span class="stat-label">Leitores</span>
-      </span>
-      <span class="stat">
-        <span class="stat-num">94%</span>
-        <span class="stat-label">Taxa de abertura</span>
-      </span>
-      <span class="stat">
-        <span class="stat-num">3min</span>
-        <span class="stat-label">Leitura média</span>
-      </span>
-    </div>
-    <p class="proof-quote">"A única newsletter que abro antes do café. Nada que eu precisei saber escapou da Carta Brasil."</p>
-  </div>
-  </div>
-
-  <!-- FOOTER CTA -->
-  <div class="footer-cta">
-    <h2>R$ 10,45 por mês.</h2>
-    <p>Menos que um café. Acesso imediato, cancele quando quiser.</p>
-    <form class="form-wrap" action="preferencias.html" method="GET" style="margin: 0 auto;">
-      <input type="email" name="email" placeholder="seu@email.com" required />
-      <button type="submit">Assinar por R$&nbsp;10,45/mês</button>
-    </form>
+  <!-- CONTENT -->
+  <div class="container" id="content">
+    <div class="loading">Carregando notícias...</div>
   </div>
 
   <!-- FOOTER -->
-  <footer class="site-footer-minimal">
-    <p>&copy; 2026 Carta Brasil. Todos os direitos reservados.</p>
-    <p><a href="privacidade.html">Privacidade</a> &middot; <a href="portal.html">Portal</a> &middot; <a href="https://agenciabrasil.ebc.com.br" target="_blank" rel="noopener">Agência Brasil (EBC)</a></p>
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/">Carta Brasil</a>
+        <p>Notícias verificadas direto no seu e-mail. Curadoria editorial com fontes primárias da Agência Brasil.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Editorias</h4>
+        <a href="/?section=politica">Política</a>
+        <a href="/?section=economia">Economia</a>
+        <a href="/?section=internacional">Mundo</a>
+        <a href="/?section=tecnologia">Tecnologia</a>
+      </div>
+      <div class="footer-col">
+        <h4>Brasil</h4>
+        <a href="/?section=direitos-humanos">Direitos Humanos</a>
+        <a href="/?section=educacao">Educação</a>
+        <a href="/?section=esportes">Esportes</a>
+        <a href="/?section=justica">Justiça</a>
+        <a href="/?section=saude">Saúde</a>
+        <a href="/?section=geral">Geral</a>
+      </div>
+      <div class="footer-col">
+        <h4>Institucional</h4>
+        <a href="/newsletter">Assinar</a>
+        <a href="acervo.html">Acervo</a>
+        <a href="#">Sobre</a>
+        <a href="contato.html">Contato</a>
+        <a href="privacidade.html">Privacidade</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Carta Brasil. Todos os direitos reservados.</p>
+      <p>Fonte editorial: <a href="https://agenciabrasil.ebc.com.br" target="_blank" rel="noopener">Agência Brasil (EBC)</a></p>
+    </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
-    // Dateline com data atual em PT-BR
+    const SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const categoryLabels = {
+      politica: 'Política',
+      economia: 'Economia',
+      mercados: 'Economia',
+      internacional: 'Mundo',
+      tecnologia: 'Tecnologia',
+      geral: 'Geral',
+      'direitos-humanos': 'Direitos Humanos',
+      educacao: 'Educação',
+      esportes: 'Esportes',
+      justica: 'Justiça',
+      saude: 'Saúde',
+      analise: 'Análise'
+    };
+
+    // Categorias que pertencem ao grupo "Brasil"
+    const brasilCategories = ['direitos-humanos', 'educacao', 'esportes', 'geral', 'justica', 'saude'];
+
+    let allArticles = [];
+    let currentSection = new URLSearchParams(window.location.search).get('section') || 'home';
+
+    // ── HELPERS ───────────────────────────────────────────────
+
+    function formatTime(dateStr) {
+      const dt = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now - dt;
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffH = Math.floor(diffMs / 3600000);
+      const diffD = Math.floor(diffMs / 86400000);
+
+      if (diffMin < 1) return 'Agora';
+      if (diffMin < 60) return 'Há ' + diffMin + ' min';
+      if (diffH < 24) return 'Há ' + diffH + (diffH === 1 ? ' hora' : ' horas');
+      if (diffD === 1) return 'Há 1 dia';
+      if (diffD < 7) return 'Há ' + diffD + ' dias';
+
+      const day = dt.getDate();
+      const month = dt.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+      return day + ' ' + month;
+    }
+
+    function imgTag(url, cls) {
+      if (url) return '<img class="' + cls + '" src="' + url + '" alt="" loading="lazy" />';
+      return '<div class="' + cls + ' img-placeholder">Sem imagem</div>';
+    }
+
+    function truncate(text, max) {
+      if (!text) return '';
+      if (text.length <= max) return text;
+      return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
+    }
+
+    function stripTags(html) {
+      if (!html) return '';
+      return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    function link(id) { return 'noticia.html?id=' + id; }
+
+    function isRecent(dateStr) {
+      const dt = new Date(dateStr);
+      const now = new Date();
+      return (now - dt) < 3600000; // less than 1 hour
+    }
+
+    // ── DATELINE ─────────────────────────────────────────────
+
     const d = new Date();
     const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const formatted = d.toLocaleDateString('pt-BR', opts);
-    document.getElementById('dateline').textContent =
-      formatted.charAt(0).toUpperCase() + formatted.slice(1);
+    const fmt = d.toLocaleDateString('pt-BR', opts);
+    document.getElementById('dateline').textContent = fmt.charAt(0).toUpperCase() + fmt.slice(1);
+
+    // ── STICKY BAR (clone nav links) ──────────────────────────
+
+    const stickyBar = document.getElementById('stickyBar');
+    const stickyNav = document.getElementById('stickyNav');
+    const navBar = document.querySelector('.nav-bar');
+
+    // Clone nav structure into sticky bar
+    document.querySelectorAll('.nav-bar .nav-links > *').forEach(el => {
+      const clone = el.cloneNode(true);
+      stickyNav.appendChild(clone);
+    });
+
+    // ── NAV (handle clicks on both nav-bar and sticky-bar) ──
+
+    async function setActiveSection(section) {
+      currentSection = section;
+      // Highlight main nav links
+      document.querySelectorAll('.nav-link').forEach(b => {
+        const isBrasilSub = brasilCategories.includes(section);
+        const match = b.dataset.section === section || (b.dataset.section === 'brasil' && isBrasilSub);
+        b.classList.toggle('active', match);
+      });
+      // Highlight dropdown items
+      document.querySelectorAll('.nav-dropdown-item').forEach(b => {
+        b.classList.toggle('active', b.dataset.section === section);
+      });
+      await render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.nav-link').forEach(btn => {
+      btn.addEventListener('click', () => setActiveSection(btn.dataset.section));
+    });
+
+    document.querySelectorAll('.nav-dropdown-item').forEach(btn => {
+      btn.addEventListener('click', () => setActiveSection(btn.dataset.section));
+    });
+
+    // ── SCROLL → show/hide sticky bar ───────────────────────
+
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const threshold = navBar.offsetTop + navBar.offsetHeight;
+          stickyBar.classList.toggle('visible', window.scrollY > threshold);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    // ── SEARCH ───────────────────────────────────────────────
+
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    function openSearch() {
+      searchOverlay.classList.add('active');
+      searchInput.value = '';
+      searchResults.innerHTML = '';
+      setTimeout(() => searchInput.focus(), 100);
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', openSearch);
+    document.getElementById('searchBtn2').addEventListener('click', openSearch);
+
+    function closeSearch() {
+      searchOverlay.classList.remove('active');
+      searchInput.value = '';
+      searchResults.innerHTML = '';
+    }
+
+    document.getElementById('searchClose').addEventListener('click', closeSearch);
+
+    searchOverlay.addEventListener('click', (e) => {
+      if (e.target === searchOverlay) closeSearch();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && searchOverlay.classList.contains('active')) closeSearch();
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchOverlay.classList.add('active');
+        searchInput.value = '';
+        searchResults.innerHTML = '';
+        setTimeout(() => searchInput.focus(), 100);
+      }
+    });
+
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      const query = searchInput.value.trim().toLowerCase();
+      if (query.length < 2) {
+        searchResults.innerHTML = '';
+        return;
+      }
+      searchTimeout = setTimeout(() => performSearch(query), 200);
+    });
+
+    function performSearch(query) {
+      const results = allArticles.filter(a =>
+        a.title.toLowerCase().includes(query) ||
+        (a.description && a.description.toLowerCase().includes(query))
+      ).slice(0, 8);
+
+      if (results.length === 0) {
+        searchResults.innerHTML = '<div class="search-empty">Nenhum resultado para "' + query + '"</div>';
+        return;
+      }
+
+      let html = '';
+      results.forEach(a => {
+        html += '<a class="search-result-item" href="' + link(a.id) + '">' +
+          '<div class="search-result-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</div>' +
+          '<div class="search-result-title">' + a.title + '</div>' +
+          '<div class="search-result-time">' + formatTime(a.published_at) + '</div>' +
+        '</a>';
+      });
+      searchResults.innerHTML = html;
+    }
+
+    // ── RENDER (FT-style layout) ─────────────────────────────
+
+    function renderPage(articles) {
+      if (articles.length === 0) return '<div class="loading">Nenhuma notícia disponível.</div>';
+
+      const heroLeft = articles.slice(0, 2);
+      const hero = heroLeft[0];
+      const mediaArticle = articles[2];
+      const sidebarArticles = articles.slice(3, 6);
+      const headlineArticles = articles.slice(6, 11);
+      const featuredArticle = articles[11];
+      const sidebarExtra = articles.slice(12, 15);
+
+      const usedIds = new Set([
+        ...heroLeft.map(a => a.id),
+        mediaArticle && mediaArticle.id,
+        ...sidebarArticles.map(a => a.id),
+        ...headlineArticles.map(a => a.id),
+        featuredArticle && featuredArticle.id,
+        ...sidebarExtra.map(a => a.id)
+      ].filter(Boolean));
+
+      const remaining = articles.filter(a => !usedIds.has(a.id));
+
+      const byCategory = {};
+      remaining.forEach(a => {
+        if (!byCategory[a.category]) byCategory[a.category] = [];
+        if (byCategory[a.category].length < 3) byCategory[a.category].push(a);
+      });
+
+      let html = '';
+
+      // ── Hero grid (3 columns like FT) ──
+      html += '<div class="hero-grid">';
+
+      // Left column: 2 articles with images
+      html += '<div class="hero-main">';
+      heroLeft.forEach(function(a) {
+        html += '<a class="hero-main-item" href="' + link(a.id) + '">' +
+          imgTag(a.image_url, 'hero-main-img') +
+          '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+          '<span class="time">' + formatTime(a.published_at) + '</span>' +
+          '<h2 class="hero-title">' + a.title + '</h2>' +
+          (a.description ? '<p class="hero-desc">' + truncate(a.description, 120) + '</p>' : '') +
+        '</a>';
+      });
+      html += '</div>';
+
+      // Center column: image + caption article
+      if (mediaArticle) {
+        html += '<div class="hero-media"><a href="' + link(mediaArticle.id) + '">' +
+          imgTag(mediaArticle.image_url, 'hero-img') +
+          '<span class="time">' + formatTime(mediaArticle.published_at) + '</span>' +
+          '<div class="hero-media-caption">' +
+            '<span class="cat cat-' + mediaArticle.category + '">' + (categoryLabels[mediaArticle.category] || mediaArticle.category) + '</span>' +
+            '<p class="hero-media-title">' + mediaArticle.title + '</p>' +
+            (mediaArticle.description ? '<p class="hero-media-desc">' + truncate(mediaArticle.description, 200) + '</p>' : '') +
+            (mediaArticle.body ? '<p class="hero-media-body">' + truncate(stripTags(mediaArticle.body), 400) + '</p>' : '') +
+          '</div>' +
+        '</a></div>';
+      }
+
+      // Right column: sidebar stories
+      if (sidebarArticles.length > 0) {
+        html += '<div class="hero-sidebar">';
+        sidebarArticles.forEach(a => {
+          html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
+            (a.image_url ? '<img class="sidebar-img" src="' + a.image_url + '" alt="" loading="lazy" />' : '') +
+            '<span class="time">' + formatTime(a.published_at) + '</span>' +
+            '<span class="sidebar-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+            '<p class="sidebar-title">' + a.title + '</p>' +
+          '</a>';
+        });
+        html += '</div>';
+      }
+
+      html += '</div>';
+
+      // ── Below hero (3 columns) ──
+      if (headlineArticles.length > 0 || featuredArticle) {
+        html += '<div class="below-hero">';
+
+        // Left: headline list
+        html += '<div class="headlines-col">';
+        headlineArticles.forEach((a, i) => {
+          html += '<a class="headline-item" href="' + link(a.id) + '" style="animation-delay:' + (i * 0.04) + 's">' +
+            '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+            '<p class="headline-title">' + a.title + '</p>' +
+            (isRecent(a.published_at) ? '<span class="badge-new">novo</span>' : '<span class="time">' + formatTime(a.published_at) + '</span>') +
+          '</a>';
+        });
+        html += '</div>';
+
+        // Center: featured article with image
+        if (featuredArticle) {
+          html += '<div class="featured-center"><a href="' + link(featuredArticle.id) + '">' +
+            imgTag(featuredArticle.image_url, 'featured-img') +
+            '<span class="time">' + formatTime(featuredArticle.published_at) + '</span>' +
+            '<span class="cat cat-' + featuredArticle.category + '">' + (categoryLabels[featuredArticle.category] || featuredArticle.category) + '</span>' +
+            '<p class="featured-title">' + featuredArticle.title + '</p>' +
+            (featuredArticle.description ? '<p class="featured-desc">' + truncate(featuredArticle.description, 150) + '</p>' : '') +
+          '</a></div>';
+        }
+
+        // Right: more sidebar items
+        if (sidebarExtra.length > 0) {
+          html += '<div class="sidebar-extra">';
+          sidebarExtra.forEach((a, i) => {
+            var isLast = i === sidebarExtra.length - 1;
+            html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
+              (isLast && a.image_url ? '<img class="sidebar-img" src="' + a.image_url + '" alt="" loading="lazy" />' : '') +
+              '<span class="time">' + formatTime(a.published_at) + '</span>' +
+              '<span class="sidebar-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+              '<p class="sidebar-title">' + a.title + '</p>' +
+            '</a>';
+          });
+          html += '</div>';
+        }
+
+        html += '</div>';
+      }
+
+      // ── Category sections ──
+      var catOrder = ['politica', 'economia', 'internacional', 'tecnologia', 'geral', 'direitos-humanos', 'educacao', 'esportes', 'justica', 'saude'];
+      catOrder.forEach(function(catKey) {
+        if (byCategory[catKey] && byCategory[catKey].length > 0) {
+          var label = categoryLabels[catKey] || catKey;
+          html += '<div class="cat-section">' +
+            '<div class="section-rule"><span>' + label + '</span></div>' +
+            '<div class="cat-grid">';
+          byCategory[catKey].forEach(function(a) {
+            html += '<a class="cat-card" href="' + link(a.id) + '">' +
+              imgTag(a.image_url, 'cat-card-img') +
+              '<div class="cat-card-meta"><span class="time">' + formatTime(a.published_at) + '</span></div>' +
+              '<p class="cat-card-title">' + a.title + '</p>' +
+              (a.description ? '<p class="cat-card-desc">' + truncate(a.description, 100) + '</p>' : '') +
+            '</a>';
+          });
+          html += '</div></div>';
+        }
+      });
+
+      return html;
+    }
+
+    async function render() {
+      const container = document.getElementById('content');
+
+      // Análise busca direto do banco (sem depender do limit da home)
+      if (currentSection === 'analise') {
+        const { data: analiseArticles, error } = await sb
+          .from('articles')
+          .select('id, title, description, body, category, image_url, published_at')
+          .eq('status', 'published')
+          .eq('category', 'analise')
+          .order('published_at', { ascending: false })
+          .limit(50);
+
+        if (error || !analiseArticles || analiseArticles.length === 0) {
+          container.innerHTML = '<div class="loading">Nenhuma notícia de análise disponível.</div>';
+          return;
+        }
+        container.innerHTML = renderPage(analiseArticles);
+        return;
+      }
+
+      let filtered = allArticles;
+      if (currentSection === 'brasil') {
+        filtered = allArticles.filter(a => brasilCategories.includes(a.category));
+      } else if (currentSection === 'economia') {
+        filtered = allArticles.filter(a => a.category === 'mercados' || a.category === 'economia');
+      } else if (currentSection !== 'home') {
+        filtered = allArticles.filter(a => a.category === currentSection);
+      }
+      container.innerHTML = renderPage(filtered);
+    }
+
+    // ── LOAD ─────────────────────────────────────────────────
+
+    async function loadPortal() {
+      const { data: articles, error } = await sb
+        .from('articles')
+        .select('id, title, description, body, category, image_url, published_at')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false })
+        .limit(100);
+
+      if (error || !articles || articles.length === 0) {
+        document.getElementById('content').innerHTML = '<div class="loading">Nenhuma notícia disponível no momento.</div>';
+        return;
+      }
+
+      allArticles = articles;
+      if (currentSection !== 'home') {
+        setActiveSection(currentSection);
+      } else {
+        render();
+      }
+    }
+
+    loadPortal();
   </script>
 
 </body>
