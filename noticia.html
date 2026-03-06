@@ -1060,6 +1060,7 @@
       var query = sb.from('articles')
         .select('id, title, category, image_url, published_at')
         .eq('status', 'published')
+        .not('image_url', 'is', null)
         .order('published_at', { ascending: false })
         .limit(7);
 
@@ -1072,9 +1073,7 @@
 
       var grid = document.getElementById('moreNewsGrid');
       grid.innerHTML = articles.map(function(a) {
-        var imgHtml = a.image_url
-          ? '<img class="more-news-card-img" src="' + a.image_url + '" alt="" loading="lazy" />'
-          : '<div class="more-news-card-placeholder">Sem imagem</div>';
+        var imgHtml = '<img class="more-news-card-img" src="' + a.image_url + '" alt="" loading="lazy" />';
         var cat = categoryLabels[a.category] || a.category;
         var d = new Date(a.published_at);
         var dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
