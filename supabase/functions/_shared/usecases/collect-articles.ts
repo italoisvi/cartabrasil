@@ -14,6 +14,20 @@ import {
   buildImageCaption,
 } from "../domain/article.ts";
 
+async function fetchLinhaFina(articleUrl: string): Promise<string | null> {
+  try {
+    const res = await globalThis.fetch(articleUrl);
+    const html = await res.text();
+    const match = html.match(/<div[^>]*class="[^"]*linha-fina-noticia[^"]*"[^>]*>\s*([\s\S]*?)\s*<\/div>/i);
+    if (match) {
+      return match[1].replace(/<[^>]*>/g, "").trim() || null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 interface CollectArticlesDeps {
   rssFetcher: RSSFetcher;
   articleRepo: ArticleRepository;
@@ -48,7 +62,8 @@ export class CollectArticlesUseCase {
 
       let body = normalizeBody(item.description);
       body = await this.imageStorage.uploadBodyImages(body, articleId);
-      const description = extractDescription(item.description, body);
+      const linhaFina = await fetchLinhaFina(item.link);
+      const description = linhaFina || extractDescription(item.description, body);
 
       try {
         await this.articleRepo.insert({

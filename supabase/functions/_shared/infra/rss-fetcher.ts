@@ -3,6 +3,16 @@
 
 import type { RSSFetcher, RSSItem } from "../domain/ports.ts";
 
+function decodeEntities(text: string): string {
+  return text
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
 function getTagContent(xml: string, tag: string): string {
   const regex = new RegExp(
     `<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>|<${tag}[^>]*>([\\s\\S]*?)</${tag}>`,
@@ -19,7 +29,7 @@ function parseRSSItems(xml: string): RSSItem[] {
 
   while ((match = itemRegex.exec(xml)) !== null) {
     const block = match[1];
-    const title = getTagContent(block, "title");
+    const title = decodeEntities(getTagContent(block, "title"));
     const description = getTagContent(block, "description");
     const pubDate = getTagContent(block, "pubDate");
     const creator = getTagContent(block, "dc:creator");

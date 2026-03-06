@@ -5,7 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CartaBrasil</title>
-  <link rel="icon" type="image/png" href="assets/images/cart.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
@@ -1160,24 +1159,52 @@
     function renderPage(articles) {
       if (articles.length === 0) return '<div class="loading">Nenhuma notícia disponível.</div>';
 
-      const heroLeft = articles.slice(0, 2);
-      const hero = heroLeft[0];
-      const mediaArticle = articles[2];
-      const sidebarArticles = articles.slice(3, 6);
-      const headlineArticles = articles.slice(6, 11);
-      const featuredArticle = articles[11];
-      const sidebarExtra = articles.slice(12, 15);
+      // Deduplicar por título similar (>70% igual)
+      function normalize(t) { return t.toLowerCase().replace(/[^a-záàãâéêíóôõúç0-9]/g, ''); }
+      const seen = [];
+      const unique = articles.filter(function(a) {
+        var n = normalize(a.title);
+        for (var i = 0; i < seen.length; i++) {
+          if (n === seen[i] || (n.length > 20 && seen[i].length > 20 && (n.includes(seen[i].slice(0, 20)) || seen[i].includes(n.slice(0, 20))))) return false;
+        }
+        seen.push(n);
+        return true;
+      });
 
-      const usedIds = new Set([
+      // Separar artigos com e sem foto
+      const withPhoto = unique.filter(a => a.image_url);
+      const noPhoto = unique.filter(a => !a.image_url);
+
+      // Posições com foto obrigatória
+      const heroLeft = withPhoto.slice(0, 2);
+      const mediaArticle = withPhoto[2];
+      const sidebarArticles = withPhoto.slice(3, 6);
+      const featuredArticle = withPhoto[6];
+      const sidebarExtra = withPhoto.slice(7, 10);
+
+      // Posições de texto (headlines) — sem foto, complementar com restantes
+      const usedPhotoIds = new Set([
         ...heroLeft.map(a => a.id),
         mediaArticle && mediaArticle.id,
         ...sidebarArticles.map(a => a.id),
-        ...headlineArticles.map(a => a.id),
         featuredArticle && featuredArticle.id,
         ...sidebarExtra.map(a => a.id)
       ].filter(Boolean));
 
-      const remaining = articles.filter(a => !usedIds.has(a.id));
+      const headlineArticles = noPhoto.slice(0, 5);
+      if (headlineArticles.length < 5) {
+        var extra = withPhoto.filter(a => !usedPhotoIds.has(a.id));
+        for (var i = 0; i < extra.length && headlineArticles.length < 5; i++) {
+          headlineArticles.push(extra[i]);
+        }
+      }
+
+      const usedIds = new Set([
+        ...Array.from(usedPhotoIds),
+        ...headlineArticles.map(a => a.id)
+      ]);
+
+      const remaining = unique.filter(a => !usedIds.has(a.id));
 
       const byCategory = {};
       remaining.forEach(a => {
@@ -1282,18 +1309,40 @@
       catOrder.forEach(function(catKey) {
         if (byCategory[catKey] && byCategory[catKey].length > 0) {
           var label = categoryLabels[catKey] || catKey;
+          var catWithPhoto = byCategory[catKey].filter(a => a.image_url);
+          var catNoPhoto = byCategory[catKey].filter(a => !a.image_url);
+
+          if (catWithPhoto.length === 0 && catNoPhoto.length === 0) return;
+
           html += '<div class="cat-section">' +
-            '<div class="section-rule"><span>' + label + '</span></div>' +
-            '<div class="cat-grid">';
-          byCategory[catKey].forEach(function(a) {
-            html += '<a class="cat-card" href="' + link(a.id) + '">' +
-              imgTag(a.image_url, 'cat-card-img') +
-              '<div class="cat-card-meta"><span class="time">' + formatTime(a.published_at) + '</span></div>' +
-              '<p class="cat-card-title">' + a.title + '</p>' +
-              (a.description ? '<p class="cat-card-desc">' + truncate(a.description, 100) + '</p>' : '') +
-            '</a>';
-          });
-          html += '</div></div>';
+            '<div class="section-rule"><span>' + label + '</span></div>';
+
+          if (catWithPhoto.length > 0) {
+            html += '<div class="cat-grid">';
+            catWithPhoto.forEach(function(a) {
+              html += '<a class="cat-card" href="' + link(a.id) + '">' +
+                '<img class="cat-card-img" src="' + a.image_url + '" alt="" loading="lazy" />' +
+                '<div class="cat-card-meta"><span class="time">' + formatTime(a.published_at) + '</span></div>' +
+                '<p class="cat-card-title">' + a.title + '</p>' +
+                (a.description ? '<p class="cat-card-desc">' + truncate(a.description, 100) + '</p>' : '') +
+              '</a>';
+            });
+            html += '</div>';
+          }
+
+          if (catNoPhoto.length > 0) {
+            html += '<div class="cat-text-list">';
+            catNoPhoto.forEach(function(a) {
+              html += '<a class="headline-item" href="' + link(a.id) + '">' +
+                '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+                '<p class="headline-title">' + a.title + '</p>' +
+                '<span class="time">' + formatTime(a.published_at) + '</span>' +
+              '</a>';
+            });
+            html += '</div>';
+          }
+
+          html += '</div>';
         }
       });
 
