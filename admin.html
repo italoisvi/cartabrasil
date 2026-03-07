@@ -56,9 +56,6 @@
       letter-spacing: 0.04em;
       color: var(--ink);
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
       white-space: nowrap;
     }
 
@@ -914,8 +911,16 @@
 
     @media (max-width: 600px) {
       header { flex-direction: column; gap: 0.4rem; text-align: center; }
-      .container { padding: 1.5rem 1.25rem; }
+      .container { padding: 1.5rem 1rem; }
       .editor-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+      .editor-actions { flex-wrap: wrap; }
+      .form-grid { grid-template-columns: 1fr; }
+      .dash-title { font-size: 1.1rem; }
+      .article-table th:nth-child(4),
+      .article-table td:nth-child(4),
+      .article-table th:nth-child(5),
+      .article-table td:nth-child(5) { display: none; }
+      .td-title { font-size: 0.82rem; }
       footer { flex-direction: column; gap: 0.5rem; text-align: center; }
     }
   </style>

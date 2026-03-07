@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    img { max-width: 100%; height: auto; }
 
     :root {
       --ink: #111111;
@@ -608,13 +609,25 @@
 
     @media (max-width: 768px) {
       .more-news-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+      article { padding: 0 1.5rem; }
+      .article-headline { font-size: 1.6rem; }
     }
 
     @media (max-width: 600px) {
       header { flex-direction: column; gap: 0.4rem; text-align: center; }
-      article { padding: 0 1.25rem; }
-      .article-end { padding: 2rem 1.25rem 3rem; }
-      .more-news { padding: 0 1.25rem 3rem; }
+      article { padding: 0 1rem; }
+      .article-meta { padding-top: 2rem; }
+      .article-headline { font-size: 1.3rem; }
+      .article-description { font-size: 0.95rem; }
+      .article-body p { font-size: 0.95rem; line-height: 1.75; }
+      .article-body h2 { font-size: 1.1rem; }
+      .article-body blockquote { padding: 0.6rem 0 0.6rem 1rem; font-size: 0.95rem; }
+      .article-body img { width: 100%; border-radius: 6px; }
+      .article-body figure figcaption { width: 100%; }
+      .article-end { padding: 2rem 1rem 3rem; }
+      .more-news { padding: 0 1rem 3rem; }
       .more-news-grid { grid-template-columns: 1fr; }
       .footer-top { grid-template-columns: 1fr; gap: 1.5rem; }
       .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }

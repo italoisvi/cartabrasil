@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    img { max-width: 100%; height: auto; }
 
     :root {
       --ink: #111111;
@@ -55,9 +56,6 @@
       letter-spacing: 0.04em;
       color: var(--ink);
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
     }
 
     .logo strong { font-weight: 700; }
@@ -323,11 +321,25 @@
     .footer-bottom a:hover { color: rgba(255,255,255,0.7); }
 
     /* ── RESPONSIVE ────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .main { padding: 2rem 1.5rem 3rem; }
+      .page-title { font-size: 1.3rem; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+
     @media (max-width: 600px) {
       header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      .main { padding: 1.5rem 1rem 2.5rem; }
+      .page-title { font-size: 1.15rem; margin-bottom: 1rem; }
+      .filters { gap: 0.4rem; margin-bottom: 1.5rem; padding-bottom: 1rem; }
+      .filter-chip { padding: 0.35rem 0.7rem; font-size: 0.65rem; }
+      .news-item { padding: 1.2rem 0; }
+      .news-item-header { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+      .news-headline { font-size: 1rem; }
+      .news-description { font-size: 0.82rem; }
       .footer-top { grid-template-columns: 1fr; gap: 1.5rem; }
       .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
-      .news-item-header { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
     }
   </style>
 </head>

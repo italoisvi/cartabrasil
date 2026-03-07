@@ -53,10 +53,7 @@
       font-weight: 400;
       letter-spacing: 0.04em;
       color: var(--ink);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      white-space: nowrap;
+      text-decoration: none;
     }
 
     .logo strong { font-weight: 700; }
@@ -211,7 +208,8 @@
 
     @media (max-width: 600px) {
       header { padding: 1rem; }
-      .register-wrap { margin: 2rem auto; padding: 0 1.25rem; }
+      .register-wrap { margin: 2rem auto; padding: 0 1rem; }
+      .register-title { font-size: 1.3rem; }
       .form-row { grid-template-columns: 1fr; }
       footer { flex-direction: column; gap: 0.5rem; text-align: center; }
     }

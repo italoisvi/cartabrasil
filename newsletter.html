@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    img { max-width: 100%; height: auto; }
 
     :root {
       --ink: #111111;
@@ -55,9 +56,6 @@
       letter-spacing: 0.04em;
       color: var(--ink);
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
     }
 
     .logo strong { font-weight: 700; }
@@ -500,24 +498,31 @@
     .pillar:nth-child(3) { animation-delay: 0.2s; }
 
     /* ── RESPONSIVE ──────────────────────────────────────────── */
-    @media (max-width: 600px) {
-      .pillars {
-        grid-template-columns: 1fr;
-      }
-      .pillar {
-        border-right: none;
-        border-bottom: 1px solid var(--rule);
-        padding: 1.25rem 0;
-      }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero p { font-size: 0.9rem; max-width: 100%; }
+      .hero { padding: 4rem 1.5rem 2.5rem; }
+      .pillars { grid-template-columns: 1fr; }
+      .pillar { border-right: none; border-bottom: 1px solid var(--rule); padding: 1.25rem 0; }
       .pillar:last-child { border-bottom: none; }
-
-      header { flex-direction: column; gap: 0.4rem; text-align: center; }
-
+      .proof { padding: 2.5rem 1.5rem; }
       .stat { margin: 0 1rem; }
+    }
 
-      .site-footer-minimal { flex-direction: column; gap: 0.5rem; text-align: center; }
-
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      .hero { padding: 3rem 1rem 2rem; }
+      .hero h1 { font-size: 1.4rem; }
+      .hero p { font-size: 0.85rem; }
+      .form-wrap { flex-direction: column; border: none; gap: 0.5rem; }
+      .form-wrap input { border: 1px solid var(--ink); padding: 0.85rem 1rem; }
+      .form-wrap button { padding: 0.85rem 1rem; }
+      .stat { display: block; margin: 0 auto 1.5rem; }
+      .stat-num { font-size: 1.6rem; }
+      .proof { padding: 2rem 1rem; }
+      .proof-quote { font-size: 0.9rem; }
       .news-item { grid-template-columns: 1fr; }
+      .site-footer-minimal { flex-direction: column; gap: 0.5rem; text-align: center; }
     }
   </style>
 </head>
