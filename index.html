@@ -410,6 +410,14 @@
     .hero-main-item { display: block; transition: opacity 0.15s; }
     .hero-main-item:hover { opacity: 0.7; }
 
+    .hero-text-item {
+      display: block;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+      transition: opacity 0.15s;
+    }
+    .hero-text-item:hover { opacity: 0.7; }
+
     .hero-main-img {
       width: 100%;
       aspect-ratio: 16 / 10;
@@ -475,13 +483,18 @@
       margin-top: 0.5rem;
     }
 
-    .hero-media-body {
-      font-family: 'Lora', serif;
-      font-size: 1.08rem;
-      font-weight: 400;
-      line-height: 1.85;
-      color: var(--ink);
-      margin-top: 0.5rem;
+    .hero-second {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    .hero-second-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+      border-radius: 4px;
     }
 
     .hero-sidebar {
@@ -814,14 +827,94 @@
       .sticky-nav .nav-link { white-space: nowrap; padding: 0.6rem 0.8rem; font-size: 0.68rem; }
     }
 
+    /* ── MOBILE SIDEBAR DRAWER ─────────────────────────────── */
+    .mobile-drawer-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+    }
+
+    .mobile-drawer-overlay.active { display: block; }
+
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100%;
+      background: var(--paper);
+      z-index: 201;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .mobile-drawer.active { transform: translateX(0); }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .drawer-header .logo {
+      font-size: 1.3rem;
+    }
+
+    .drawer-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.4rem;
+      color: var(--ink);
+      display: flex;
+    }
+
+    .drawer-close svg { width: 20px; height: 20px; }
+
+    .drawer-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .drawer-section h4 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .drawer-link {
+      display: block;
+      padding: 0.5rem 0;
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .drawer-link:last-child { border-bottom: none; }
+    .drawer-link:hover { color: var(--accent); }
+
     @media (max-width: 600px) {
       header { padding: 0.8rem 1rem; }
       .container { padding: 1.2rem 1rem; }
       .cat-grid { grid-template-columns: 1fr; }
       .hero-title { font-size: 1.4rem; }
       .nav-date { display: none; }
-      .footer-top { grid-template-columns: 1fr; gap: 1.5rem; }
+      .nav-bar { display: none; }
+      .footer-top { grid-template-columns: 1fr 1fr 1fr; gap: 1rem; padding: 2rem 1rem 1.5rem; }
       .footer-brand { grid-column: 1 / -1; }
+      .footer-col h4 { font-size: 0.55rem; }
+      .footer-col a { font-size: 0.68rem; padding: 0.2rem 0; }
       .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
       .sticky-right .btn-subscribe { display: none; }
       .search-overlay { padding-top: 20px; }
@@ -864,6 +957,44 @@
         <button class="search-close" id="searchClose">ESC</button>
       </div>
       <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <!-- MOBILE DRAWER -->
+  <div class="mobile-drawer-overlay" id="drawerOverlay"></div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <a class="logo" href="/">Carta<strong>Brasil</strong></a>
+      <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-section">
+      <h4>Editorias</h4>
+      <a class="drawer-link" data-section="home">Home</a>
+      <a class="drawer-link" data-section="politica">Política</a>
+      <a class="drawer-link" data-section="economia">Economia</a>
+      <a class="drawer-link" data-section="internacional">Mundo</a>
+      <a class="drawer-link" data-section="tecnologia">Tecnologia</a>
+      <a class="drawer-link" data-section="analise">Análise</a>
+    </div>
+    <div class="drawer-section">
+      <h4>Brasil</h4>
+      <a class="drawer-link" data-section="direitos-humanos">Direitos Humanos</a>
+      <a class="drawer-link" data-section="educacao">Educação</a>
+      <a class="drawer-link" data-section="esportes">Esportes</a>
+      <a class="drawer-link" data-section="justica">Justiça</a>
+      <a class="drawer-link" data-section="saude">Saúde</a>
+      <a class="drawer-link" data-section="geral">Geral</a>
+    </div>
+    <div class="drawer-section">
+      <h4>Institucional</h4>
+      <a class="drawer-link" href="/newsletter">Assinar</a>
+      <a class="drawer-link" href="acervo.html">Acervo</a>
+      <a class="drawer-link" href="contato.html">Contato</a>
+      <a class="drawer-link" href="privacidade.html">Privacidade</a>
     </div>
   </div>
 
@@ -1002,7 +1133,7 @@
 
     function imgTag(url, cls) {
       if (url) return '<img class="' + cls + '" src="' + url + '" alt="" loading="lazy" />';
-      return '<div class="' + cls + ' img-placeholder">Sem imagem</div>';
+      return '';
     }
 
     function truncate(text, max) {
@@ -1081,6 +1212,32 @@
         });
         ticking = true;
       }
+    });
+
+    // ── MOBILE DRAWER ─────────────────────────────────────────
+    const drawer = document.getElementById('mobileDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+
+    function openDrawer() {
+      drawer.classList.add('active');
+      drawerOverlay.classList.add('active');
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove('active');
+      drawerOverlay.classList.remove('active');
+    }
+
+    document.getElementById('menuBtn').addEventListener('click', openDrawer);
+    document.getElementById('menuBtn2').addEventListener('click', openDrawer);
+    document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+
+    document.querySelectorAll('.drawer-link[data-section]').forEach(link => {
+      link.addEventListener('click', function() {
+        closeDrawer();
+        setActiveSection(this.dataset.section);
+      });
     });
 
     // ── SEARCH ───────────────────────────────────────────────
@@ -1179,29 +1336,38 @@
       // Posições com foto obrigatória
       const heroLeft = withPhoto.slice(0, 2);
       const mediaArticle = withPhoto[2];
-      const sidebarArticles = withPhoto.slice(3, 6);
-      const featuredArticle = withPhoto[6];
-      const sidebarExtra = withPhoto.slice(7, 10);
+      const secondMediaArticle = withPhoto[3];
+      const sidebarArticles = withPhoto.slice(4, 7);
+      const featuredArticle = withPhoto[7];
+      const sidebarExtra = withPhoto.slice(8, 11);
 
-      // Posições de texto (headlines) — sem foto, complementar com restantes
+      // IDs já usados nas posições com foto
       const usedPhotoIds = new Set([
         ...heroLeft.map(a => a.id),
         mediaArticle && mediaArticle.id,
+        secondMediaArticle && secondMediaArticle.id,
         ...sidebarArticles.map(a => a.id),
         featuredArticle && featuredArticle.id,
         ...sidebarExtra.map(a => a.id)
       ].filter(Boolean));
 
-      const headlineArticles = noPhoto.slice(0, 5);
-      if (headlineArticles.length < 5) {
-        var extra = withPhoto.filter(a => !usedPhotoIds.has(a.id));
-        for (var i = 0; i < extra.length && headlineArticles.length < 5; i++) {
-          headlineArticles.push(extra[i]);
-        }
-      }
+      // Artigos extras (text-only) para preencher espaços na coluna esquerda e sidebar
+      const unusedPool = unique.filter(a => !usedPhotoIds.has(a.id));
+      const heroLeftExtra = unusedPool.slice(0, 1);
+      const sidebarTextExtra = unusedPool.slice(1, 2);
+
+      const usedExtrasIds = new Set([
+        ...heroLeftExtra.map(a => a.id),
+        ...sidebarTextExtra.map(a => a.id)
+      ]);
+
+      // Posições de texto (headlines) — sem foto, complementar com restantes
+      const headlinePool = unusedPool.filter(a => !usedExtrasIds.has(a.id));
+      const headlineArticles = headlinePool.slice(0, 5);
 
       const usedIds = new Set([
         ...Array.from(usedPhotoIds),
+        ...Array.from(usedExtrasIds),
         ...headlineArticles.map(a => a.id)
       ]);
 
@@ -1218,7 +1384,7 @@
       // ── Hero grid (3 columns like FT) ──
       html += '<div class="hero-grid">';
 
-      // Left column: 2 articles with images
+      // Left column: 2 articles with images + text-only extras
       html += '<div class="hero-main">';
       heroLeft.forEach(function(a) {
         html += '<a class="hero-main-item" href="' + link(a.id) + '">' +
@@ -1229,28 +1395,54 @@
           (a.description ? '<p class="hero-desc">' + truncate(a.description, 120) + '</p>' : '') +
         '</a>';
       });
+      heroLeftExtra.forEach(function(a) {
+        html += '<a class="hero-text-item" href="' + link(a.id) + '">' +
+          '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+          '<span class="time">' + formatTime(a.published_at) + '</span>' +
+          '<h2 class="hero-title">' + a.title + '</h2>' +
+        '</a>';
+      });
       html += '</div>';
 
-      // Center column: image + caption article
+      // Center column: main article + second article below
       if (mediaArticle) {
-        html += '<div class="hero-media"><a href="' + link(mediaArticle.id) + '">' +
+        html += '<div class="hero-media">';
+        html += '<a href="' + link(mediaArticle.id) + '">' +
           imgTag(mediaArticle.image_url, 'hero-img') +
           '<span class="time">' + formatTime(mediaArticle.published_at) + '</span>' +
           '<div class="hero-media-caption">' +
             '<span class="cat cat-' + mediaArticle.category + '">' + (categoryLabels[mediaArticle.category] || mediaArticle.category) + '</span>' +
             '<p class="hero-media-title">' + mediaArticle.title + '</p>' +
             (mediaArticle.description ? '<p class="hero-media-desc">' + truncate(mediaArticle.description, 200) + '</p>' : '') +
-            (mediaArticle.body ? '<p class="hero-media-body">' + truncate(stripTags(mediaArticle.body), 400) + '</p>' : '') +
           '</div>' +
-        '</a></div>';
+        '</a>';
+        if (secondMediaArticle) {
+          html += '<a class="hero-second" href="' + link(secondMediaArticle.id) + '">' +
+            imgTag(secondMediaArticle.image_url, 'hero-second-img') +
+            '<span class="time">' + formatTime(secondMediaArticle.published_at) + '</span>' +
+            '<div class="hero-media-caption">' +
+              '<span class="cat cat-' + secondMediaArticle.category + '">' + (categoryLabels[secondMediaArticle.category] || secondMediaArticle.category) + '</span>' +
+              '<p class="hero-media-title">' + secondMediaArticle.title + '</p>' +
+              (secondMediaArticle.description ? '<p class="hero-media-desc">' + truncate(secondMediaArticle.description, 200) + '</p>' : '') +
+            '</div>' +
+          '</a>';
+        }
+        html += '</div>';
       }
 
-      // Right column: sidebar stories
+      // Right column: sidebar stories + text-only extras
       if (sidebarArticles.length > 0) {
         html += '<div class="hero-sidebar">';
         sidebarArticles.forEach(a => {
           html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
             (a.image_url ? '<img class="sidebar-img" src="' + a.image_url + '" alt="" loading="lazy" />' : '') +
+            '<span class="time">' + formatTime(a.published_at) + '</span>' +
+            '<span class="sidebar-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
+            '<p class="sidebar-title">' + a.title + '</p>' +
+          '</a>';
+        });
+        sidebarTextExtra.forEach(a => {
+          html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
             '<span class="time">' + formatTime(a.published_at) + '</span>' +
             '<span class="sidebar-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
             '<p class="sidebar-title">' + a.title + '</p>' +

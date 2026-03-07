@@ -36,42 +36,182 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    a { text-decoration: none; color: inherit; }
+
     /* ── HEADER ─────────────────────────────────────────────── */
     header {
       border-bottom: 1px solid var(--rule);
-      padding: 1.25rem 2rem;
-      display: flex;
+      padding: 0.8rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: space-between;
       background: var(--paper);
       position: sticky;
       top: 0;
       z-index: 10;
     }
 
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .header-center {
+      text-align: center;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.8rem;
+    }
+
     .logo {
       font-family: 'Lora', serif;
-      font-size: 1.1rem;
+      font-size: 2rem;
       font-weight: 400;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.02em;
       color: var(--ink);
       text-decoration: none;
+      white-space: nowrap;
     }
 
     .logo strong { font-weight: 700; }
 
-    .logo-mascot {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.4rem;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.15s;
     }
 
+    .icon-btn:hover { opacity: 0.6; }
+    .icon-btn svg { width: 20px; height: 20px; }
 
-    .header-meta {
-      font-size: 0.7rem;
+    .btn-subscribe {
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      padding: 0.45rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-subscribe:hover { opacity: 0.8; }
+
+    /* ── SEARCH OVERLAY ───────────────────────────────────────── */
+    .search-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 80px;
+    }
+
+    .search-overlay.active { display: flex; }
+
+    .search-box {
+      background: var(--paper);
+      width: 100%;
+      max-width: 640px;
+      border-radius: 8px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+      animation: fadeDown 0.25s ease;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-input-wrap {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--rule);
+      gap: 0.8rem;
+    }
+
+    .search-input-wrap svg { width: 20px; height: 20px; color: var(--ink-muted); flex-shrink: 0; }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      color: var(--ink);
+      background: transparent;
+    }
+
+    .search-input::placeholder { color: var(--ink-muted); }
+
+    .search-close {
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.65rem;
       color: var(--ink-muted);
-      letter-spacing: 0.12em;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .search-results {
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .search-result-item {
+      display: block;
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--rule);
+      transition: background 0.12s;
+    }
+
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: var(--bg); }
+
+    .search-result-cat {
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .search-result-title {
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+    }
+
+    .search-result-time {
+      font-size: 0.62rem;
+      color: var(--ink-muted);
+      margin-top: 0.2rem;
+    }
+
+    .search-empty {
+      padding: 2rem 1.2rem;
+      text-align: center;
+      color: var(--ink-muted);
+      font-size: 0.85rem;
     }
 
     /* ── DATELINE ──────────────────────────────────────────── */
@@ -324,12 +464,15 @@
     @media (max-width: 768px) {
       .main { padding: 2rem 1.5rem 3rem; }
       .page-title { font-size: 1.3rem; }
+      .logo { font-size: 1.6rem; }
       .footer-top { grid-template-columns: 1fr 1fr; }
       .footer-brand { grid-column: 1 / -1; }
     }
 
     @media (max-width: 600px) {
-      header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      header { padding: 0.8rem 1rem; }
+      .search-overlay { padding-top: 20px; }
+      .search-box { margin: 0 0.5rem; }
       .main { padding: 1.5rem 1rem 2.5rem; }
       .page-title { font-size: 1.15rem; margin-bottom: 1rem; }
       .filters { gap: 0.4rem; margin-bottom: 1.5rem; padding-bottom: 1rem; }
@@ -347,9 +490,34 @@
 
   <!-- HEADER -->
   <header>
-    <a class="logo" href="/">Carta<strong>Brasil</strong></a>
-    <p class="header-meta">Carta<strong>Brasil</strong> · Breaking news</p>
+    <div class="header-left">
+      <button class="icon-btn" id="searchBtn" aria-label="Pesquisar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </div>
+    <div class="header-center">
+      <a class="logo" href="/">Carta<strong>Brasil</strong></a>
+    </div>
+    <div class="header-right">
+      <a class="btn-subscribe" href="/newsletter">Assinar</a>
+    </div>
   </header>
+
+  <!-- SEARCH OVERLAY -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="Pesquisar notícias..." autocomplete="off" />
+        <button class="search-close" id="searchClose">ESC</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
 
   <!-- DATELINE -->
   <div class="dateline" id="dateline"></div>
@@ -543,6 +711,85 @@
 
     // Load inicial
     loadArticles();
+
+    // ── SEARCH ───────────────────────────────────────────────
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    function openSearch() {
+      searchOverlay.classList.add('active');
+      searchInput.value = '';
+      searchResults.innerHTML = '';
+      setTimeout(() => searchInput.focus(), 100);
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', openSearch);
+
+    function closeSearch() {
+      searchOverlay.classList.remove('active');
+      searchInput.value = '';
+      searchResults.innerHTML = '';
+    }
+
+    document.getElementById('searchClose').addEventListener('click', closeSearch);
+
+    searchOverlay.addEventListener('click', (e) => {
+      if (e.target === searchOverlay) closeSearch();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && searchOverlay.classList.contains('active')) closeSearch();
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        openSearch();
+      }
+    });
+
+    function formatSearchTime(dateStr) {
+      const dt = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now - dt;
+      const diffMin = Math.floor(diffMs / 60000);
+      if (diffMin < 60) return diffMin + ' min atrás';
+      const diffH = Math.floor(diffMin / 60);
+      if (diffH < 24) return diffH + 'h atrás';
+      return dt.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    }
+
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      const query = searchInput.value.trim();
+      if (query.length < 2) {
+        searchResults.innerHTML = '';
+        return;
+      }
+      searchTimeout = setTimeout(() => performSearch(query), 200);
+    });
+
+    async function performSearch(query) {
+      const { data } = await sb.from('articles')
+        .select('id, title, category, published_at')
+        .or('title.ilike.%' + query + '%,description.ilike.%' + query + '%')
+        .order('published_at', { ascending: false })
+        .limit(8);
+
+      if (!data || data.length === 0) {
+        searchResults.innerHTML = '<div class="search-empty">Nenhum resultado para "' + query + '"</div>';
+        return;
+      }
+
+      let html = '';
+      data.forEach(a => {
+        html += '<a class="search-result-item" href="noticia.html?id=' + a.id + '">' +
+          '<div class="search-result-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</div>' +
+          '<div class="search-result-title">' + a.title + '</div>' +
+          '<div class="search-result-time">' + formatSearchTime(a.published_at) + '</div>' +
+        '</a>';
+      });
+      searchResults.innerHTML = html;
+    }
   </script>
 
 </body>
