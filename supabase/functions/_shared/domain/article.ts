@@ -106,6 +106,18 @@ function removeJunk(html: string): string {
     "",
   );
 
+  // Embeds do Instagram — converter blockquote em link estilizado
+  clean = clean.replace(
+    /<blockquote[^>]*class="[^"]*instagram-media[^"]*"[^>]*>[\s\S]*?<\/blockquote>/gi,
+    (match) => {
+      const hrefMatch = match.match(/data-instgrm-permalink="([^"]+)"/i)
+        || match.match(/<a[^>]*href="(https?:\/\/(?:www\.)?instagram\.com\/[^"]+)"/i);
+      if (!hrefMatch) return "";
+      const url = hrefMatch[1];
+      return `<p><a href="${url}">Ver publicação no Instagram</a></p>`;
+    },
+  );
+
   // Iframes (vídeos embarcados)
   clean = clean.replace(/<iframe[\s\S]*?<\/iframe>/gi, "");
   // Parágrafos que ficaram só com iframe
