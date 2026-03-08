@@ -1351,23 +1351,12 @@
         ...sidebarExtra.map(a => a.id)
       ].filter(Boolean));
 
-      // Artigos extras (text-only) para preencher espaços na coluna esquerda e sidebar
+      // Posições de texto (headlines)
       const unusedPool = unique.filter(a => !usedPhotoIds.has(a.id));
-      const heroLeftExtra = unusedPool.slice(0, 1);
-      const sidebarTextExtra = unusedPool.slice(1, 2);
-
-      const usedExtrasIds = new Set([
-        ...heroLeftExtra.map(a => a.id),
-        ...sidebarTextExtra.map(a => a.id)
-      ]);
-
-      // Posições de texto (headlines) — sem foto, complementar com restantes
-      const headlinePool = unusedPool.filter(a => !usedExtrasIds.has(a.id));
-      const headlineArticles = headlinePool.slice(0, 5);
+      const headlineArticles = unusedPool.slice(0, 5);
 
       const usedIds = new Set([
         ...Array.from(usedPhotoIds),
-        ...Array.from(usedExtrasIds),
         ...headlineArticles.map(a => a.id)
       ]);
 
@@ -1393,13 +1382,6 @@
           '<span class="time">' + formatTime(a.published_at) + '</span>' +
           '<h2 class="hero-title">' + a.title + '</h2>' +
           (a.description ? '<p class="hero-desc">' + truncate(a.description, 120) + '</p>' : '') +
-        '</a>';
-      });
-      heroLeftExtra.forEach(function(a) {
-        html += '<a class="hero-text-item" href="' + link(a.id) + '">' +
-          '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
-          '<span class="time">' + formatTime(a.published_at) + '</span>' +
-          '<h2 class="hero-title">' + a.title + '</h2>' +
         '</a>';
       });
       html += '</div>';
@@ -1436,13 +1418,6 @@
         sidebarArticles.forEach(a => {
           html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
             (a.image_url ? '<img class="sidebar-img" src="' + a.image_url + '" alt="" loading="lazy" />' : '') +
-            '<span class="time">' + formatTime(a.published_at) + '</span>' +
-            '<span class="sidebar-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
-            '<p class="sidebar-title">' + a.title + '</p>' +
-          '</a>';
-        });
-        sidebarTextExtra.forEach(a => {
-          html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
             '<span class="time">' + formatTime(a.published_at) + '</span>' +
             '<span class="sidebar-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
             '<p class="sidebar-title">' + a.title + '</p>' +
@@ -1503,9 +1478,8 @@
         if (byCategory[catKey] && byCategory[catKey].length > 0) {
           var label = categoryLabels[catKey] || catKey;
           var catWithPhoto = byCategory[catKey].filter(a => a.image_url);
-          var catNoPhoto = byCategory[catKey].filter(a => !a.image_url);
 
-          if (catWithPhoto.length === 0 && catNoPhoto.length === 0) return;
+          if (catWithPhoto.length === 0) return;
 
           html += '<div class="cat-section">' +
             '<div class="section-rule"><span>' + label + '</span></div>';
@@ -1518,18 +1492,6 @@
                 '<div class="cat-card-meta"><span class="time">' + formatTime(a.published_at) + '</span></div>' +
                 '<p class="cat-card-title">' + a.title + '</p>' +
                 (a.description ? '<p class="cat-card-desc">' + truncate(a.description, 100) + '</p>' : '') +
-              '</a>';
-            });
-            html += '</div>';
-          }
-
-          if (catNoPhoto.length > 0) {
-            html += '<div class="cat-text-list">';
-            catNoPhoto.forEach(function(a) {
-              html += '<a class="headline-item" href="' + link(a.id) + '">' +
-                '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
-                '<p class="headline-title">' + a.title + '</p>' +
-                '<span class="time">' + formatTime(a.published_at) + '</span>' +
               '</a>';
             });
             html += '</div>';
