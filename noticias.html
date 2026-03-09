@@ -670,6 +670,7 @@
         .from('articles')
         .select('id, title, description, category, published_at')
         .eq('status', 'published')
+        .neq('source_name', 'G1')
         .order('published_at', { ascending: false })
         .range(offset, offset + PAGE_SIZE - 1);
 
@@ -773,6 +774,7 @@
     async function performSearch(query) {
       const { data } = await sb.from('articles')
         .select('id, title, category, published_at')
+        .neq('source_name', 'G1')
         .or('title.ilike.%' + query + '%,description.ilike.%' + query + '%')
         .order('published_at', { ascending: false })
         .limit(8);

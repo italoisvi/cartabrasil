@@ -19,9 +19,6 @@ const FEEDS: FeedConfig[] = [
   { url: "https://agenciabrasil.ebc.com.br/rss/esportes/feed.xml", category: "esportes", sourceName: "Agência Brasil" },
   { url: "https://agenciabrasil.ebc.com.br/rss/justica/feed.xml", category: "justica", sourceName: "Agência Brasil" },
   { url: "https://agenciabrasil.ebc.com.br/rss/saude/feed.xml", category: "saude", sourceName: "Agência Brasil" },
-
-  // ── G1 (categoria extraída da URL de cada artigo) ──
-  { url: "https://g1.globo.com/rss/g1/", category: null, sourceName: "G1" },
 ];
 
 Deno.serve(async (req) => {

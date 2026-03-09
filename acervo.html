@@ -529,7 +529,8 @@
       const { data, error } = await sb
         .from('articles')
         .select('category')
-        .eq('status', 'published');
+        .eq('status', 'published')
+        .neq('source_name', 'G1');
 
       if (error || !data) return;
 
@@ -593,6 +594,7 @@
         .from('articles')
         .select('id, title, description, category, image_url, published_at, source_name, author', { count: 'exact' })
         .eq('status', 'published')
+        .neq('source_name', 'G1')
         .order('published_at', { ascending: false })
         .range(currentPage * PER_PAGE, (currentPage + 1) * PER_PAGE - 1);
 
