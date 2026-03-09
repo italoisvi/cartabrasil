@@ -95,8 +95,8 @@ export function buildNewsletterHtml(
             <td style="padding: 24px 32px; border-bottom: 1px solid #e0e0e0;">
               <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
-                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #111111; letter-spacing: 0.03em;">
-                    Carta Brasil
+                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 400; color: #111111; letter-spacing: 0.03em;">
+                    Carta<strong>Brasil</strong>
                   </td>
                   <td align="right" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #999999; letter-spacing: 0.1em; text-transform: uppercase;">
                     Breaking news
@@ -140,7 +140,7 @@ export function buildNewsletterHtml(
           <tr>
             <td style="padding: 20px 32px; border-top: 1px solid #e0e0e0; text-align: center;">
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #999999; margin: 0 0 6px;">
-                &copy; 2026 Carta Brasil &middot; Todos os direitos reservados
+                &copy; 2026 Carta<strong>Brasil</strong> &middot; Todos os direitos reservados
               </p>
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; margin: 0;">
                 <a href="${unsubscribeUrl}" style="color: #999999; text-decoration: underline;">Alterar preferências</a>
@@ -201,8 +201,8 @@ export function buildWelcomeHtml(
             <td style="padding: 24px 32px; border-bottom: 1px solid #e0e0e0;">
               <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
-                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #111111; letter-spacing: 0.03em;">
-                    Carta Brasil
+                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 400; color: #111111; letter-spacing: 0.03em;">
+                    Carta<strong>Brasil</strong>
                   </td>
                   <td align="right" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; color: #999999; letter-spacing: 0.1em; text-transform: uppercase;">
                     Bem-vindo
@@ -272,7 +272,7 @@ export function buildWelcomeHtml(
           <tr>
             <td style="padding: 20px 32px; border-top: 1px solid #e0e0e0; text-align: center;">
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #999999; margin: 0 0 6px;">
-                &copy; 2026 Carta Brasil &middot; Todos os direitos reservados
+                &copy; 2026 Carta<strong>Brasil</strong> &middot; Todos os direitos reservados
               </p>
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; margin: 0;">
                 <a href="${prefsUrl}" style="color: #999999; text-decoration: underline;">Alterar preferências</a>
