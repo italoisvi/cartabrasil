@@ -10,15 +10,15 @@ import { SupabaseImageStorage } from "../_shared/infra/supabase-image-storage.ts
 
 const FEEDS: FeedConfig[] = [
   // ── Agência Brasil (categoria fixa por feed) ──
-  { url: "http://agenciabrasil.ebc.com.br/rss/politica/feed.xml", category: "politica", sourceName: "Agência Brasil" },
-  { url: "http://agenciabrasil.ebc.com.br/rss/economia/feed.xml", category: "mercados", sourceName: "Agência Brasil" },
-  { url: "http://agenciabrasil.ebc.com.br/rss/internacional/feed.xml", category: "internacional", sourceName: "Agência Brasil" },
-  { url: "http://agenciabrasil.ebc.com.br/rss/geral/feed.xml", category: "geral", sourceName: "Agência Brasil" },
-  { url: "http://agenciabrasil.ebc.com.br/rss/direitos-humanos/feed.xml", category: "direitos-humanos", sourceName: "Agência Brasil" },
-  { url: "http://agenciabrasil.ebc.com.br/rss/educacao/feed.xml", category: "educacao", sourceName: "Agência Brasil" },
-  { url: "http://agenciabrasil.ebc.com.br/rss/esportes/feed.xml", category: "esportes", sourceName: "Agência Brasil" },
-  { url: "http://agenciabrasil.ebc.com.br/rss/justica/feed.xml", category: "justica", sourceName: "Agência Brasil" },
-  { url: "http://agenciabrasil.ebc.com.br/rss/saude/feed.xml", category: "saude", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/politica/feed.xml", category: "politica", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/economia/feed.xml", category: "mercados", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/internacional/feed.xml", category: "internacional", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/geral/feed.xml", category: "geral", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/direitos-humanos/feed.xml", category: "direitos-humanos", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/educacao/feed.xml", category: "educacao", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/esportes/feed.xml", category: "esportes", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/justica/feed.xml", category: "justica", sourceName: "Agência Brasil" },
+  { url: "https://agenciabrasil.ebc.com.br/rss/saude/feed.xml", category: "saude", sourceName: "Agência Brasil" },
 
   // ── G1 (categoria extraída da URL de cada artigo) ──
   { url: "https://g1.globo.com/rss/g1/", category: null, sourceName: "G1" },
