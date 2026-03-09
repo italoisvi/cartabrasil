@@ -461,7 +461,10 @@
       // Enviar email de boas-vindas
       fetch(SUPABASE_URL + '/functions/v1/welcome-subscriber', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+        },
         body: JSON.stringify({ email, categories, frequency })
       }).catch(function(err) { console.error('Erro ao enviar boas-vindas:', err); });
     });
