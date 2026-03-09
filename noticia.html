@@ -1217,6 +1217,17 @@
         document.body.appendChild(igScript);
       }
 
+      // Carregar widgets.js do Twitter/X se houver embeds na página
+      if (bodyEl.querySelector('.twitter-tweet')) {
+        var twScript = document.createElement('script');
+        twScript.src = 'https://platform.twitter.com/widgets.js';
+        twScript.async = true;
+        twScript.onload = function() {
+          if (window.twttr) window.twttr.widgets.load(bodyEl);
+        };
+        document.body.appendChild(twScript);
+      }
+
       // Transição: skeleton → conteúdo
       document.getElementById('articleSkeleton').style.display = 'none';
       document.getElementById('articleContent').style.display = '';
