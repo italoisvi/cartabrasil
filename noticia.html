@@ -1217,6 +1217,16 @@
         document.body.appendChild(igScript);
       }
 
+      // Detectar blockquotes de tweets que perderam a classe (artigos antigos)
+      // Padrão: blockquote com link para twitter.com/x.com e texto "(@usuario)"
+      bodyEl.querySelectorAll('blockquote:not(.twitter-tweet)').forEach(function(bq) {
+        var hasTwitterLink = bq.querySelector('a[href*="twitter.com"], a[href*="x.com"]');
+        var hasHandle = /\(@\w+\)/.test(bq.textContent);
+        if (hasTwitterLink && hasHandle) {
+          bq.classList.add('twitter-tweet');
+        }
+      });
+
       // Carregar widgets.js do Twitter/X se houver embeds na página
       if (bodyEl.querySelector('.twitter-tweet')) {
         var twScript = document.createElement('script');

@@ -306,6 +306,11 @@ function sanitizeTags(html: string): string {
       } else {
         return ""; // remover iframes de fontes não confiáveis
       }
+    } else if (t === "blockquote") {
+      const cls = attrs.match(/class="([^"]*)"/i);
+      if (cls && cls[1].includes("twitter-tweet")) {
+        cleanAttrs = ` class="twitter-tweet"`;
+      }
     } else if (t === "figure") {
       const cls = attrs.match(/class="([^"]*)"/i);
       if (cls && cls[1].includes("video-embed")) {
