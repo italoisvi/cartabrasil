@@ -145,7 +145,7 @@ export function buildNewsletterHtml(
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; margin: 0;">
                 <a href="${unsubscribeUrl}" style="color: #999999; text-decoration: underline;">Alterar preferências</a>
                 &nbsp;&middot;&nbsp;
-                <a href="${baseUrl}" style="color: #999999; text-decoration: underline;">Descadastrar</a>
+                <a href="${baseUrl}/descadastrar?email=${encodeURIComponent(email)}" style="color: #999999; text-decoration: underline;">Descadastrar</a>
               </p>
             </td>
           </tr>
@@ -277,7 +277,7 @@ export function buildWelcomeHtml(
               <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; margin: 0;">
                 <a href="${prefsUrl}" style="color: #999999; text-decoration: underline;">Alterar preferências</a>
                 &nbsp;&middot;&nbsp;
-                <a href="${baseUrl}" style="color: #999999; text-decoration: underline;">Descadastrar</a>
+                <a href="${baseUrl}/descadastrar?email=${encodeURIComponent(email)}" style="color: #999999; text-decoration: underline;">Descadastrar</a>
               </p>
             </td>
           </tr>

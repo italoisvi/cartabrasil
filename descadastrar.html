@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/png" href="/assets/images/CB.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Descadastrar — CartaBrasil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #111111;
+      --ink-light: #555555;
+      --ink-muted: #999999;
+      --rule: #e0e0e0;
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --accent: #c0392b;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+    }
+
+    .logo {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .logo strong { font-weight: 700; }
+
+    .header-meta {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .content {
+      flex: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .content h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.4rem, 4vw, 1.8rem);
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-bottom: 0.8rem;
+    }
+
+    .content p {
+      font-size: 0.9rem;
+      color: var(--ink-light);
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    .content .user-email {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-danger {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-danger:hover { background: #a93226; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--ink-muted);
+      border: 1px solid var(--rule);
+      margin-left: 0.75rem;
+    }
+
+    .btn-secondary:hover { border-color: var(--ink-muted); }
+
+    .btn-back {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    .btn-back:hover { color: var(--ink); }
+
+    .success-message {
+      display: none;
+    }
+
+    .success-message h1 {
+      margin-bottom: 0.6rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.06em;
+    }
+
+    footer a {
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    footer a:hover { color: var(--ink); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .content { animation: fadeUp 0.6s ease both; }
+
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      .content { padding: 3rem 1rem; }
+      .btn { display: block; margin: 0 0 0.75rem; }
+      .btn-secondary { margin-left: 0; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="/">Carta<strong>Brasil</strong></a>
+    <p class="header-meta">Carta<strong>Brasil</strong> · Breaking news</p>
+  </header>
+
+  <div class="content" id="confirmView">
+    <h1>Deseja cancelar sua assinatura?</h1>
+    <p>Você não receberá mais newsletters no endereço <span class="user-email" id="userEmail">—</span>. Você pode se recadastrar a qualquer momento.</p>
+    <div>
+      <button class="btn btn-danger" id="btnConfirm">Cancelar assinatura</button>
+    </div>
+    <a class="btn-back" href="/">Voltar ao portal</a>
+  </div>
+
+  <div class="content success-message" id="successView">
+    <h1>Assinatura cancelada.</h1>
+    <p>Você não receberá mais emails da Carta Brasil. Sentiremos sua falta.</p>
+    <a class="btn btn-secondary" href="/newsletter">Assinar novamente</a>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Carta<strong>Brasil</strong> &middot; Todos os direitos reservados</p>
+    <p><a href="/privacidade">Privacidade</a> &middot; <a href="/">Portal</a></p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    var SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
+    var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    var params = new URLSearchParams(window.location.search);
+    var email = params.get('email');
+
+    if (email) {
+      document.getElementById('userEmail').textContent = email;
+    } else {
+      document.getElementById('confirmView').innerHTML =
+        '<h1>E-mail não encontrado</h1><p>Use o link de descadastro que recebeu por e-mail.</p><a class="btn-back" href="/">Voltar ao portal</a>';
+    }
+
+    document.getElementById('btnConfirm').addEventListener('click', async function() {
+      if (!email) return;
+
+      var btn = this;
+      btn.textContent = 'Cancelando...';
+      btn.disabled = true;
+
+      var { error } = await sb.from('subscribers')
+        .update({ active: false })
+        .eq('email', email);
+
+      if (error) {
+        alert('Erro ao cancelar. Tente novamente.');
+        console.error(error);
+        btn.textContent = 'Cancelar assinatura';
+        btn.disabled = false;
+        return;
+      }
+
+      document.getElementById('confirmView').style.display = 'none';
+      document.getElementById('successView').style.display = 'block';
+    });
+  </script>
+
+</body>
+</html>

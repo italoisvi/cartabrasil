@@ -388,7 +388,7 @@
   <!-- FOOTER -->
   <footer>
     <p>&copy; 2026 Carta<strong>Brasil</strong> &middot; Todos os direitos reservados</p>
-    <p>Privacidade &middot; Descadastrar</p>
+    <p><a href="/privacidade" style="color: var(--ink-muted);">Privacidade</a> &middot; <a id="unsubLink" href="/descadastrar" style="color: var(--ink-muted);">Descadastrar</a></p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -402,6 +402,7 @@
     const email = params.get('email');
     if (email) {
       document.getElementById('userEmail').textContent = email;
+      document.getElementById('unsubLink').href = '/descadastrar?email=' + encodeURIComponent(email);
     }
 
     // Toggle de cards de categoria
