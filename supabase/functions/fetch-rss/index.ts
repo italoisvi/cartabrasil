@@ -3,22 +3,26 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { CollectArticlesUseCase } from "../_shared/usecases/collect-articles.ts";
+import type { FeedConfig } from "../_shared/usecases/collect-articles.ts";
 import { HttpRSSFetcher } from "../_shared/infra/rss-fetcher.ts";
 import { SupabaseArticleRepo } from "../_shared/infra/supabase-article-repo.ts";
 import { SupabaseImageStorage } from "../_shared/infra/supabase-image-storage.ts";
-import type { Category } from "../_shared/domain/ports.ts";
 
-const FEEDS: Record<string, Category> = {
-  "http://agenciabrasil.ebc.com.br/rss/politica/feed.xml": "politica",
-  "http://agenciabrasil.ebc.com.br/rss/economia/feed.xml": "mercados",
-  "http://agenciabrasil.ebc.com.br/rss/internacional/feed.xml": "internacional",
-  "http://agenciabrasil.ebc.com.br/rss/geral/feed.xml": "geral",
-  "http://agenciabrasil.ebc.com.br/rss/direitos-humanos/feed.xml": "direitos-humanos",
-  "http://agenciabrasil.ebc.com.br/rss/educacao/feed.xml": "educacao",
-  "http://agenciabrasil.ebc.com.br/rss/esportes/feed.xml": "esportes",
-  "http://agenciabrasil.ebc.com.br/rss/justica/feed.xml": "justica",
-  "http://agenciabrasil.ebc.com.br/rss/saude/feed.xml": "saude",
-};
+const FEEDS: FeedConfig[] = [
+  // ── Agência Brasil (categoria fixa por feed) ──
+  { url: "http://agenciabrasil.ebc.com.br/rss/politica/feed.xml", category: "politica", sourceName: "Agência Brasil" },
+  { url: "http://agenciabrasil.ebc.com.br/rss/economia/feed.xml", category: "mercados", sourceName: "Agência Brasil" },
+  { url: "http://agenciabrasil.ebc.com.br/rss/internacional/feed.xml", category: "internacional", sourceName: "Agência Brasil" },
+  { url: "http://agenciabrasil.ebc.com.br/rss/geral/feed.xml", category: "geral", sourceName: "Agência Brasil" },
+  { url: "http://agenciabrasil.ebc.com.br/rss/direitos-humanos/feed.xml", category: "direitos-humanos", sourceName: "Agência Brasil" },
+  { url: "http://agenciabrasil.ebc.com.br/rss/educacao/feed.xml", category: "educacao", sourceName: "Agência Brasil" },
+  { url: "http://agenciabrasil.ebc.com.br/rss/esportes/feed.xml", category: "esportes", sourceName: "Agência Brasil" },
+  { url: "http://agenciabrasil.ebc.com.br/rss/justica/feed.xml", category: "justica", sourceName: "Agência Brasil" },
+  { url: "http://agenciabrasil.ebc.com.br/rss/saude/feed.xml", category: "saude", sourceName: "Agência Brasil" },
+
+  // ── G1 (categoria extraída da URL de cada artigo) ──
+  { url: "https://g1.globo.com/rss/g1/", category: null, sourceName: "G1" },
+];
 
 Deno.serve(async (req) => {
   const authHeader = req.headers.get("Authorization");
@@ -41,14 +45,15 @@ Deno.serve(async (req) => {
 
   const results: Record<string, number> = {};
 
-  for (const [feedUrl, category] of Object.entries(FEEDS)) {
+  for (const feed of FEEDS) {
+    const label = `${feed.sourceName}/${feed.category || "auto"}`;
     try {
-      const count = await useCase.execute(feedUrl, category);
-      results[category] = count;
-      console.log(`${category}: ${count} novos artigos`);
+      const count = await useCase.execute(feed);
+      results[label] = count;
+      console.log(`${label}: ${count} novos artigos`);
     } catch (err) {
-      console.error(`Erro no feed ${category}:`, err);
-      results[category] = -1;
+      console.error(`Erro no feed ${label}:`, err);
+      results[label] = -1;
     }
   }
 
