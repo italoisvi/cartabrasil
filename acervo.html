@@ -430,7 +430,7 @@
     </div>
     <div class="header-right">
       <a class="btn-subscribe" href="/newsletter">Assinar newsletter</a>
-      <a class="btn-subscribe" id="btnPremiumHeader" href="/minha-assinatura" style="background:var(--accent);">Premium</a>
+      <a class="btn-subscribe" id="btnPremiumHeader" href="/minha-assinatura" style="background:#c0392b;color:#fff;">Premium</a>
     </div>
   </header>
 
@@ -696,7 +696,7 @@
       if (!btn) return;
       if (localStorage.getItem('cb_plan') === 'premium') {
         btn.textContent = 'Minha assinatura';
-        btn.style.background = 'var(--green)';
+        btn.style.background = '#27ae60';
       }
     })();
   </script>
