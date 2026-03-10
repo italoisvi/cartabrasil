@@ -19,15 +19,18 @@ Deno.serve(async (req) => {
     return new Response("Invalid JSON", { status: 400 });
   }
 
-  // Apenas processa checkout.session.completed
-  if (event.type !== "checkout.session.completed") {
+  // Processa checkout.session.completed e invoice.paid (Payment Links enviam invoice.paid)
+  const processableEvents = ["checkout.session.completed", "invoice.paid"];
+  if (!processableEvents.includes(event.type)) {
     return new Response(JSON.stringify({ received: true }), {
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  const session = event.data.object;
-  const customerEmail = session.customer_details?.email || session.customer_email;
+  const obj = event.data.object;
+  const customerEmail = event.type === "invoice.paid"
+    ? obj.customer_email
+    : (obj.customer_details?.email || obj.customer_email);
 
   if (!customerEmail) {
     console.error("No customer email found in session");
