@@ -386,6 +386,17 @@
     <button class="btn-confirm" id="btnConfirm">Confirmar preferências</button>
   </div>
 
+  <!-- SUCCESS SCREEN (hidden by default) -->
+  <div id="successScreen" style="display:none; max-width:680px; margin:0 auto; padding:4rem 2rem; text-align:center; animation: fadeUp 0.6s ease both;">
+    <div style="width:64px; height:64px; border-radius:50%; background:#27ae60; margin:0 auto 1.5rem; display:flex; align-items:center; justify-content:center;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    <h1 style="font-family:'Lora',serif; font-size:1.8rem; font-weight:600; margin-bottom:0.6rem;">Tudo pronto!</h1>
+    <p style="font-size:0.95rem; color:var(--ink-light); margin-bottom:0.3rem;">Suas preferências foram salvas com sucesso.</p>
+    <p style="font-size:0.85rem; color:var(--ink-muted); margin-bottom:2.5rem;">Você receberá as notícias no e-mail <strong id="successEmail" style="color:var(--ink);"></strong></p>
+    <a href="/" style="display:inline-block; background:var(--ink); color:#fff; padding:0.9rem 2rem; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; transition:background 0.2s;">Voltar ao portal</a>
+  </div>
+
   <!-- FOOTER -->
   <footer>
     <p>&copy; 2026 Carta<strong>Brasil</strong> &middot; Todos os direitos reservados</p>
@@ -457,8 +468,14 @@
         return;
       }
 
-      btn.textContent = 'Preferências salvas!';
-      btn.style.background = '#27ae60';
+      // Mostrar tela de sucesso
+      document.querySelector('.page-title').style.display = 'none';
+      document.querySelectorAll('.section-label').forEach(el => el.style.display = 'none');
+      document.querySelector('.categories').style.display = 'none';
+      document.querySelector('.frequency').style.display = 'none';
+      document.querySelector('.confirm-section').style.display = 'none';
+      document.getElementById('successEmail').textContent = email;
+      document.getElementById('successScreen').style.display = 'block';
 
       // Enviar email de boas-vindas
       fetch(SUPABASE_URL + '/functions/v1/welcome-subscriber', {
