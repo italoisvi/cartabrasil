@@ -1028,6 +1028,35 @@
       }
 
       document.title = article.title + ' — CartaBrasil';
+
+      // Structured data for Google (Article schema)
+      var ldJson = {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": article.title,
+        "description": article.description || '',
+        "image": article.image_url || '',
+        "datePublished": article.published_at,
+        "dateModified": article.published_at,
+        "author": { "@type": "Person", "name": article.author || 'CartaBrasil' },
+        "publisher": {
+          "@type": "Organization",
+          "name": "CartaBrasil",
+          "logo": { "@type": "ImageObject", "url": "https://cartabrasil.com.br/assets/images/CB.png" }
+        },
+        "mainEntityOfPage": window.location.href
+      };
+      var ldScript = document.createElement('script');
+      ldScript.type = 'application/ld+json';
+      ldScript.textContent = JSON.stringify(ldJson);
+      document.head.appendChild(ldScript);
+
+      // Dynamic meta tags for sharing
+      var metaDesc = document.createElement('meta');
+      metaDesc.name = 'description';
+      metaDesc.content = article.description || article.title;
+      document.head.appendChild(metaDesc);
+
       document.getElementById('articleCategory').textContent = categoryLabels[article.category] || article.category;
       document.getElementById('articleHeadline').textContent = article.title;
       document.getElementById('articleDescription').textContent = article.description || '';
