@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /preferencias
+Disallow: /descadastrar
+Disallow: /minha-assinatura
+Disallow: /assinatura-sucesso
+Disallow: /cadastro
+Disallow: /perfil
+
+Sitemap: https://cartabrasil.com.br/sitemap.xml
