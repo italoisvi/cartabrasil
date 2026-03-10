@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/png" href="/assets/images/CB.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>if(localStorage.getItem('cb_plan')!=='premium'){var s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6145282174231024';s.crossOrigin='anonymous';document.head.appendChild(s);}</script>
+  <title>Minha Assinatura — CartaBrasil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #111111;
+      --ink-light: #555555;
+      --ink-muted: #999999;
+      --rule: #e0e0e0;
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --accent: #c0392b;
+      --green: #27ae60;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--paper);
+    }
+
+    .logo {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+    }
+
+    .logo strong { font-weight: 700; }
+
+    .header-meta {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ── CONTENT ──────────────────────────────── */
+    .content {
+      flex: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    .content h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.4rem, 4vw, 1.8rem);
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+      text-align: center;
+    }
+
+    .content .subtitle {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── FORM ─────────────────────────────────── */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      border: 1px solid var(--rule);
+      padding: 0.85rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--ink);
+    }
+
+    .form-error {
+      font-size: 0.78rem;
+      color: var(--accent);
+      min-height: 1.2em;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.85rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-align: center;
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--rule);
+    }
+
+    .btn-outline:hover { border-color: var(--ink); }
+
+    /* ── PREMIUM STATUS ───────────────────────── */
+    .status-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.4rem 1.2rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: var(--green);
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .badge-free {
+      background: var(--ink-muted);
+    }
+
+    .status-email {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .status-plan {
+      font-size: 0.78rem;
+      color: var(--ink-light);
+    }
+
+    .benefits {
+      text-align: left;
+      margin: 1.5rem 0;
+    }
+
+    .benefits li {
+      list-style: none;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.85rem;
+      color: var(--ink-light);
+    }
+
+    .benefits li::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 700;
+      margin-right: 0.75rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .divider {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      margin: 2rem 0;
+    }
+
+    .upgrade-cta {
+      text-align: center;
+      margin-top: 2rem;
+      padding: 2rem;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+    }
+
+    .upgrade-cta h3 {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .upgrade-cta p {
+      font-size: 0.8rem;
+      color: var(--ink-light);
+      margin-bottom: 1.25rem;
+    }
+
+    .upgrade-cta .btn {
+      display: inline-block;
+      width: auto;
+      padding: 0.85rem 2.5rem;
+    }
+
+    /* ── FOOTER ──────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper);
+    }
+
+    footer p {
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.06em;
+    }
+
+    footer a {
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+
+    footer a:hover { color: var(--ink); }
+
+    /* ── ANIMATION ───────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .content { animation: fadeUp 0.6s ease both; }
+
+    @media (max-width: 600px) {
+      header { flex-direction: column; gap: 0.4rem; text-align: center; }
+      .content { padding: 3rem 1rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="/">Carta<strong>Brasil</strong></a>
+    <p class="header-meta">Minha assinatura</p>
+  </header>
+
+  <div class="content" id="mainContent">
+    <!-- VIEW 1: Login por email -->
+    <div id="loginView">
+      <h1>Minha assinatura</h1>
+      <p class="subtitle">Informe seu e-mail para verificar o status da sua assinatura.</p>
+
+      <form id="checkForm">
+        <div class="form-group">
+          <label for="emailInput">E-mail</label>
+          <input type="email" id="emailInput" placeholder="seu@email.com" required />
+        </div>
+
+        <p class="form-error" id="errorMsg"></p>
+
+        <button type="submit" class="btn" id="btnCheck">Verificar assinatura</button>
+      </form>
+
+      <div class="divider">ou</div>
+
+      <a class="btn btn-outline" href="https://buy.stripe.com/cNi8wQaf36WZ3DWgnT4gg00">Assinar o Premium</a>
+    </div>
+
+    <!-- VIEW 2: Status premium -->
+    <div id="premiumView" style="display:none;">
+      <div class="status-card">
+        <span class="badge">Premium ativo</span>
+        <p class="status-email" id="premiumEmail"></p>
+        <p class="status-plan">Assinatura premium — sem anúncios</p>
+      </div>
+
+      <ul class="benefits">
+        <li>Navegação sem anúncios</li>
+        <li>Newsletter com acesso prioritário</li>
+        <li>Apoio ao jornalismo independente</li>
+      </ul>
+
+      <div class="actions">
+        <a class="btn" href="/">Acessar o portal</a>
+        <button class="btn btn-outline" id="btnLogout">Sair desta sessão</button>
+      </div>
+    </div>
+
+    <!-- VIEW 3: Não é premium -->
+    <div id="freeView" style="display:none;">
+      <div class="status-card">
+        <span class="badge badge-free">Plano gratuito</span>
+        <p class="status-email" id="freeEmail"></p>
+        <p class="status-plan">Você está no plano gratuito</p>
+      </div>
+
+      <div class="upgrade-cta">
+        <h3>Quer remover os anúncios?</h3>
+        <p>Assine o Premium e navegue sem interrupções, além de apoiar o jornalismo independente.</p>
+        <a class="btn" href="https://buy.stripe.com/cNi8wQaf36WZ3DWgnT4gg00">Assinar Premium</a>
+      </div>
+
+      <div class="actions" style="margin-top: 1.5rem;">
+        <a class="btn btn-outline" href="/">Voltar ao portal</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Carta<strong>Brasil</strong> &middot; Todos os direitos reservados</p>
+    <p><a href="/privacidade">Privacidade</a> &middot; <a href="/">Portal</a></p>
+  </footer>
+
+  <script>
+    var SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsY250Z2l6bWFhcHFrdGVheGtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDY3ODcsImV4cCI6MjA4Nzg4Mjc4N30.p-DHtTw-AeGYDswsBR73V8jQXlpW_g_6out1xtT6Cr4';
+
+    // Se já está identificado como premium, mostrar direto
+    var savedPlan = localStorage.getItem('cb_plan');
+    var savedEmail = localStorage.getItem('cb_email');
+
+    if (savedPlan === 'premium' && savedEmail) {
+      showPremium(savedEmail);
+    }
+
+    function showPremium(email) {
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('freeView').style.display = 'none';
+      document.getElementById('premiumView').style.display = 'block';
+      document.getElementById('premiumEmail').textContent = email;
+    }
+
+    function showFree(email) {
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('premiumView').style.display = 'none';
+      document.getElementById('freeView').style.display = 'block';
+      document.getElementById('freeEmail').textContent = email;
+    }
+
+    // Form submit — verificar email no banco
+    document.getElementById('checkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var email = document.getElementById('emailInput').value.trim();
+      var errorEl = document.getElementById('errorMsg');
+      var btn = document.getElementById('btnCheck');
+
+      errorEl.textContent = '';
+      btn.textContent = 'Verificando...';
+      btn.disabled = true;
+
+      fetch(SUPABASE_URL + '/functions/v1/check-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ email: email })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.error) {
+          errorEl.textContent = data.error;
+          btn.textContent = 'Verificar assinatura';
+          btn.disabled = false;
+          return;
+        }
+
+        if (data.plan === 'premium') {
+          localStorage.setItem('cb_plan', 'premium');
+          localStorage.setItem('cb_email', email);
+          showPremium(email);
+        } else {
+          localStorage.removeItem('cb_plan');
+          localStorage.removeItem('cb_email');
+          showFree(email);
+        }
+      })
+      .catch(function() {
+        errorEl.textContent = 'Erro de conexão. Tente novamente.';
+        btn.textContent = 'Verificar assinatura';
+        btn.disabled = false;
+      });
+    });
+
+    // Logout
+    document.getElementById('btnLogout').addEventListener('click', function() {
+      localStorage.removeItem('cb_plan');
+      localStorage.removeItem('cb_email');
+      document.getElementById('premiumView').style.display = 'none';
+      document.getElementById('freeView').style.display = 'none';
+      document.getElementById('loginView').style.display = 'block';
+      document.getElementById('emailInput').value = '';
+    });
+  </script>
+
+</body>
+</html>
