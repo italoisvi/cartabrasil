@@ -67,7 +67,7 @@ export interface NewsItem {
 export interface ArticleRepository {
   findByOriginalUrl(url: string): Promise<{ id: string } | null>;
   insert(article: ArticleData): Promise<void>;
-  findRecent(since: Date, limit: number): Promise<ArticleRecord[]>;
+  findRecent(since: Date, limit: number, dateField?: string): Promise<ArticleRecord[]>;
 }
 
 export interface SubscriberRepository {

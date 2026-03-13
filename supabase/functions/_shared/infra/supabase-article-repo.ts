@@ -43,13 +43,13 @@ export class SupabaseArticleRepo implements ArticleRepository {
     }
   }
 
-  async findRecent(since: Date, limit: number): Promise<ArticleRecord[]> {
+  async findRecent(since: Date, limit: number, dateField: string = "published_at"): Promise<ArticleRecord[]> {
     const { data, error } = await this.supabase
       .from("articles")
       .select("id, title, category, published_at")
       .eq("status", "published")
-      .gte("published_at", since.toISOString())
-      .order("published_at", { ascending: false })
+      .gte(dateField, since.toISOString())
+      .order(dateField, { ascending: false })
       .limit(limit);
 
     if (error) throw error;

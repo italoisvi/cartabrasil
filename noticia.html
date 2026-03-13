@@ -1222,6 +1222,9 @@
         }
       }
 
+      // Reescrever links de fontes externas para artigos internos do CartaBrasil
+      await rewriteExternalLinks(bodyEl, sb);
+
       // Converter links do Instagram em embeds reais
       bodyEl.querySelectorAll('a[href*="instagram.com/p/"], a[href*="instagram.com/reel/"]').forEach(function(link) {
         var url = link.href.split('?')[0]; // URL limpa sem query params
@@ -1278,6 +1281,65 @@
 
       // Carregar mais notícias
       loadMoreNews(articleId);
+    }
+
+    // Reescrever links de fontes externas (Agência Brasil, G1) para artigos internos
+    async function rewriteExternalLinks(bodyEl, supabase) {
+      var newsDomains = ['agenciabrasil.ebc.com.br', 'ebc.com.br', 'g1.globo.com'];
+      var externalLinks = [];
+
+      bodyEl.querySelectorAll('a[href]').forEach(function(a) {
+        var href = a.getAttribute('href');
+        if (!href) return;
+        try {
+          var url = new URL(href, window.location.href);
+          var dominated = newsDomains.some(function(d) {
+            return url.hostname === d || url.hostname.endsWith('.' + d);
+          });
+          if (dominated) externalLinks.push(a);
+        } catch(e) {}
+      });
+
+      if (externalLinks.length === 0) return;
+
+      // URLs únicas para busca no banco
+      var urlSet = {};
+      externalLinks.forEach(function(a) {
+        var href = a.getAttribute('href');
+        // Normalizar: remover trailing slash e query params
+        var clean = href.split('?')[0].split('#')[0].replace(/\/+$/, '');
+        urlSet[clean] = true;
+      });
+      var uniqueUrls = Object.keys(urlSet);
+
+      // Buscar artigos correspondentes pelo original_url
+      var { data: matches } = await supabase
+        .from('articles')
+        .select('id, original_url')
+        .in('original_url', uniqueUrls);
+
+      // Mapa: URL normalizada → ID do artigo interno
+      var urlToId = {};
+      if (matches) {
+        matches.forEach(function(m) {
+          var normalized = m.original_url.split('?')[0].split('#')[0].replace(/\/+$/, '');
+          urlToId[normalized] = m.id;
+        });
+      }
+
+      // Reescrever ou remover links
+      externalLinks.forEach(function(a) {
+        var href = a.getAttribute('href');
+        var clean = href.split('?')[0].split('#')[0].replace(/\/+$/, '');
+        var id = urlToId[clean];
+        if (id) {
+          a.href = 'noticia.html?id=' + id;
+        } else {
+          // Artigo não existe no CartaBrasil → manter texto, remover link
+          var text = document.createTextNode(a.textContent);
+          a.parentNode.replaceChild(text, a);
+        }
+      });
     }
 
     // Remove todas as tags HTML — usado para inspecionar só o texto da linha
