@@ -102,11 +102,15 @@ export class CollectArticlesUseCase {
       let body = normalizeBody(item.description);
       body = await this.imageStorage.uploadBodyImages(body, articleId);
 
-      // Description: linha-fina (EBC) > limpeza da description > extração do body
-      let description: string | null = await fetchLinhaFina(item.link);
-      if (!description) {
-        const cleaned = cleanAgenciaBrasilDescription(item.description);
-        if (cleaned.length > 20) description = cleaned;
+      // Description: estratégia depende da fonte
+      let description: string | null = null;
+      if (feed.sourceName === "Agência Brasil") {
+        // EBC: linha-fina > limpeza específica > extração do body
+        description = await fetchLinhaFina(item.link);
+        if (!description) {
+          const cleaned = cleanAgenciaBrasilDescription(item.description);
+          if (cleaned.length > 20) description = cleaned;
+        }
       }
       if (!description) {
         description = extractDescription(item.description, body);

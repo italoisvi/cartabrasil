@@ -37,7 +37,7 @@ function parseRSSItems(xml: string): RSSItem[] {
     const title = decodeEntities(getTagContent(block, "title"));
     const description = getTagContent(block, "description");
     const pubDate = getTagContent(block, "pubDate");
-    const creator = getTagContent(block, "dc:creator");
+    const creator = getTagContent(block, "dc:creator") || getTagContent(block, "author");
     const imageUrl = getTagContent(block, "imagem-destaque") || null;
 
     const linkMatch = block.match(/<link[^>]*>([\s\S]*?)<\/link>/i);
