@@ -1571,7 +1571,6 @@
           .select('id, title, description, body, category, image_url, published_at')
           .eq('status', 'published')
           .eq('category', 'analise')
-          .neq('source_name', 'G1')
           .order('published_at', { ascending: false })
           .limit(50);
 
@@ -1601,7 +1600,6 @@
         .from('articles')
         .select('id, title, description, body, category, image_url, published_at')
         .eq('status', 'published')
-        .neq('source_name', 'G1')
         .order('published_at', { ascending: false })
         .limit(100);
 

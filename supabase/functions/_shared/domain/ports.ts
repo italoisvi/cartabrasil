@@ -24,8 +24,6 @@ export interface RSSItem {
   pubDate: string;
   creator: string;
   imageUrl: string | null;
-  subtitle: string | null;
-  mediaUrl: string | null;
 }
 
 export interface ArticleData {

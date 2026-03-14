@@ -84,8 +84,7 @@ function transformInlineImages(html: string): string {
 }
 
 /**
- * Converte atributos de lazy-loading do G1 para src padrão.
- * G1 usa data-src (ou data-echo) no lugar de src para imagens inline.
+ * Converte atributos de lazy-loading para src padrão.
  */
 function fixLazyImages(html: string): string {
   // data-src="URL" → src="URL" (quando src está ausente ou é placeholder)
@@ -98,7 +97,7 @@ function fixLazyImages(html: string): string {
       return `<img${before}src="${dataSrc}"${after}>`;
     },
   );
-  // Mesmo para data-echo (EBC e alguns G1 antigos)
+  // Mesmo para data-echo (EBC)
   result = result.replace(
     /<img([^>]*?)data-echo="([^"]+)"([^>]*?)>/gi,
     (_match, before: string, dataEcho: string, after: string) => {
@@ -107,7 +106,7 @@ function fixLazyImages(html: string): string {
       return `<img${before}src="${dataEcho}"${after}>`;
     },
   );
-  // Remover prefixo "N de N " das figcaptions do G1 (ex: "2 de 2 Edson Delgado...")
+  // Remover prefixo "N de N " das figcaptions
   result = result.replace(
     /(<figcaption[^>]*>)\s*\d+\s+de\s+\d+\s+/gi,
     "$1",
@@ -124,12 +123,6 @@ function removeJunk(html: string): string {
   // Logo da Agência Brasil no topo
   clean = clean.replace(
     /<p[^>]*>\s*<a[^>]*>\s*<img[^>]*alt="Logo Ag[eê]ncia Brasil"[^>]*>\s*<\/a>\s*<\/p>/gi,
-    "",
-  );
-
-  // Imagem hero do G1 no início do description (já capturada via media:content)
-  clean = clean.replace(
-    /^\s*<img[^>]*glbimg\.com[^>]*\/?>\s*(?:<br\s*\/?>)?\s*/i,
     "",
   );
 
@@ -151,77 +144,6 @@ function removeJunk(html: string): string {
     "",
   );
 
-  // Promoção WhatsApp/redes sociais do G1 — remover bloco <p> ou <a> inteiro
-  // Padrão: <p>...<a href="...">✅Clique aqui para seguir o canal do g1 ... no WhatsApp</a>...</p>
-  clean = clean.replace(
-    /<p[^>]*>[\s\S]*?(?:Siga o canal|Clique aqui para seguir|Participe do canal)[\s\S]*?WhatsApp[\s\S]*?<\/p>/gi,
-    "",
-  );
-  clean = clean.replace(
-    /<a[^>]*>[\s\S]*?(?:Siga o canal|Clique aqui para seguir|Participe do canal)[\s\S]*?WhatsApp[\s\S]*?<\/a>/gi,
-    "",
-  );
-  // Texto solto (sem wrapper)
-  clean = clean.replace(
-    /[✅📲📳]?\s*(?:Siga o canal|Clique aqui para seguir|Participe do canal)\s+d[eo]\s+g1[\s\S]*?WhatsApp/gi,
-    "",
-  );
-
-  // Promoção redes sociais do G1 — remover bloco <p> inteiro
-  clean = clean.replace(
-    /<p[^>]*>[\s\S]*?Siga a p[aá]gina d[eo] g1[\s\S]{0,60}(?:Instagram|Telegram|Facebook)[\s\S]*?<\/p>/gi,
-    "",
-  );
-  clean = clean.replace(
-    /[📲📳🔲]?\s*Siga a p[aá]gina d[eo] g1[\s\S]{0,40}(?:Instagram|Telegram|Facebook)/gi,
-    "",
-  );
-
-  // Promoções genéricas do G1 — bloco <p> inteiro
-  clean = clean.replace(
-    /<p[^>]*>[\s\S]*?(?:Baixe o app|Acompanhe o|Siga o)\s+g1[\s\S]*?<\/p>/gi,
-    "",
-  );
-  clean = clean.replace(
-    /[📲📳🔲✅]?\s*(?:Baixe o app|Acompanhe o|Siga o) g1[\s\S]{0,60}/gi,
-    "",
-  );
-  clean = clean.replace(
-    /<p[^>]*>[\s\S]*?Leia mais not[ií]cias sobre[\s\S]{0,40}g1[\s\S]*?<\/p>/gi,
-    "",
-  );
-  clean = clean.replace(
-    /Leia mais not[ií]cias sobre[\s\S]{0,40}g1[\s\S]{0,20}\./gi,
-    "",
-  );
-
-  // Lixo do G1 — headings "Veja vídeos de [região]:" (h2/h3)
-  clean = clean.replace(
-    /<h[23][^>]*>\s*Veja\s+v[ií]deos\s+d[eo]\s+[\s\S]*?<\/h[23]>/gi,
-    "",
-  );
-
-  // Lixo do G1 — chamadas para vídeos e telejornais (bloco <p> inteiro)
-  clean = clean.replace(
-    /<p[^>]*>[\s\S]*?(?:Veja os v[ií]deos|V[ií]deos? mais assistidos?|Reveja os telejornais)[\s\S]*?<\/p>/gi,
-    "",
-  );
-  clean = clean.replace(
-    /Veja os v[ií]deos que est[aã]o em alta no g1[\s\S]{0,30}/gi,
-    "",
-  );
-  clean = clean.replace(
-    /V[ií]deos? mais assistidos?\s+d[eo]\s+g1[\s\S]{0,30}/gi,
-    "",
-  );
-  clean = clean.replace(
-    /VÍDEOS:\s*(?:assista|g1|tudo sobre)[\s\S]{0,60}/gi,
-    "",
-  );
-  clean = clean.replace(
-    /Reveja os telejornais[\s\S]{0,30}/gi,
-    "",
-  );
   clean = clean.replace(
     /LEIA MAIS:[\s\S]*?\n/gi,
     "",
@@ -255,7 +177,7 @@ function removeJunk(html: string): string {
     }
     return "";
   });
-  // Legendas soltas do G1 — texto curto com "— Foto:" (duplica figcaption)
+  // Legendas soltas — texto curto com "— Foto:" (duplica figcaption)
   clean = clean.replace(
     /<p[^>]*>[^<]{0,120}\s*[—–-]\s*Foto:\s*[^<]{0,60}<\/p>/gi,
     "",
@@ -339,7 +261,7 @@ function sanitizeTags(html: string): string {
 
 /**
  * Remove parágrafos que duplicam conteúdo de <figcaption> próximos.
- * O G1 e a EBC frequentemente repetem a legenda da foto como texto
+ * A EBC frequentemente repete a legenda da foto como texto
  * solto no body, causando duplicação visual.
  */
 function removeDuplicateCaptions(html: string): string {
@@ -392,7 +314,7 @@ export function normalizeBody(rawHtml: string): string {
   // 1. Transformar imagens inline da EBC antes de qualquer limpeza
   html = transformInlineImages(html);
 
-  // 1b. Converter lazy-loading do G1 (data-src → src) e limpar figcaptions
+  // 1b. Converter lazy-loading (data-src → src) e limpar figcaptions
   html = fixLazyImages(html);
 
   // 2. Remover lixo editorial
@@ -469,27 +391,3 @@ export function isValidCategory(value: string): value is Category {
     .includes(value);
 }
 
-/**
- * Extrai a categoria CartaBrasil a partir da URL de um artigo do G1.
- * Analisa o path para mapear editorias do G1 → categorias do domínio.
- */
-export function categoryFromG1Url(url: string): Category {
-  const path = url.replace(/^https?:\/\/g1\.globo\.com\//, "");
-
-  if (/^economia\b/i.test(path)) return "mercados";
-  if (/^mundo\b/i.test(path)) return "internacional";
-  if (/^tecnologia\b/i.test(path)) return "tecnologia";
-  if (/^politica\b/i.test(path)) return "politica";
-  if (/^educacao\b/i.test(path)) return "educacao";
-  if (/^(saude|bemestar)\b/i.test(path)) return "saude";
-  if (/^(esporte|futebol)\b/i.test(path)) return "esportes";
-  if (/^(ciencia|natureza|meio-ambiente)\b/i.test(path)) return "geral";
-
-  // URLs regionais podem conter sub-editoria: /sp/sao-paulo/economia/...
-  if (/\/economia\//i.test(path)) return "mercados";
-  if (/\/politica\//i.test(path)) return "politica";
-  if (/\/educacao\//i.test(path)) return "educacao";
-  if (/\/empreendedorismo\//i.test(path)) return "mercados";
-
-  return "geral";
-}

@@ -56,9 +56,8 @@ export class SendNewsletterUseCase {
     }
 
     const since = timeSince(frequency);
-    // Usar created_at (momento da coleta no CartaBrasil) em vez de published_at
-    // pois artigos são publicados horas antes de serem coletados pelo RSS,
-    // e fontes desativadas (ex: G1) não devem aparecer com artigos antigos
+    // Usar created_at (momento da coleta) em vez de published_at
+    // pois artigos são publicados horas antes de serem coletados pelo RSS
     const articles = await this.articleRepo.findRecent(since, 20, "created_at");
 
     if (!articles.length) {

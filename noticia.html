@@ -1198,7 +1198,7 @@
 
         var cleanBody = article.body;
 
-        // Remover título do artigo duplicado no body (G1 coloca o título no description)
+        // Remover título do artigo duplicado no body
         if (article.title) {
           cleanBody = cleanBody.replace(new RegExp('<p>\\s*' + escRx(article.title) + '\\s*<\\/p>', 'gi'), '');
           // Também como texto solto no início (antes de virar <p>)
@@ -1346,9 +1346,9 @@
       loadMoreNews(articleId);
     }
 
-    // Reescrever links de fontes externas (Agência Brasil, G1) para artigos internos
+    // Reescrever links de fontes externas (Agência Brasil) para artigos internos
     async function rewriteExternalLinks(bodyEl, supabase) {
-      var newsDomains = ['agenciabrasil.ebc.com.br', 'ebc.com.br', 'g1.globo.com'];
+      var newsDomains = ['agenciabrasil.ebc.com.br', 'ebc.com.br'];
       var externalLinks = [];
 
       bodyEl.querySelectorAll('a[href]').forEach(function(a) {
@@ -1538,8 +1538,7 @@
       var query = sb.from('articles')
         .select('id, title, category, image_url, published_at')
         .eq('status', 'published')
-        .neq('source_name', 'G1')
-        .not('image_url', 'is', null)
+                .not('image_url', 'is', null)
         .order('published_at', { ascending: false })
         .limit(7);
 
@@ -1663,8 +1662,7 @@
     async function performSearch(query) {
       const { data } = await sb.from('articles')
         .select('id, title, category, published_at')
-        .neq('source_name', 'G1')
-        .or('title.ilike.%' + query + '%,description.ilike.%' + query + '%')
+                .or('title.ilike.%' + query + '%,description.ilike.%' + query + '%')
         .order('published_at', { ascending: false })
         .limit(8);
 
