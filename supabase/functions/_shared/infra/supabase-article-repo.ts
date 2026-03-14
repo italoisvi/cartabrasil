@@ -35,6 +35,7 @@ export class SupabaseArticleRepo implements ArticleRepository {
       author: article.author,
       original_url: article.originalUrl,
       published_at: article.publishedAt,
+      slug: article.slug,
     });
 
     if (error) {

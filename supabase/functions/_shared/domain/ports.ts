@@ -41,6 +41,7 @@ export interface ArticleData {
   author: string;
   originalUrl: string;
   publishedAt: string;
+  slug: string;
 }
 
 export interface ArticleRecord {

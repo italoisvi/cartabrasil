@@ -4,6 +4,19 @@
 import type { Category } from "./ports.ts";
 
 /**
+ * Gera slug a partir do título para URLs amigáveis.
+ */
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .substring(0, 80);
+}
+
+/**
  * Decodifica HTML entities comuns do RSS.
  */
 function decodeHtmlEntities(raw: string): string {

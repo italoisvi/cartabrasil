@@ -3,8 +3,8 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/share/:id",
-      "destination": "https://zlcntgizmaapqkteaxkd.supabase.co/functions/v1/article-og?id=:id"
+      "source": "/share/:slug",
+      "destination": "https://zlcntgizmaapqkteaxkd.supabase.co/functions/v1/article-og?slug=:slug"
     }
   ],
   "headers": [

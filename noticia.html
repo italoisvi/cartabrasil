@@ -1115,6 +1115,11 @@
       setOgTag('og:image', article.image_url || 'https://cartabrasil.com.br/assets/images/CB.png');
       setOgTag('og:url', window.location.href);
 
+      // Guardar slug para o botão de compartilhar
+      if (article.slug) {
+        document.getElementById('shareBtn').dataset.slug = article.slug;
+      }
+
       document.getElementById('articleCategory').textContent = categoryLabels[article.category] || article.category;
       document.getElementById('articleHeadline').textContent = article.title;
       document.getElementById('articleDescription').textContent = article.description || '';
@@ -1568,14 +1573,16 @@
     // ── SHARE ────────────────────────────────────────────────
     document.getElementById('shareBtn').addEventListener('click', async function() {
       var title = document.getElementById('articleHeadline').textContent;
-      var description = document.getElementById('articleDescription').textContent;
-      // URL de share com OG tags para preview rico no WhatsApp/Telegram
+      var slug = this.dataset.slug;
       var articleId = new URLSearchParams(window.location.search).get('id');
-      var url = 'https://cartabrasil.com.br/share/' + articleId;
+      // URL limpa com slug para preview rico no WhatsApp/Telegram
+      var url = slug
+        ? 'https://cartabrasil.com.br/share/' + slug
+        : 'https://cartabrasil.com.br/share/' + articleId;
 
       if (navigator.share) {
         try {
-          await navigator.share({ title: title, text: description, url: url });
+          await navigator.share({ title: title, text: title, url: url });
         } catch(e) { /* cancelado pelo usuário */ }
       } else {
         await navigator.clipboard.writeText(url);

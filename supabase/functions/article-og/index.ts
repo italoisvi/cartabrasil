@@ -3,9 +3,11 @@
 // Telegram, Twitter, Facebook etc. Crawlers não executam JS,
 // então precisam das tags no HTML estático.
 //
-// Uso: /functions/v1/article-og?id=UUID
+// Uso: /functions/v1/article-og?slug=meu-artigo
 // Crawlers veem as OG tags → preview rico.
 // Usuários são redirecionados para a página real.
+//
+// DEPLOY: supabase functions deploy article-og --no-verify-jwt
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -22,30 +24,40 @@ function escapeHtml(str: string): string {
 
 Deno.serve(async (req) => {
   const url = new URL(req.url);
-  const articleId = url.searchParams.get("id");
+  const slug = url.searchParams.get("slug");
+  const id = url.searchParams.get("id");
 
-  if (!articleId) {
+  if (!slug && !id) {
     return Response.redirect(`${SITE_URL}`, 302);
   }
-
-  const articleUrl = `${SITE_URL}/noticia?id=${articleId}`;
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  const { data: article } = await supabase
+  let query = supabase
     .from("articles")
-    .select("title, description, image_url, category, published_at, author")
-    .eq("id", articleId)
-    .eq("status", "published")
-    .maybeSingle();
+    .select("id, title, description, image_url, category, published_at, author, slug")
+    .eq("status", "published");
 
-  const title = article?.title || "CartaBrasil";
-  const description = article?.description || "As principais notícias do Brasil, curadas para você.";
-  const image = article?.image_url || DEFAULT_IMAGE;
-  const author = article?.author || "CartaBrasil";
+  if (slug) {
+    query = query.eq("slug", slug);
+  } else {
+    query = query.eq("id", id!);
+  }
+
+  const { data: article } = await query.maybeSingle();
+
+  if (!article) {
+    return Response.redirect(`${SITE_URL}`, 302);
+  }
+
+  const articleUrl = `${SITE_URL}/noticia?id=${article.id}`;
+  const title = article.title || "CartaBrasil";
+  const description = article.description || "As principais notícias do Brasil, curadas para você.";
+  const image = article.image_url || DEFAULT_IMAGE;
+  const author = article.author || "CartaBrasil";
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -59,9 +71,11 @@ Deno.serve(async (req) => {
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(description)}" />
   <meta property="og:image" content="${escapeHtml(image)}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:url" content="${escapeHtml(articleUrl)}" />
   <meta property="og:locale" content="pt_BR" />
-  ${article?.published_at ? `<meta property="article:published_time" content="${article.published_at}" />` : ""}
+  ${article.published_at ? `<meta property="article:published_time" content="${article.published_at}" />` : ""}
   ${author ? `<meta property="article:author" content="${escapeHtml(author)}" />` : ""}
 
   <!-- Twitter Card -->

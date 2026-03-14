@@ -13,6 +13,7 @@ import {
   extractDescription,
   buildImageCaption,
   categoryFromG1Url,
+  generateSlug,
 } from "../domain/article.ts";
 
 /**
@@ -348,6 +349,7 @@ export class CollectArticlesUseCase {
           author: item.creator,
           originalUrl: item.link,
           publishedAt: new Date(item.pubDate).toISOString(),
+          slug: generateSlug(item.title),
         });
         inserted++;
       } catch (err) {
