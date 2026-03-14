@@ -6,6 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>if(localStorage.getItem('cb_plan')!=='premium'){var s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6145282174231024';s.crossOrigin='anonymous';document.head.appendChild(s);}</script>
   <title>CartaBrasil</title>
+
+  <!-- Open Graph defaults (atualizados dinamicamente via JS) -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="CartaBrasil" />
+  <meta property="og:title" content="CartaBrasil — Notícias do Brasil" />
+  <meta property="og:description" content="As principais notícias do Brasil, curadas para você." />
+  <meta property="og:image" content="https://cartabrasil.com.br/assets/images/CB.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
@@ -367,6 +376,42 @@
     }
 
     .article-source a:hover { color: var(--accent); }
+
+    .share-btn {
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 0.4rem 0.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: border-color 0.2s;
+    }
+    .share-btn:hover { border-color: var(--ink-muted); }
+    .share-btn img { width: 16px; height: 16px; opacity: 0.5; }
+    .share-btn:hover img { opacity: 0.8; }
+
+    .share-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink);
+      color: #fff;
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: 'DM Sans', sans-serif;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .share-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
 
     .article-image { margin-bottom: 2.5rem; }
 
@@ -925,6 +970,9 @@
         <a href="#" target="_blank" rel="noopener" id="articleSourceLink"></a>
         <span>&middot;</span>
         <span id="articleAuthor"></span>
+        <button class="share-btn" id="shareBtn" title="Compartilhar">
+          <img src="assets/icons/compartilhar.svg" alt="Compartilhar" />
+        </button>
       </div>
 
       <figure class="article-image" style="display:none;">
@@ -1056,6 +1104,16 @@
       metaDesc.name = 'description';
       metaDesc.content = article.description || article.title;
       document.head.appendChild(metaDesc);
+
+      // Atualizar OG tags com dados do artigo
+      function setOgTag(prop, content) {
+        var el = document.querySelector('meta[property="' + prop + '"]');
+        if (el) el.setAttribute('content', content);
+      }
+      setOgTag('og:title', article.title);
+      setOgTag('og:description', article.description || article.title);
+      setOgTag('og:image', article.image_url || 'https://cartabrasil.com.br/assets/images/CB.png');
+      setOgTag('og:url', window.location.href);
 
       document.getElementById('articleCategory').textContent = categoryLabels[article.category] || article.category;
       document.getElementById('articleHeadline').textContent = article.title;
@@ -1506,6 +1564,38 @@
     }
 
     loadArticle();
+
+    // ── SHARE ────────────────────────────────────────────────
+    document.getElementById('shareBtn').addEventListener('click', async function() {
+      var title = document.getElementById('articleHeadline').textContent;
+      var description = document.getElementById('articleDescription').textContent;
+      // URL de share com OG tags para preview rico no WhatsApp/Telegram
+      var articleId = new URLSearchParams(window.location.search).get('id');
+      var url = 'https://cartabrasil.com.br/share/' + articleId;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: title, text: description, url: url });
+        } catch(e) { /* cancelado pelo usuário */ }
+      } else {
+        await navigator.clipboard.writeText(url);
+        showShareToast('Link copiado!');
+      }
+    });
+
+    function showShareToast(msg) {
+      var existing = document.querySelector('.share-toast');
+      if (existing) existing.remove();
+      var toast = document.createElement('div');
+      toast.className = 'share-toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      requestAnimationFrame(function() { toast.classList.add('show'); });
+      setTimeout(function() {
+        toast.classList.remove('show');
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 2000);
+    }
 
     // ── SEARCH ───────────────────────────────────────────────
     const searchOverlay = document.getElementById('searchOverlay');

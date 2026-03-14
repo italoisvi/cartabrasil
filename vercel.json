@@ -1,6 +1,12 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/share/:id",
+      "destination": "https://zlcntgizmaapqkteaxkd.supabase.co/functions/v1/article-og?id=:id"
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
