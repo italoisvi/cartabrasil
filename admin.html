@@ -334,6 +334,36 @@
     .badge-draft { background: var(--ink-muted); color: #fff; }
     .badge-scheduled { background: #d4a017; color: #fff; }
 
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .pagination button {
+      background: none;
+      border: 1px solid var(--rule);
+      padding: 0.45rem 0.85rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pagination button:hover { border-color: var(--ink); color: var(--ink); }
+    .pagination button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .pagination button:disabled { opacity: 0.4; cursor: default; }
+
+    .pagination-info {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+    }
+
     .autosave-indicator {
       font-size: 0.7rem;
       color: var(--ink-muted);
@@ -978,7 +1008,7 @@
       </div>
       <div class="dash-search">
         <input type="text" id="dashSearch" placeholder="Buscar por título ou autor..." onkeyup="debounceSearch()" />
-        <select id="dashCategory" onchange="loadArticles()">
+        <select id="dashCategory" onchange="currentPage=0;loadArticles()">
           <option value="">Todas categorias</option>
           <option value="politica">Política</option>
           <option value="mercados">Economia</option>
@@ -992,7 +1022,7 @@
           <option value="saude">Saúde</option>
           <option value="analise">Análise</option>
         </select>
-        <select id="dashSource" onchange="loadArticles()">
+        <select id="dashSource" onchange="currentPage=0;loadArticles()">
           <option value="">Todas as fontes</option>
           <option value="Carta Brasil">Carta Brasil</option>
           <option value="Agência Brasil">Agência Brasil</option>
@@ -1157,6 +1187,8 @@
     };
 
     let currentFilter = 'all';
+    let currentPage = 0;
+    const PAGE_SIZE = 20;
     let editingArticleId = null;
     let quill = null;
     let searchTimer = null;
@@ -1166,6 +1198,7 @@
 
     function debounceSearch() {
       clearTimeout(searchTimer);
+      currentPage = 0;
       searchTimer = setTimeout(loadArticles, 300);
     }
 
@@ -1214,9 +1247,13 @@
 
     // ── Dashboard ───────────────────────────────
     async function loadArticles() {
+      var from = currentPage * PAGE_SIZE;
+      var to = from + PAGE_SIZE - 1;
+
       var query = sb.from('articles')
-        .select('id, title, category, status, published_at, source_name, author, location, updated_at, image_url')
-        .order('created_at', { ascending: false });
+        .select('id, title, category, status, published_at, source_name, author, location, updated_at, image_url', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (currentFilter !== 'all') {
         query = query.eq('status', currentFilter);
@@ -1237,7 +1274,7 @@
         query = query.or('title.ilike.%' + searchTerm + '%,author.ilike.%' + searchTerm + '%');
       }
 
-      var { data, error } = await query;
+      var { data, error, count } = await query;
       var listEl = document.getElementById('articleList');
 
       if (error || !data || data.length === 0) {
@@ -1273,11 +1310,40 @@
       });
 
       html += '</tbody></table>';
+      html += renderPagination(count);
       listEl.innerHTML = html;
+    }
+
+    function renderPagination(total) {
+      var totalPages = Math.ceil(total / PAGE_SIZE);
+      if (totalPages <= 1) return '';
+
+      var html = '<div class="pagination">';
+      html += '<button ' + (currentPage === 0 ? 'disabled' : '') + ' onclick="goToPage(' + (currentPage - 1) + ')">&larr; Anterior</button>';
+
+      var startPage = Math.max(0, currentPage - 2);
+      var endPage = Math.min(totalPages - 1, startPage + 4);
+      if (endPage - startPage < 4) startPage = Math.max(0, endPage - 4);
+
+      for (var i = startPage; i <= endPage; i++) {
+        html += '<button class="' + (i === currentPage ? 'active' : '') + '" onclick="goToPage(' + i + ')">' + (i + 1) + '</button>';
+      }
+
+      html += '<button ' + (currentPage >= totalPages - 1 ? 'disabled' : '') + ' onclick="goToPage(' + (currentPage + 1) + ')">Próxima &rarr;</button>';
+      html += '<span class="pagination-info">' + total + ' artigos</span>';
+      html += '</div>';
+      return html;
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      loadArticles();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function setFilter(filter, btn) {
       currentFilter = filter;
+      currentPage = 0;
       document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
       loadArticles();
