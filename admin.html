@@ -992,6 +992,11 @@
           <option value="saude">Saúde</option>
           <option value="analise">Análise</option>
         </select>
+        <select id="dashSource" onchange="loadArticles()">
+          <option value="">Todas as fontes</option>
+          <option value="Carta Brasil">Carta Brasil</option>
+          <option value="Agência Brasil">Agência Brasil</option>
+        </select>
       </div>
       <div id="articleList"></div>
     </div>
@@ -1210,12 +1215,16 @@
     // ── Dashboard ───────────────────────────────
     async function loadArticles() {
       var query = sb.from('articles')
-        .select('id, title, category, status, published_at, source_name, author, location, updated_at')
-        .eq('source_name', 'Carta Brasil')
+        .select('id, title, category, status, published_at, source_name, author, location, updated_at, image_url')
         .order('created_at', { ascending: false });
 
       if (currentFilter !== 'all') {
         query = query.eq('status', currentFilter);
+      }
+
+      var sourceFilter = document.getElementById('dashSource') ? document.getElementById('dashSource').value : '';
+      if (sourceFilter) {
+        query = query.eq('source_name', sourceFilter);
       }
 
       var catFilter = document.getElementById('dashCategory') ? document.getElementById('dashCategory').value : '';
@@ -1238,7 +1247,7 @@
       }
 
       var html = '<table class="article-table"><thead><tr>' +
-        '<th>Título</th><th>Autor</th><th>Categoria</th><th>Status</th><th>Data</th><th></th>' +
+        '<th>Título</th><th>Fonte</th><th>Categoria</th><th>Status</th><th>Data</th><th></th>' +
         '</tr></thead><tbody>';
 
       data.forEach(function(a) {
@@ -1247,16 +1256,17 @@
         var badgeClass = a.status === 'published' ? 'badge-published' : (a.status === 'scheduled' ? 'badge-scheduled' : 'badge-draft');
         var badgeText = a.status === 'published' ? 'Publicado' : (a.status === 'scheduled' ? 'Agendado' : 'Rascunho');
         var catClass = 'cat-' + a.category;
+        var sourceShort = (a.source_name || '').replace('Agência ', 'Ag. ');
 
         html += '<tr>' +
           '<td class="td-title">' + a.title + '</td>' +
-          '<td style="font-size:0.78rem;color:var(--ink-muted);">' + (a.author || '—') + '</td>' +
+          '<td style="font-size:0.72rem;color:var(--ink-muted);">' + sourceShort + '</td>' +
           '<td><span class="cat-label ' + catClass + '">' + (categoryLabels[a.category] || a.category) + '</span></td>' +
           '<td><span class="badge ' + badgeClass + '">' + badgeText + '</span></td>' +
           '<td style="font-size:0.78rem;color:var(--ink-muted);">' + dateStr + '</td>' +
           '<td><div class="td-actions">' +
             '<button class="btn btn-outline btn-sm" onclick="editArticle(\'' + a.id + '\')">Editar</button>' +
-            (a.status === 'published' ? '<button class="btn btn-sm" style="background:#E1306C;color:#fff;" onclick="postToInstagramFromDash(\'' + a.id + '\')">Instagram</button>' : '') +
+            (a.status === 'published' && a.image_url ? '<button class="btn btn-sm" style="background:#E1306C;color:#fff;" onclick="postToInstagramFromDash(\'' + a.id + '\')">Instagram</button>' : '') +
             '<button class="btn btn-danger btn-sm" onclick="deleteArticle(\'' + a.id + '\', this)">Excluir</button>' +
           '</div></td>' +
           '</tr>';

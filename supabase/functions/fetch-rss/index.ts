@@ -19,8 +19,6 @@ const FEEDS: FeedConfig[] = [
   { url: "https://agenciabrasil.ebc.com.br/rss/esportes/feed.xml", category: "esportes", sourceName: "Agência Brasil" },
   { url: "https://agenciabrasil.ebc.com.br/rss/justica/feed.xml", category: "justica", sourceName: "Agência Brasil" },
   { url: "https://agenciabrasil.ebc.com.br/rss/saude/feed.xml", category: "saude", sourceName: "Agência Brasil" },
-  // ── Agência Senado ──
-  { url: "https://www12.senado.leg.br/noticias/rss", category: "politica", sourceName: "Agência Senado" },
 ];
 
 Deno.serve(async (req) => {
