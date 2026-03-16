@@ -332,6 +332,16 @@
 
     .badge-published { background: var(--green); color: #fff; }
     .badge-draft { background: var(--ink-muted); color: #fff; }
+    .badge-scheduled { background: #d4a017; color: #fff; }
+
+    .autosave-indicator {
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      font-style: italic;
+      white-space: nowrap;
+    }
+
+    .autosave-indicator.saving { color: var(--accent); }
 
     .cat-label {
       font-size: 0.65rem;
@@ -964,6 +974,7 @@
         <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Todos</button>
         <button class="filter-btn" data-filter="published" onclick="setFilter('published', this)">Publicados</button>
         <button class="filter-btn" data-filter="draft" onclick="setFilter('draft', this)">Rascunhos</button>
+        <button class="filter-btn" data-filter="scheduled" onclick="setFilter('scheduled', this)">Agendados</button>
       </div>
       <div class="dash-search">
         <input type="text" id="dashSearch" placeholder="Buscar por título ou autor..." onkeyup="debounceSearch()" />
@@ -992,8 +1003,10 @@
       <div class="editor-header">
         <a class="editor-back" onclick="showDashboard()">&larr; Voltar aos artigos</a>
         <div class="editor-actions">
+          <span class="autosave-indicator" id="autosaveIndicator"></span>
           <button class="btn btn-outline btn-sm" onclick="openPreview()">Pré-visualizar</button>
           <button class="btn btn-sm" style="background:var(--ink-muted);color:#fff;" onclick="saveArticle('draft')">Salvar rascunho</button>
+          <button class="btn btn-sm" style="background:#d4a017;color:#fff;" onclick="showScheduleModal()">Agendar</button>
           <button class="btn btn-green btn-sm" onclick="saveArticle('published')">Publicar</button>
         </div>
       </div>
@@ -1049,6 +1062,11 @@
           <label class="form-label">Legenda da imagem</label>
           <input type="text" class="form-input" id="edImageCaption" placeholder="Ex: Foto: João Silva / Agência" />
         </div>
+
+        <div class="form-group" id="scheduleGroup" style="display:none;">
+          <label class="form-label">Publicação agendada para</label>
+          <input type="datetime-local" class="form-input" id="edScheduledAt" />
+        </div>
       </div>
 
       <div class="form-group full">
@@ -1090,6 +1108,17 @@
     </div>
   </div>
 
+  <!-- ════════════ SCHEDULE MODAL ════════════ -->
+  <div class="preview-overlay" id="scheduleOverlay">
+    <div class="preview-container" style="max-width:420px;text-align:center;">
+      <button class="preview-close" onclick="closeScheduleModal()">&times;</button>
+      <h2 style="font-family:'Lora',serif;font-size:1.3rem;font-weight:600;margin-bottom:0.5rem;">Agendar publicação</h2>
+      <p style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:1.5rem;">Escolha a data e hora para publicar automaticamente.</p>
+      <input type="datetime-local" class="form-input" id="scheduleDateTime" style="width:100%;margin-bottom:1.5rem;" />
+      <button class="btn btn-primary" style="width:100%;background:#d4a017;" onclick="confirmSchedule()">Confirmar agendamento</button>
+    </div>
+  </div>
+
   <!-- ════════════ TOAST ════════════ -->
   <div class="toast" id="toast"></div>
 
@@ -1118,6 +1147,9 @@
     let editingArticleId = null;
     let quill = null;
     let searchTimer = null;
+    let autosaveTimer = null;
+    const AUTOSAVE_KEY = 'cb_autosave';
+    const AUTOSAVE_DELAY = 5000; // 5 segundos
 
     function debounceSearch() {
       clearTimeout(searchTimer);
@@ -1204,8 +1236,8 @@
       data.forEach(function(a) {
         var d = new Date(a.published_at);
         var dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-        var badgeClass = a.status === 'published' ? 'badge-published' : 'badge-draft';
-        var badgeText = a.status === 'published' ? 'Publicado' : 'Rascunho';
+        var badgeClass = a.status === 'published' ? 'badge-published' : (a.status === 'scheduled' ? 'badge-scheduled' : 'badge-draft');
+        var badgeText = a.status === 'published' ? 'Publicado' : (a.status === 'scheduled' ? 'Agendado' : 'Rascunho');
         var catClass = 'cat-' + a.category;
 
         html += '<tr>' +
@@ -1359,6 +1391,13 @@
       document.getElementById('edLocation').value = articleData ? (articleData.location || '') : '';
       document.getElementById('edImageCaption').value = articleData ? (articleData.image_caption || '') : '';
 
+      // Mostrar campo de agendamento se artigo já está agendado
+      if (articleData && articleData.scheduled_at) {
+        document.getElementById('scheduleGroup').style.display = '';
+        var sched = new Date(articleData.scheduled_at);
+        document.getElementById('edScheduledAt').value = sched.toISOString().slice(0, 16);
+      }
+
       // Extrair relacionadas existentes do body antes de carregar no Quill
       var bodyToLoad = articleData ? (articleData.body || '') : '';
       selectedRelated = [];
@@ -1399,6 +1438,20 @@
       var indicator = document.getElementById('relatedIndicator');
       if (indicator) indicator.remove();
 
+      // Limpar campo de agendamento
+      document.getElementById('edScheduledAt').value = '';
+      document.getElementById('scheduleGroup').style.display = 'none';
+
+      // Limpar indicador de autosave
+      document.getElementById('autosaveIndicator').textContent = '';
+
+      showView('editorView');
+
+      // Tentar restaurar autosave (só para artigos novos sem dados pré-carregados)
+      if (!articleData) {
+        checkAutosaveRestore();
+      }
+
       // Se já existem relacionadas, mostrar indicador
       if (pendingRelated.length > 0) {
         indicator = document.createElement('div');
@@ -1409,7 +1462,8 @@
         document.querySelector('.quill-wrap').after(indicator);
       }
 
-      showView('editorView');
+      // Ativar autosave
+      setupAutosave();
     }
 
     async function editArticle(id) {
@@ -1431,7 +1485,7 @@
       reader.readAsDataURL(file);
     }
 
-    async function saveArticle(status) {
+    async function saveArticle(status, scheduledAt) {
       var title = document.getElementById('edTitle').value.trim();
       if (!title) { toast('Título é obrigatório'); return; }
 
@@ -1514,12 +1568,27 @@
         record.published_at = new Date().toISOString();
       }
 
+      // Agendamento
+      if (status === 'scheduled' && scheduledAt) {
+        record.scheduled_at = scheduledAt;
+        record.published_at = isNew ? new Date().toISOString() : undefined;
+      }
+
       var { error } = isNew
         ? await sb.from('articles').insert(record)
         : await sb.from('articles').update(record).eq('id', articleId);
 
       if (error) { toast('Erro ao salvar: ' + error.message); return; }
-      toast(status === 'published' ? 'Artigo publicado!' : 'Rascunho salvo');
+
+      // Limpar autosave após salvar com sucesso
+      clearAutosave();
+
+      var msgs = {
+        published: 'Artigo publicado!',
+        draft: 'Rascunho salvo',
+        scheduled: 'Publicação agendada!'
+      };
+      toast(msgs[status] || 'Salvo');
 
       // Voltar para a lista de artigos após salvar
       setTimeout(function() {
@@ -1636,6 +1705,130 @@
       renderSelectedRelated();
       document.getElementById('relatedResults').innerHTML = '<p class="related-empty">Digite um termo para buscar artigos.</p>';
       document.getElementById('relatedSearch').value = '';
+    }
+
+    // ── Auto-save ─────────────────────────────────
+    function getAutosaveData() {
+      return {
+        id: editingArticleId,
+        title: document.getElementById('edTitle').value,
+        description: document.getElementById('edDescription').value,
+        category: document.getElementById('edCategory').value,
+        author: document.getElementById('edAuthor').value,
+        location: document.getElementById('edLocation').value,
+        imageCaption: document.getElementById('edImageCaption').value,
+        body: quill ? quill.root.innerHTML : '',
+        pendingRelated: pendingRelated,
+        savedAt: new Date().toISOString()
+      };
+    }
+
+    function performAutosave() {
+      var data = getAutosaveData();
+      if (!data.title && !data.body) return; // nada para salvar
+      var key = AUTOSAVE_KEY + '_' + (editingArticleId || 'new');
+      localStorage.setItem(key, JSON.stringify(data));
+
+      var indicator = document.getElementById('autosaveIndicator');
+      var time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      indicator.textContent = 'Salvo automaticamente às ' + time;
+      indicator.classList.remove('saving');
+    }
+
+    function scheduleAutosave() {
+      clearTimeout(autosaveTimer);
+      var indicator = document.getElementById('autosaveIndicator');
+      indicator.textContent = 'Salvando...';
+      indicator.classList.add('saving');
+      autosaveTimer = setTimeout(performAutosave, AUTOSAVE_DELAY);
+    }
+
+    var autosaveSetup = false;
+    function setupAutosave() {
+      if (autosaveSetup) return;
+      autosaveSetup = true;
+      // Observar mudanças nos campos do formulário
+      ['edTitle', 'edDescription', 'edCategory', 'edAuthor', 'edLocation', 'edImageCaption'].forEach(function(id) {
+        var el = document.getElementById(id);
+        el.addEventListener('input', scheduleAutosave);
+        el.addEventListener('change', scheduleAutosave);
+      });
+      // Observar mudanças no Quill
+      if (quill) {
+        quill.on('text-change', scheduleAutosave);
+      }
+    }
+
+    function checkAutosaveRestore() {
+      var key = AUTOSAVE_KEY + '_' + (editingArticleId || 'new');
+      var saved = localStorage.getItem(key);
+      if (!saved) return false;
+
+      try {
+        var data = JSON.parse(saved);
+        if (!data.title && !data.body) return false;
+
+        var savedTime = new Date(data.savedAt);
+        var timeStr = savedTime.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+        if (confirm('Existe um rascunho salvo automaticamente (' + timeStr + ').\n\nDeseja restaurar?')) {
+          document.getElementById('edTitle').value = data.title || '';
+          document.getElementById('edDescription').value = data.description || '';
+          document.getElementById('edCategory').value = data.category || 'geral';
+          document.getElementById('edAuthor').value = data.author || '';
+          document.getElementById('edLocation').value = data.location || '';
+          document.getElementById('edImageCaption').value = data.imageCaption || '';
+          if (data.body && quill) quill.root.innerHTML = data.body;
+          if (data.pendingRelated) pendingRelated = data.pendingRelated;
+          return true;
+        } else {
+          localStorage.removeItem(key);
+        }
+      } catch (e) { /* ignore */ }
+      return false;
+    }
+
+    function clearAutosave() {
+      var key = AUTOSAVE_KEY + '_' + (editingArticleId || 'new');
+      localStorage.removeItem(key);
+      // Limpar também a chave 'new' se o artigo ganhou ID
+      if (editingArticleId) {
+        localStorage.removeItem(AUTOSAVE_KEY + '_new');
+      }
+      var indicator = document.getElementById('autosaveIndicator');
+      indicator.textContent = '';
+    }
+
+    // ── Schedule ──────────────────────────────────
+    function showScheduleModal() {
+      var title = document.getElementById('edTitle').value.trim();
+      if (!title) { toast('Preencha o título antes de agendar'); return; }
+
+      // Pré-preencher com data/hora atual + 1 hora
+      var now = new Date();
+      now.setHours(now.getHours() + 1);
+      now.setMinutes(0);
+      var iso = now.toISOString().slice(0, 16);
+      document.getElementById('scheduleDateTime').value = iso;
+      document.getElementById('scheduleOverlay').classList.add('active');
+    }
+
+    function closeScheduleModal() {
+      document.getElementById('scheduleOverlay').classList.remove('active');
+    }
+
+    function confirmSchedule() {
+      var dt = document.getElementById('scheduleDateTime').value;
+      if (!dt) { toast('Selecione uma data e hora'); return; }
+
+      var scheduled = new Date(dt);
+      if (scheduled <= new Date()) {
+        toast('A data deve ser no futuro');
+        return;
+      }
+
+      closeScheduleModal();
+      saveArticle('scheduled', scheduled.toISOString());
     }
 
     // ── Preview ─────────────────────────────────
