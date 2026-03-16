@@ -364,6 +364,57 @@
       color: var(--ink-muted);
     }
 
+    .bulk-bar {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 1.2rem;
+      background: #111;
+      color: #fff;
+      margin-bottom: 1rem;
+      animation: fadeUp 0.3s ease;
+    }
+
+    .bulk-bar.show { display: flex; }
+
+    .bulk-bar span {
+      font-size: 0.78rem;
+      font-weight: 400;
+    }
+
+    .bulk-bar button {
+      background: #E1306C;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .bulk-bar button:hover { opacity: 0.85; }
+
+    .bulk-bar .bulk-cancel {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+    }
+
+    .article-table .td-check {
+      width: 32px;
+      text-align: center;
+    }
+
+    .article-table .td-check input {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
     .autosave-indicator {
       font-size: 0.7rem;
       color: var(--ink-muted);
@@ -1028,6 +1079,11 @@
           <option value="Agência Brasil">Agência Brasil</option>
         </select>
       </div>
+      <div class="bulk-bar" id="bulkBar">
+        <span id="bulkCount">0 selecionados</span>
+        <button onclick="bulkPostInstagram()">Postar no Instagram</button>
+        <button class="bulk-cancel" onclick="clearSelection()">Cancelar</button>
+      </div>
       <div id="articleList"></div>
     </div>
   </section>
@@ -1284,6 +1340,7 @@
       }
 
       var html = '<table class="article-table"><thead><tr>' +
+        '<th class="td-check"><input type="checkbox" onchange="toggleSelectAll(this)" title="Selecionar todos" /></th>' +
         '<th>Título</th><th>Fonte</th><th>Categoria</th><th>Status</th><th>Data</th><th></th>' +
         '</tr></thead><tbody>';
 
@@ -1294,8 +1351,10 @@
         var badgeText = a.status === 'published' ? 'Publicado' : (a.status === 'scheduled' ? 'Agendado' : 'Rascunho');
         var catClass = 'cat-' + a.category;
         var sourceShort = (a.source_name || '').replace('Agência ', 'Ag. ');
+        var canPost = a.status === 'published' && a.image_url;
 
         html += '<tr>' +
+          '<td class="td-check">' + (canPost ? '<input type="checkbox" class="ig-check" value="' + a.id + '" onchange="updateBulkBar()" />' : '') + '</td>' +
           '<td class="td-title">' + a.title + '</td>' +
           '<td style="font-size:0.72rem;color:var(--ink-muted);">' + sourceShort + '</td>' +
           '<td><span class="cat-label ' + catClass + '">' + (categoryLabels[a.category] || a.category) + '</span></td>' +
@@ -1303,7 +1362,6 @@
           '<td style="font-size:0.78rem;color:var(--ink-muted);">' + dateStr + '</td>' +
           '<td><div class="td-actions">' +
             '<button class="btn btn-outline btn-sm" onclick="editArticle(\'' + a.id + '\')">Editar</button>' +
-            (a.status === 'published' && a.image_url ? '<button class="btn btn-sm" style="background:#E1306C;color:#fff;" onclick="postToInstagramFromDash(\'' + a.id + '\')">Instagram</button>' : '') +
             '<button class="btn btn-danger btn-sm" onclick="deleteArticle(\'' + a.id + '\', this)">Excluir</button>' +
           '</div></td>' +
           '</tr>';
@@ -1931,6 +1989,78 @@
 
       closeScheduleModal();
       saveArticle('scheduled', scheduled.toISOString());
+    }
+
+    // ── Bulk selection ─────────────────────────────
+    function updateBulkBar() {
+      var checked = document.querySelectorAll('.ig-check:checked');
+      var bar = document.getElementById('bulkBar');
+      var countEl = document.getElementById('bulkCount');
+      if (checked.length > 0) {
+        bar.classList.add('show');
+        countEl.textContent = checked.length + ' selecionado' + (checked.length > 1 ? 's' : '');
+      } else {
+        bar.classList.remove('show');
+      }
+    }
+
+    function toggleSelectAll(master) {
+      var checks = document.querySelectorAll('.ig-check');
+      checks.forEach(function(c) { c.checked = master.checked; });
+      updateBulkBar();
+    }
+
+    function clearSelection() {
+      var checks = document.querySelectorAll('.ig-check');
+      checks.forEach(function(c) { c.checked = false; });
+      var master = document.querySelector('.article-table thead input[type="checkbox"]');
+      if (master) master.checked = false;
+      updateBulkBar();
+    }
+
+    async function bulkPostInstagram() {
+      var checked = document.querySelectorAll('.ig-check:checked');
+      var ids = Array.from(checked).map(function(c) { return c.value; });
+      if (ids.length === 0) return;
+
+      if (!confirm('Publicar ' + ids.length + ' artigo(s) no Instagram?')) return;
+
+      toast('Publicando ' + ids.length + ' artigo(s) no Instagram...');
+      var success = 0;
+      var errors = 0;
+
+      for (var i = 0; i < ids.length; i++) {
+        toast('Publicando ' + (i + 1) + ' de ' + ids.length + '...');
+        try {
+          var { data, error } = await sb.from('articles').select('*').eq('id', ids[i]).maybeSingle();
+          if (error || !data || !data.image_url) { errors++; continue; }
+
+          var slug = data.title.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+          var caption = data.title;
+          if (data.description) caption += '\n\n' + data.description;
+          caption += '\n\nLeia a matéria completa no link da bio.';
+          caption += '\n\n#CartaBrasil #Notícias #Brasil';
+
+          var res = await fetch(SUPABASE_URL + '/functions/v1/publish-instagram', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({ image_url: data.image_url, caption: caption })
+          });
+          var result = await res.json();
+          if (result.success) { success++; } else { errors++; console.error('IG error:', result); }
+        } catch (e) {
+          errors++;
+          console.error('IG bulk error:', e);
+        }
+      }
+
+      clearSelection();
+      toast(success + ' publicado(s) no Instagram' + (errors > 0 ? ', ' + errors + ' erro(s)' : ''));
     }
 
     // ── Instagram (from dashboard) ─────────────────
