@@ -1067,6 +1067,14 @@
           <label class="form-label">Publicação agendada para</label>
           <input type="datetime-local" class="form-input" id="edScheduledAt" />
         </div>
+
+        <div class="form-group full" style="flex-direction:row;align-items:center;gap:0.6rem;">
+          <input type="checkbox" id="edPostInstagram" style="width:16px;height:16px;cursor:pointer;" />
+          <label for="edPostInstagram" style="font-size:0.82rem;cursor:pointer;color:var(--ink);font-weight:400;">
+            Publicar no Instagram
+          </label>
+          <span style="font-size:0.7rem;color:var(--ink-muted);">(@portalcartabrasil)</span>
+        </div>
       </div>
 
       <div class="form-group full">
@@ -1438,9 +1446,10 @@
       var indicator = document.getElementById('relatedIndicator');
       if (indicator) indicator.remove();
 
-      // Limpar campo de agendamento
+      // Limpar campo de agendamento e Instagram
       document.getElementById('edScheduledAt').value = '';
       document.getElementById('scheduleGroup').style.display = 'none';
+      document.getElementById('edPostInstagram').checked = false;
 
       // Limpar indicador de autosave
       document.getElementById('autosaveIndicator').textContent = '';
@@ -1582,6 +1591,12 @@
 
       // Limpar autosave após salvar com sucesso
       clearAutosave();
+
+      // Publicar no Instagram se marcado e status = published
+      var postToIG = document.getElementById('edPostInstagram').checked;
+      if (postToIG && status === 'published') {
+        await publishToInstagram(record, imageUrl);
+      }
 
       var msgs = {
         published: 'Artigo publicado!',
@@ -1829,6 +1844,49 @@
 
       closeScheduleModal();
       saveArticle('scheduled', scheduled.toISOString());
+    }
+
+    // ── Instagram ─────────────────────────────────
+    async function publishToInstagram(record, newImageUrl) {
+      // Pegar a URL da imagem (nova ou existente)
+      var igImageUrl = newImageUrl || document.getElementById('coverPreview').src;
+      if (!igImageUrl || igImageUrl.includes('data:')) {
+        toast('Sem imagem de capa para o Instagram');
+        return;
+      }
+
+      // Montar caption
+      var slug = record.title.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      var caption = record.title;
+      if (record.description) caption += '\n\n' + record.description;
+      caption += '\n\nLeia a matéria completa em cartabrasil.com.br/noticia.html?slug=' + slug;
+      caption += '\n\n#CartaBrasil #Notícias #Brasil';
+
+      toast('Publicando no Instagram...');
+
+      try {
+        var res = await fetch(SUPABASE_URL + '/functions/v1/publish-instagram', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ image_url: igImageUrl, caption: caption })
+        });
+
+        var data = await res.json();
+        if (data.success) {
+          toast('Publicado no Instagram!');
+        } else {
+          toast('Erro no Instagram: ' + (data.error || 'desconhecido'));
+          console.error('IG error:', data);
+        }
+      } catch (e) {
+        toast('Erro ao conectar com Instagram');
+        console.error('IG fetch error:', e);
+      }
     }
 
     // ── Preview ─────────────────────────────────
