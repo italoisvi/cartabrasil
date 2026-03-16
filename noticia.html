@@ -1059,14 +1059,16 @@
     async function loadArticle() {
       const params = new URLSearchParams(window.location.search);
       const articleId = params.get('id');
-      if (!articleId) return;
+      const articleSlug = params.get('slug');
+      if (!articleId && !articleSlug) return;
 
-      const { data: article, error } = await sb
-        .from('articles')
-        .select('*')
-        .eq('id', articleId)
-        .eq('status', 'published')
-        .maybeSingle();
+      var query = sb.from('articles').select('*').eq('status', 'published');
+      if (articleSlug) {
+        query = query.eq('slug', articleSlug);
+      } else {
+        query = query.eq('id', articleId);
+      }
+      const { data: article, error } = await query.maybeSingle();
 
       if (error || !article) {
         document.getElementById('articleSkeleton').style.display = 'none';
@@ -1251,7 +1253,7 @@
             if (links.length > 0) {
               var relHtml = '<div class="related"><p class="related-title">Notícias relacionadas</p><ul class="related-list">';
               links.forEach(function(r) {
-                relHtml += '<li class="related-item"><a class="related-link" href="noticia.html?id=' + r.id + '">' + r.title + '</a></li>';
+                relHtml += '<li class="related-item"><a class="related-link" href="noticia.html?' + (r.slug ? 'slug=' + r.slug : 'id=' + r.id) + '">' + r.title + '</a></li>';
               });
               relHtml += '</ul></div>';
               relatedEl.innerHTML = relHtml;
@@ -1504,7 +1506,7 @@
         const words = frag.split(' ').slice(0, 6).join('%');
         const { data } = await sb
           .from('articles')
-          .select('id, title')
+          .select('id, title, slug')
           .ilike('title', '%' + words + '%')
           .limit(1);
 
@@ -1526,7 +1528,7 @@
           '<ul class="related-list">';
         related.forEach(r => {
           html += '<li class="related-item">' +
-            '<a class="related-link" href="noticia.html?id=' + r.id + '">' + r.title + '</a>' +
+            '<a class="related-link" href="noticia.html?' + (r.slug ? 'slug=' + r.slug : 'id=' + r.id) + '">' + r.title + '</a>' +
           '</li>';
         });
         html += '</ul></div>';
@@ -1536,7 +1538,7 @@
 
     async function loadMoreNews(excludeId) {
       var query = sb.from('articles')
-        .select('id, title, category, image_url, published_at')
+        .select('id, title, category, image_url, published_at, slug')
         .eq('status', 'published')
                 .not('image_url', 'is', null)
         .order('published_at', { ascending: false })
@@ -1556,7 +1558,7 @@
         var d = new Date(a.published_at);
         var dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-        return '<a class="more-news-card" href="noticia.html?id=' + a.id + '">' +
+        return '<a class="more-news-card" href="noticia.html?' + (a.slug ? 'slug=' + a.slug : 'id=' + a.id) + '">' +
           imgHtml +
           '<p class="more-news-card-cat">' + cat + '</p>' +
           '<p class="more-news-card-title">' + a.title + '</p>' +
@@ -1661,7 +1663,7 @@
 
     async function performSearch(query) {
       const { data } = await sb.from('articles')
-        .select('id, title, category, published_at')
+        .select('id, title, category, published_at, slug')
                 .or('title.ilike.%' + query + '%,description.ilike.%' + query + '%')
         .order('published_at', { ascending: false })
         .limit(8);
@@ -1673,7 +1675,7 @@
 
       let html = '';
       data.forEach(a => {
-        html += '<a class="search-result-item" href="noticia.html?id=' + a.id + '">' +
+        html += '<a class="search-result-item" href="noticia.html?' + (a.slug ? 'slug=' + a.slug : 'id=' + a.id) + '">' +
           '<div class="search-result-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</div>' +
           '<div class="search-result-title">' + a.title + '</div>' +
           '<div class="search-result-time">' + formatSearchTime(a.published_at) + '</div>' +

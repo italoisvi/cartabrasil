@@ -1256,6 +1256,7 @@
           '<td style="font-size:0.78rem;color:var(--ink-muted);">' + dateStr + '</td>' +
           '<td><div class="td-actions">' +
             '<button class="btn btn-outline btn-sm" onclick="editArticle(\'' + a.id + '\')">Editar</button>' +
+            (a.status === 'published' ? '<button class="btn btn-sm" style="background:#E1306C;color:#fff;" onclick="postToInstagramFromDash(\'' + a.id + '\')">Instagram</button>' : '') +
             '<button class="btn btn-danger btn-sm" onclick="deleteArticle(\'' + a.id + '\', this)">Excluir</button>' +
           '</div></td>' +
           '</tr>';
@@ -1566,6 +1567,13 @@
 
       if (imageUrl) record.image_url = imageUrl;
 
+      // Gerar slug a partir do título
+      var slug = title.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        .substring(0, 80);
+      record.slug = slug;
+
       if (isNew) {
         record.original_url = 'cms://' + articleId;
         record.published_at = new Date().toISOString();
@@ -1595,7 +1603,10 @@
       // Publicar no Instagram se marcado e status = published
       var postToIG = document.getElementById('edPostInstagram').checked;
       if (postToIG && status === 'published') {
+        toast('Artigo salvo! Publicando no Instagram...');
         await publishToInstagram(record, imageUrl);
+        setTimeout(function() { showDashboard(); }, 1500);
+        return;
       }
 
       var msgs = {
@@ -1846,7 +1857,47 @@
       saveArticle('scheduled', scheduled.toISOString());
     }
 
-    // ── Instagram ─────────────────────────────────
+    // ── Instagram (from dashboard) ─────────────────
+    async function postToInstagramFromDash(articleId) {
+      if (!confirm('Publicar este artigo no Instagram?')) return;
+
+      toast('Carregando artigo...');
+      var { data, error } = await sb.from('articles').select('*').eq('id', articleId).maybeSingle();
+      if (error || !data) { toast('Erro ao carregar artigo'); return; }
+      if (!data.image_url) { toast('Artigo não tem imagem de capa'); return; }
+
+      var slug = data.title.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      var caption = data.title;
+      if (data.description) caption += '\n\n' + data.description;
+      caption += '\n\nLeia a matéria completa no link da bio.';
+      caption += '\n\n#CartaBrasil #Notícias #Brasil';
+
+      toast('Publicando no Instagram...');
+      try {
+        var res = await fetch(SUPABASE_URL + '/functions/v1/publish-instagram', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ image_url: data.image_url, caption: caption })
+        });
+        var result = await res.json();
+        if (result.success) {
+          toast('Publicado no Instagram!');
+        } else {
+          toast('Erro no Instagram: ' + (result.error || 'desconhecido'));
+          console.error('IG error:', result);
+        }
+      } catch (e) {
+        toast('Erro ao conectar com Instagram');
+        console.error('IG fetch error:', e);
+      }
+    }
+
+    // ── Instagram (from editor) ─────────────────────
     async function publishToInstagram(record, newImageUrl) {
       // Pegar a URL da imagem (nova ou existente)
       var igImageUrl = newImageUrl || document.getElementById('coverPreview').src;
@@ -1861,7 +1912,7 @@
         .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       var caption = record.title;
       if (record.description) caption += '\n\n' + record.description;
-      caption += '\n\nLeia a matéria completa em cartabrasil.com.br/noticia.html?slug=' + slug;
+      caption += '\n\nLeia a matéria completa no link da bio.';
       caption += '\n\n#CartaBrasil #Notícias #Brasil';
 
       toast('Publicando no Instagram...');

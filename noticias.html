@@ -658,7 +658,7 @@
       const label = categoryLabels[a.category] || a.category;
       const catClass = 'cat-' + a.category;
 
-      return '<a class="news-item" href="noticia.html?id=' + a.id + '">' +
+      return '<a class="news-item" href="noticia.html?' + (a.slug ? 'slug=' + a.slug : 'id=' + a.id) + '">' +
         '<div class="news-item-header">' +
           '<span class="news-category ' + catClass + '">' + label + '</span>' +
           '<span class="news-time">' + formatDate(a.published_at) + '</span>' +
@@ -678,7 +678,7 @@
 
       let query = sb
         .from('articles')
-        .select('id, title, description, category, published_at')
+        .select('id, title, description, category, published_at, slug')
         .eq('status', 'published')
         .order('published_at', { ascending: false })
         .range(offset, offset + PAGE_SIZE - 1);
@@ -782,7 +782,7 @@
 
     async function performSearch(query) {
       const { data } = await sb.from('articles')
-        .select('id, title, category, published_at')
+        .select('id, title, category, published_at, slug')
         .or('title.ilike.%' + query + '%,description.ilike.%' + query + '%')
         .order('published_at', { ascending: false })
         .limit(8);
@@ -794,7 +794,7 @@
 
       let html = '';
       data.forEach(a => {
-        html += '<a class="search-result-item" href="noticia.html?id=' + a.id + '">' +
+        html += '<a class="search-result-item" href="noticia.html?' + (a.slug ? 'slug=' + a.slug : 'id=' + a.id) + '">' +
           '<div class="search-result-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</div>' +
           '<div class="search-result-title">' + a.title + '</div>' +
           '<div class="search-result-time">' + formatSearchTime(a.published_at) + '</div>' +

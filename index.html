@@ -1204,7 +1204,7 @@
       return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
     }
 
-    function link(id) { return 'noticia.html?id=' + id; }
+    function link(a) { return 'noticia.html?' + (a.slug ? 'slug=' + a.slug : 'id=' + (a.id || a)); }
 
     function isRecent(dateStr) {
       const dt = new Date(dateStr);
@@ -1360,7 +1360,7 @@
 
       let html = '';
       results.forEach(a => {
-        html += '<a class="search-result-item" href="' + link(a.id) + '">' +
+        html += '<a class="search-result-item" href="' + link(a) + '">' +
           '<div class="search-result-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</div>' +
           '<div class="search-result-title">' + a.title + '</div>' +
           '<div class="search-result-time">' + formatTime(a.published_at) + '</div>' +
@@ -1433,7 +1433,7 @@
       // Left column: 2 articles with images + text-only extras
       html += '<div class="hero-main">';
       heroLeft.forEach(function(a) {
-        html += '<a class="hero-main-item" href="' + link(a.id) + '">' +
+        html += '<a class="hero-main-item" href="' + link(a) + '">' +
           imgTag(a.image_url, 'hero-main-img') +
           '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
           '<span class="time">' + formatTime(a.published_at) + '</span>' +
@@ -1446,7 +1446,7 @@
       // Center column: main article + second article below
       if (mediaArticle) {
         html += '<div class="hero-media">';
-        html += '<a href="' + link(mediaArticle.id) + '">' +
+        html += '<a href="' + link(mediaArticle) + '">' +
           imgTag(mediaArticle.image_url, 'hero-img') +
           '<span class="time">' + formatTime(mediaArticle.published_at) + '</span>' +
           '<div class="hero-media-caption">' +
@@ -1456,7 +1456,7 @@
           '</div>' +
         '</a>';
         if (secondMediaArticle) {
-          html += '<a class="hero-second" href="' + link(secondMediaArticle.id) + '">' +
+          html += '<a class="hero-second" href="' + link(secondMediaArticle) + '">' +
             imgTag(secondMediaArticle.image_url, 'hero-second-img') +
             '<span class="time">' + formatTime(secondMediaArticle.published_at) + '</span>' +
             '<div class="hero-media-caption">' +
@@ -1473,7 +1473,7 @@
       if (sidebarArticles.length > 0) {
         html += '<div class="hero-sidebar">';
         sidebarArticles.forEach(a => {
-          html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
+          html += '<a class="sidebar-item" href="' + link(a) + '">' +
             (a.image_url ? '<img class="sidebar-img" src="' + a.image_url + '" alt="" loading="lazy" />' : '') +
             '<span class="time">' + formatTime(a.published_at) + '</span>' +
             '<span class="sidebar-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
@@ -1492,7 +1492,7 @@
         // Left: headline list
         html += '<div class="headlines-col">';
         headlineArticles.forEach((a, i) => {
-          html += '<a class="headline-item" href="' + link(a.id) + '" style="animation-delay:' + (i * 0.04) + 's">' +
+          html += '<a class="headline-item" href="' + link(a) + '" style="animation-delay:' + (i * 0.04) + 's">' +
             '<span class="cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
             '<p class="headline-title">' + a.title + '</p>' +
             (isRecent(a.published_at) ? '<span class="badge-new">novo</span>' : '<span class="time">' + formatTime(a.published_at) + '</span>') +
@@ -1502,7 +1502,7 @@
 
         // Center: featured article with image
         if (featuredArticle) {
-          html += '<div class="featured-center"><a href="' + link(featuredArticle.id) + '">' +
+          html += '<div class="featured-center"><a href="' + link(featuredArticle) + '">' +
             imgTag(featuredArticle.image_url, 'featured-img') +
             '<span class="time">' + formatTime(featuredArticle.published_at) + '</span>' +
             '<span class="cat cat-' + featuredArticle.category + '">' + (categoryLabels[featuredArticle.category] || featuredArticle.category) + '</span>' +
@@ -1516,7 +1516,7 @@
           html += '<div class="sidebar-extra">';
           sidebarExtra.forEach((a, i) => {
             var isLast = i === sidebarExtra.length - 1;
-            html += '<a class="sidebar-item" href="' + link(a.id) + '">' +
+            html += '<a class="sidebar-item" href="' + link(a) + '">' +
               (isLast && a.image_url ? '<img class="sidebar-img" src="' + a.image_url + '" alt="" loading="lazy" />' : '') +
               '<span class="time">' + formatTime(a.published_at) + '</span>' +
               '<span class="sidebar-cat cat-' + a.category + '">' + (categoryLabels[a.category] || a.category) + '</span>' +
@@ -1544,7 +1544,7 @@
           if (catWithPhoto.length > 0) {
             html += '<div class="cat-grid">';
             catWithPhoto.forEach(function(a) {
-              html += '<a class="cat-card" href="' + link(a.id) + '">' +
+              html += '<a class="cat-card" href="' + link(a) + '">' +
                 '<img class="cat-card-img" src="' + a.image_url + '" alt="" loading="lazy" />' +
                 '<div class="cat-card-meta"><span class="time">' + formatTime(a.published_at) + '</span></div>' +
                 '<p class="cat-card-title">' + a.title + '</p>' +
@@ -1568,7 +1568,7 @@
       if (currentSection === 'analise') {
         const { data: analiseArticles, error } = await sb
           .from('articles')
-          .select('id, title, description, body, category, image_url, published_at')
+          .select('id, title, description, body, category, image_url, published_at, slug')
           .eq('status', 'published')
           .eq('category', 'analise')
           .order('published_at', { ascending: false })
@@ -1598,7 +1598,7 @@
     async function loadPortal() {
       const { data: articles, error } = await sb
         .from('articles')
-        .select('id, title, description, body, category, image_url, published_at')
+        .select('id, title, description, body, category, image_url, published_at, slug')
         .eq('status', 'published')
         .order('published_at', { ascending: false })
         .limit(100);
