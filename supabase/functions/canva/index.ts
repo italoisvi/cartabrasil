@@ -1,6 +1,8 @@
 // ── EDGE FUNCTION: CANVA ──────────────────────────────────────────
 // Integração com Canva Connect API para criar Stories do Instagram.
-// Endpoints: /canva?action=auth|callback|create|export|status|publish-story
+// Tokens persistidos na tabela canva_tokens (Edge Functions são stateless).
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const CANVA_CLIENT_ID = Deno.env.get("CANVA_CLIENT_ID") || "";
 const CANVA_CLIENT_SECRET = Deno.env.get("CANVA_CLIENT_SECRET") || "";
@@ -9,6 +11,7 @@ const CANVA_AUTH_URL = "https://www.canva.com/api/oauth/authorize";
 const CANVA_TOKEN_URL = "https://api.canva.com/rest/v1/oauth/token";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
+const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,6 +25,10 @@ function jsonRes(data: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+function sb() {
+  return createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 }
 
 // ── Gerar PKCE ──
@@ -44,14 +51,63 @@ async function generatePKCE() {
   return { verifier, challenge };
 }
 
-// ── Store tokens in memory (para simplificar — em produção usar DB) ──
-const tokenStore: Record<string, {
-  access_token: string;
-  refresh_token: string;
-  expires_at: number;
-}> = {};
+// ── Salvar/obter tokens do DB ──
+async function saveTokens(accessToken: string, refreshToken: string, expiresIn: number) {
+  const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
+  const client = sb();
+  // Upsert: sempre 1 registro com id='default'
+  await client.from("canva_tokens").upsert({
+    id: "default",
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_at: expiresAt,
+  });
+}
 
-const pkceStore: Record<string, string> = {};
+async function getStoredTokens() {
+  const client = sb();
+  const { data } = await client
+    .from("canva_tokens")
+    .select("*")
+    .eq("id", "default")
+    .maybeSingle();
+  return data;
+}
+
+async function getValidToken(): Promise<string> {
+  const stored = await getStoredTokens();
+  if (!stored) throw new Error("Não conectado ao Canva. Conecte primeiro.");
+
+  const expiresAt = new Date(stored.expires_at).getTime();
+
+  // Refresh se expira em menos de 1 minuto
+  if (expiresAt < Date.now() + 60000) {
+    const credentials = btoa(`${CANVA_CLIENT_ID}:${CANVA_CLIENT_SECRET}`);
+    const refreshRes = await fetch(CANVA_TOKEN_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${credentials}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: stored.refresh_token,
+      }),
+    });
+    const refreshData = await refreshRes.json();
+    if (refreshData.access_token) {
+      await saveTokens(
+        refreshData.access_token,
+        refreshData.refresh_token,
+        refreshData.expires_in
+      );
+      return refreshData.access_token;
+    }
+    throw new Error("Falha ao renovar token do Canva");
+  }
+
+  return stored.access_token;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -66,8 +122,8 @@ Deno.serve(async (req) => {
     // ════════════ AUTH: Gerar URL de autorização ════════════
     if (action === "auth") {
       const { verifier, challenge } = await generatePKCE();
-      const state = crypto.randomUUID();
-      pkceStore[state] = verifier;
+      // Codificar verifier no state (Edge Functions são stateless)
+      const statePayload = btoa(JSON.stringify({ id: crypto.randomUUID(), v: verifier }));
 
       const redirectUri = `${SUPABASE_URL}/functions/v1/canva`;
       const scopes = "asset:write design:content:write design:content:read design:meta:read";
@@ -80,25 +136,27 @@ Deno.serve(async (req) => {
         `response_type=code&` +
         `client_id=${CANVA_CLIENT_ID}&` +
         `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `state=${state}`;
+        `state=${encodeURIComponent(statePayload)}`;
 
-      return jsonRes({ auth_url: authUrl, state });
+      return jsonRes({ auth_url: authUrl });
     }
 
     // ════════════ CALLBACK: Trocar code por token ════════════
     if (callbackCode) {
       const code = callbackCode;
-      const state = url.searchParams.get("state");
+      const stateParam = url.searchParams.get("state");
 
-      if (!state) {
+      if (!stateParam) {
         return new Response("State ausente", { status: 400, headers: corsHeaders });
       }
 
-      const verifier = pkceStore[state];
-      if (!verifier) {
-        return new Response("State inválido", { status: 400, headers: corsHeaders });
+      let verifier: string;
+      try {
+        const decoded = JSON.parse(atob(decodeURIComponent(stateParam)));
+        verifier = decoded.v;
+      } catch {
+        return new Response("State inválido: " + stateParam, { status: 400, headers: corsHeaders });
       }
-      delete pkceStore[state];
 
       const redirectUri = `${SUPABASE_URL}/functions/v1/canva`;
       const credentials = btoa(`${CANVA_CLIENT_ID}:${CANVA_CLIENT_SECRET}`);
@@ -120,13 +178,12 @@ Deno.serve(async (req) => {
       const tokenData = await tokenRes.json();
 
       if (tokenData.access_token) {
-        tokenStore["default"] = {
-          access_token: tokenData.access_token,
-          refresh_token: tokenData.refresh_token,
-          expires_at: Date.now() + tokenData.expires_in * 1000,
-        };
+        await saveTokens(
+          tokenData.access_token,
+          tokenData.refresh_token,
+          tokenData.expires_in
+        );
 
-        // Redirecionar de volta para o admin com sucesso
         return new Response(
           `<html><body><script>
             window.opener && window.opener.postMessage({ canvaAuth: 'success' }, '*');
@@ -144,53 +201,20 @@ Deno.serve(async (req) => {
 
     // ════════════ CHECK: Verificar se está conectado ════════════
     if (action === "check") {
-      const token = tokenStore["default"];
-      const connected = !!token && token.expires_at > Date.now();
+      const stored = await getStoredTokens();
+      const connected = !!stored && new Date(stored.expires_at).getTime() > Date.now();
       return jsonRes({ connected });
-    }
-
-    // ── Helper: obter token válido ──
-    async function getToken(): Promise<string> {
-      const stored = tokenStore["default"];
-      if (!stored) throw new Error("Não conectado ao Canva");
-
-      // Refresh se expirado
-      if (stored.expires_at < Date.now() + 60000) {
-        const credentials = btoa(`${CANVA_CLIENT_ID}:${CANVA_CLIENT_SECRET}`);
-        const refreshRes = await fetch(CANVA_TOKEN_URL, {
-          method: "POST",
-          headers: {
-            "Authorization": `Basic ${credentials}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            grant_type: "refresh_token",
-            refresh_token: stored.refresh_token,
-          }),
-        });
-        const refreshData = await refreshRes.json();
-        if (refreshData.access_token) {
-          stored.access_token = refreshData.access_token;
-          stored.refresh_token = refreshData.refresh_token;
-          stored.expires_at = Date.now() + refreshData.expires_in * 1000;
-        } else {
-          throw new Error("Falha ao renovar token");
-        }
-      }
-
-      return stored.access_token;
     }
 
     // ════════════ CREATE: Criar design Story ════════════
     if (action === "create" && req.method === "POST") {
-      const token = await getToken();
+      const token = await getValidToken();
       const { image_url, title } = await req.json();
 
       // Passo 1: Upload da imagem como asset
       let assetId: string | undefined;
 
       if (image_url) {
-        // Baixar a imagem
         const imgRes = await fetch(image_url);
         const imgBytes = await imgRes.arrayBuffer();
 
@@ -210,10 +234,8 @@ Deno.serve(async (req) => {
 
         if (uploadData.job?.status === "success" && uploadData.job?.asset?.id) {
           assetId = uploadData.job.asset.id;
-        } else if (uploadData.job?.status === "in_progress") {
-          // Esperar upload completar
-          assetId = uploadData.job?.asset?.id;
-          // O asset pode ser usado mesmo em progresso em alguns casos
+        } else if (uploadData.job?.asset?.id) {
+          assetId = uploadData.job.asset.id;
         }
       }
 
@@ -252,7 +274,7 @@ Deno.serve(async (req) => {
 
     // ════════════ EXPORT: Exportar design como PNG ════════════
     if (action === "export" && req.method === "POST") {
-      const token = await getToken();
+      const token = await getValidToken();
       const { design_id } = await req.json();
 
       const exportRes = await fetch(`${CANVA_API}/exports`, {
@@ -273,7 +295,7 @@ Deno.serve(async (req) => {
 
     // ════════════ STATUS: Verificar status do export ════════════
     if (action === "status") {
-      const token = await getToken();
+      const token = await getValidToken();
       const exportId = url.searchParams.get("export_id");
 
       if (!exportId) return jsonRes({ error: "export_id obrigatório" }, 400);
@@ -288,7 +310,7 @@ Deno.serve(async (req) => {
 
     // ════════════ PUBLISH-STORY: Exportar + publicar no Instagram Stories ════════════
     if (action === "publish-story" && req.method === "POST") {
-      const token = await getToken();
+      const token = await getValidToken();
       const { design_id } = await req.json();
 
       // Passo 1: Exportar design
@@ -337,7 +359,6 @@ Deno.serve(async (req) => {
       const igUserId = "34230918846555179";
       const igApiBase = "https://graph.instagram.com/v25.0";
 
-      // Criar container de Stories
       const igCreateRes = await fetch(`${igApiBase}/${igUserId}/media`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -354,7 +375,6 @@ Deno.serve(async (req) => {
         return jsonRes({ error: "Erro ao criar Story no IG", details: igCreateData.error }, 400);
       }
 
-      // Aguardar container do IG
       const containerId = igCreateData.id;
       let igStatus = "IN_PROGRESS";
       let igAttempts = 0;
@@ -374,7 +394,6 @@ Deno.serve(async (req) => {
         return jsonRes({ error: "Container IG não ficou pronto", status: igStatus }, 500);
       }
 
-      // Publicar
       const igPublishRes = await fetch(`${igApiBase}/${igUserId}/media_publish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
