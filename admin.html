@@ -415,6 +415,170 @@
       cursor: pointer;
     }
 
+    /* ── Story Editor ── */
+    .story-editor-wrap {
+      display: flex;
+      height: 100vh;
+      background: var(--bg);
+    }
+
+    .story-sidebar {
+      width: 280px;
+      background: var(--paper);
+      border-right: 1px solid var(--rule);
+      padding: 1.2rem;
+      overflow-y: auto;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .story-sidebar-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .story-sidebar-logo {
+      font-family: 'Lora', serif;
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    .story-sidebar-title {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-muted);
+    }
+
+    .story-section { margin-bottom: 1.2rem; }
+
+    .story-label {
+      display: block;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-muted);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .story-tpl-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+    }
+
+    .story-tpl {
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      padding: 0.4rem;
+      font-size: 0.65rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink-light);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .story-tpl:hover { border-color: var(--ink-muted); }
+
+    .story-btn {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.7rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s;
+    }
+
+    .story-btn:hover { background: var(--rule); }
+
+    .story-btn-group { display: flex; flex-direction: column; gap: 0.3rem; }
+
+    .story-select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      padding: 0.4rem;
+      font-size: 0.78rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+    }
+
+    .story-range {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .story-color-row {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .story-swatch {
+      width: 26px;
+      height: 26px;
+      border: none;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .story-footer-actions {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .story-publish-btn {
+      width: 100%;
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      padding: 0.7rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .story-publish-btn:hover { opacity: 0.85; }
+
+    .story-close-btn {
+      background: none;
+      border: 1px solid var(--rule);
+      color: var(--ink-muted);
+    }
+
+    .story-canvas-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      padding: 1.5rem;
+      background: #e8e8e6;
+    }
+
+    .story-canvas-area canvas {
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    }
+
     .autosave-indicator {
       font-size: 0.7rem;
       color: var(--ink-muted);
@@ -1221,32 +1385,37 @@
 
   <!-- ════════════ STORY EDITOR ════════════ -->
   <div class="preview-overlay" id="storyOverlay">
-    <div style="display:flex;height:100vh;background:#1a1a1a;">
-      <!-- Sidebar de ferramentas -->
-      <div style="width:280px;background:#222;padding:1rem;overflow-y:auto;color:#fff;font-family:'DM Sans',sans-serif;">
-        <h3 style="font-size:0.9rem;font-weight:600;margin-bottom:1rem;color:#fff;">Editor de Story</h3>
+    <div class="story-editor-wrap">
+      <!-- Sidebar -->
+      <aside class="story-sidebar">
+        <div class="story-sidebar-header">
+          <span class="story-sidebar-logo">Carta<strong>Brasil</strong></span>
+          <span class="story-sidebar-title">Editor de Story</span>
+        </div>
 
-        <div style="margin-bottom:1rem;">
-          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Template</label>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.4rem;">
-            <button class="story-tpl-btn" onclick="applyStoryTemplate('dark')" style="background:#1a1a1a;color:#fff;border:1px solid #444;padding:0.4rem;font-size:0.7rem;cursor:pointer;">Escuro</button>
-            <button class="story-tpl-btn" onclick="applyStoryTemplate('light')" style="background:#fafaf8;color:#111;border:1px solid #444;padding:0.4rem;font-size:0.7rem;cursor:pointer;">Claro</button>
-            <button class="story-tpl-btn" onclick="applyStoryTemplate('accent')" style="background:#c0392b;color:#fff;border:1px solid #444;padding:0.4rem;font-size:0.7rem;cursor:pointer;">Vermelho</button>
-            <button class="story-tpl-btn" onclick="applyStoryTemplate('gradient')" style="background:linear-gradient(180deg,#000,#c0392b);color:#fff;border:1px solid #444;padding:0.4rem;font-size:0.7rem;cursor:pointer;">Gradiente</button>
+        <div class="story-section">
+          <label class="story-label">Template</label>
+          <div class="story-tpl-grid">
+            <button class="story-tpl" onclick="applyStoryTemplate('dark')"><span style="display:block;width:100%;height:24px;background:#1a1a1a;border-radius:2px;margin-bottom:4px;"></span>Escuro</button>
+            <button class="story-tpl" onclick="applyStoryTemplate('light')"><span style="display:block;width:100%;height:24px;background:#fafaf8;border-radius:2px;margin-bottom:4px;"></span>Claro</button>
+            <button class="story-tpl" onclick="applyStoryTemplate('accent')"><span style="display:block;width:100%;height:24px;background:#c0392b;border-radius:2px;margin-bottom:4px;"></span>Vermelho</button>
+            <button class="story-tpl" onclick="applyStoryTemplate('gradient')"><span style="display:block;width:100%;height:24px;background:linear-gradient(180deg,#111,#c0392b);border-radius:2px;margin-bottom:4px;"></span>Gradiente</button>
           </div>
         </div>
 
-        <div style="margin-bottom:1rem;">
-          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Texto</label>
-          <button onclick="addStoryText('headline')" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">+ Título</button>
-          <button onclick="addStoryText('subtitle')" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.3rem;font-size:0.72rem;cursor:pointer;">+ Subtítulo</button>
-          <button onclick="addStoryText('body')" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.3rem;font-size:0.72rem;cursor:pointer;">+ Texto</button>
+        <div class="story-section">
+          <label class="story-label">Adicionar texto</label>
+          <div class="story-btn-group">
+            <button class="story-btn" onclick="addStoryText('headline')">+ Título</button>
+            <button class="story-btn" onclick="addStoryText('subtitle')">+ Subtítulo</button>
+            <button class="story-btn" onclick="addStoryText('body')">+ Texto</button>
+          </div>
         </div>
 
-        <div style="margin-bottom:1rem;">
-          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Fonte</label>
-          <select id="storyFont" onchange="updateStoryFont()" style="width:100%;background:#333;color:#fff;border:1px solid #555;padding:0.4rem;margin-top:0.4rem;font-size:0.78rem;">
-            <option value="Lora">Lora (Serif)</option>
+        <div class="story-section">
+          <label class="story-label">Fonte</label>
+          <select id="storyFont" onchange="updateStoryFont()" class="story-select">
+            <option value="Lora">Lora</option>
             <option value="Playfair Display">Playfair Display</option>
             <option value="Montserrat">Montserrat</option>
             <option value="Bebas Neue">Bebas Neue</option>
@@ -1259,50 +1428,54 @@
           </select>
         </div>
 
-        <div style="margin-bottom:1rem;">
-          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Tamanho</label>
-          <input type="range" id="storyFontSize" min="16" max="120" value="48" onchange="updateStoryFontSize()" style="width:100%;margin-top:0.4rem;" />
-          <span id="storyFontSizeLabel" style="font-size:0.7rem;color:#999;">48px</span>
+        <div class="story-section">
+          <label class="story-label">Tamanho · <span id="storyFontSizeLabel">48px</span></label>
+          <input type="range" id="storyFontSize" min="16" max="120" value="48" oninput="updateStoryFontSize()" class="story-range" />
         </div>
 
-        <div style="margin-bottom:1rem;">
-          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Cor do texto</label>
-          <div style="display:flex;gap:0.3rem;margin-top:0.4rem;flex-wrap:wrap;">
-            <button onclick="setStoryTextColor('#ffffff')" style="width:24px;height:24px;background:#ffffff;border:1px solid #555;cursor:pointer;"></button>
-            <button onclick="setStoryTextColor('#111111')" style="width:24px;height:24px;background:#111111;border:1px solid #555;cursor:pointer;"></button>
-            <button onclick="setStoryTextColor('#c0392b')" style="width:24px;height:24px;background:#c0392b;border:none;cursor:pointer;"></button>
-            <button onclick="setStoryTextColor('#d4a017')" style="width:24px;height:24px;background:#d4a017;border:none;cursor:pointer;"></button>
-            <button onclick="setStoryTextColor('#2980b9')" style="width:24px;height:24px;background:#2980b9;border:none;cursor:pointer;"></button>
-            <button onclick="setStoryTextColor('#2c3e50')" style="width:24px;height:24px;background:#2c3e50;border:none;cursor:pointer;"></button>
+        <div class="story-section">
+          <label class="story-label">Cor do texto</label>
+          <div class="story-color-row">
+            <button onclick="setStoryTextColor('#ffffff')" class="story-swatch" style="background:#fff;border:1px solid var(--rule);"></button>
+            <button onclick="setStoryTextColor('#111111')" class="story-swatch" style="background:#111;"></button>
+            <button onclick="setStoryTextColor('#c0392b')" class="story-swatch" style="background:#c0392b;"></button>
+            <button onclick="setStoryTextColor('#d4a017')" class="story-swatch" style="background:#d4a017;"></button>
+            <button onclick="setStoryTextColor('#2980b9')" class="story-swatch" style="background:#2980b9;"></button>
+            <button onclick="setStoryTextColor('#2c3e50')" class="story-swatch" style="background:#2c3e50;"></button>
+            <input type="color" id="storyColorPicker" onchange="setStoryTextColor(this.value)" class="story-swatch" style="padding:0;cursor:pointer;" />
           </div>
-          <input type="color" id="storyColorPicker" onchange="setStoryTextColor(this.value)" style="width:100%;height:28px;margin-top:0.3rem;background:none;border:1px solid #555;cursor:pointer;" />
         </div>
 
-        <div style="margin-bottom:1rem;">
-          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Elementos</label>
-          <button onclick="addStoryLogo()" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">+ Logo CartaBrasil</button>
-          <button onclick="addStoryCategory()" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.3rem;font-size:0.72rem;cursor:pointer;">+ Badge Categoria</button>
-          <button onclick="addStoryRect()" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.3rem;font-size:0.72rem;cursor:pointer;">+ Caixa de cor</button>
+        <div class="story-section">
+          <label class="story-label">Elementos</label>
+          <div class="story-btn-group">
+            <button class="story-btn" onclick="addStoryLogo()">+ Logo</button>
+            <button class="story-btn" onclick="addStoryCategory()">+ Categoria</button>
+            <button class="story-btn" onclick="addStoryRect()">+ Caixa</button>
+          </div>
         </div>
 
-        <div style="margin-bottom:1rem;">
-          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Imagem de fundo</label>
-          <button onclick="adjustStoryOverlay()" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">Escurecer/Clarear fundo</button>
+        <div class="story-section">
+          <label class="story-label">Imagem</label>
+          <div class="story-btn-group">
+            <button class="story-btn" onclick="adjustStoryOverlay()">Escurecer / Clarear</button>
+            <button class="story-btn" onclick="reorderStoryLayers()">Reordenar camadas</button>
+          </div>
         </div>
 
-        <button onclick="deleteStorySelected()" style="width:100%;background:#e74c3c;color:#fff;border:none;padding:0.5rem;margin-top:0.5rem;font-size:0.72rem;cursor:pointer;">Excluir selecionado</button>
+        <button class="story-btn" style="background:var(--accent);color:#fff;margin-top:0.5rem;" onclick="deleteStorySelected()">Excluir selecionado</button>
 
-        <hr style="border-color:#444;margin:1rem 0;" />
-
-        <button onclick="publishStory()" style="width:100%;background:#E1306C;color:#fff;border:none;padding:0.7rem;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;">Publicar Story no Instagram</button>
-        <button onclick="downloadStory()" style="width:100%;background:#444;color:#fff;border:none;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">Baixar PNG</button>
-        <button onclick="closeStoryEditor()" style="width:100%;background:none;color:#999;border:1px solid #555;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">Fechar</button>
-      </div>
+        <div class="story-footer-actions">
+          <button class="story-publish-btn" onclick="publishStory()">Publicar Story</button>
+          <button class="story-btn" onclick="downloadStory()">Baixar PNG</button>
+          <button class="story-btn story-close-btn" onclick="closeStoryEditor()">Fechar editor</button>
+        </div>
+      </aside>
 
       <!-- Canvas -->
-      <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:1rem;">
+      <main class="story-canvas-area">
         <canvas id="storyCanvas" width="1080" height="1920"></canvas>
-      </div>
+      </main>
     </div>
   </div>
 
@@ -2269,14 +2442,15 @@
       // Carregar imagem de fundo
       if (data.image_url) {
         fabric.Image.fromURL(data.image_url, function(img) {
-          var scaleW = 1080 / img.width;
-          var scaleH = 1920 / img.height;
-          var s = Math.max(scaleW, scaleH);
+          // Escalar para cobrir a largura, manter proporção
+          var s = 1080 / img.width;
           img.set({
             scaleX: s, scaleY: s,
-            left: 540, top: 960,
-            originX: 'center', originY: 'center',
-            selectable: false, evented: false,
+            left: 0, top: 0,
+            originX: 'left', originY: 'top',
+            selectable: true, evented: true,
+            hasControls: true, hasBorders: true,
+            lockRotation: true,
             name: 'bg-image'
           });
           storyCanvas.add(img);
@@ -2451,10 +2625,23 @@
 
     function deleteStorySelected() {
       var obj = storyCanvas && storyCanvas.getActiveObject();
-      if (obj && obj.name !== 'bg-image' && obj.name !== 'bg-overlay') {
+      if (obj && obj.name !== 'bg-overlay') {
         storyCanvas.remove(obj);
         storyCanvas.renderAll();
       }
+    }
+
+    // Garantir que a imagem de fundo fica atrás do overlay ao desselecionar
+    function reorderStoryLayers() {
+      if (!storyCanvas) return;
+      var objs = storyCanvas.getObjects();
+      objs.forEach(function(o) {
+        if (o.name === 'bg-image') storyCanvas.sendToBack(o);
+      });
+      objs.forEach(function(o) {
+        if (o.name === 'bg-overlay') o.moveTo(1);
+      });
+      storyCanvas.renderAll();
     }
 
     function applyStoryTemplate(tpl) {
