@@ -60,6 +60,7 @@ Deno.serve(async (req) => {
 
   const url = new URL(req.url);
   const action = url.searchParams.get("action");
+  const callbackCode = url.searchParams.get("code");
 
   try {
     // ════════════ AUTH: Gerar URL de autorização ════════════
@@ -68,7 +69,7 @@ Deno.serve(async (req) => {
       const state = crypto.randomUUID();
       pkceStore[state] = verifier;
 
-      const redirectUri = `${SUPABASE_URL}/functions/v1/canva?action=callback`;
+      const redirectUri = `${SUPABASE_URL}/functions/v1/canva`;
       const scopes = "asset:write design:content:write design:content:read design:meta:read";
 
       const authUrl =
@@ -85,12 +86,12 @@ Deno.serve(async (req) => {
     }
 
     // ════════════ CALLBACK: Trocar code por token ════════════
-    if (action === "callback") {
-      const code = url.searchParams.get("code");
+    if (callbackCode) {
+      const code = callbackCode;
       const state = url.searchParams.get("state");
 
-      if (!code || !state) {
-        return new Response("Código ou state ausente", { status: 400, headers: corsHeaders });
+      if (!state) {
+        return new Response("State ausente", { status: 400, headers: corsHeaders });
       }
 
       const verifier = pkceStore[state];
@@ -99,7 +100,7 @@ Deno.serve(async (req) => {
       }
       delete pkceStore[state];
 
-      const redirectUri = `${SUPABASE_URL}/functions/v1/canva?action=callback`;
+      const redirectUri = `${SUPABASE_URL}/functions/v1/canva`;
       const credentials = btoa(`${CANVA_CLIENT_ID}:${CANVA_CLIENT_SECRET}`);
 
       const tokenRes = await fetch(CANVA_TOKEN_URL, {
