@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { image_url, caption } = await req.json();
+    const { image_url, caption, media_type } = await req.json();
 
     if (!image_url) {
       return new Response(
@@ -41,14 +41,20 @@ Deno.serve(async (req) => {
     }
 
     // ── Passo 1: Criar container de mídia ──
+    const mediaBody: Record<string, string> = {
+      image_url,
+      access_token: accessToken,
+    };
+    if (media_type === "STORIES") {
+      mediaBody.media_type = "STORIES";
+    } else {
+      mediaBody.caption = caption || "";
+    }
+
     const createRes = await fetch(`${IG_API_BASE}/${IG_USER_ID}/media`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        image_url,
-        caption: caption || "",
-        access_token: accessToken,
-      }),
+      body: JSON.stringify(mediaBody),
     });
 
     const createData = await createRes.json();

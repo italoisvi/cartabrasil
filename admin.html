@@ -1082,7 +1082,7 @@
       <div class="bulk-bar" id="bulkBar">
         <span id="bulkCount">0 selecionados</span>
         <button onclick="bulkPostInstagram()">Postar no Instagram</button>
-        <button style="background:#7c3aed;" onclick="bulkCreateStory()">Criar Story</button>
+        <button style="background:#7c3aed;" onclick="bulkOpenStoryEditor()">Criar Story</button>
         <button class="bulk-cancel" onclick="clearSelection()">Cancelar</button>
       </div>
       <div id="articleList"></div>
@@ -1219,6 +1219,93 @@
     </div>
   </div>
 
+  <!-- ════════════ STORY EDITOR ════════════ -->
+  <div class="preview-overlay" id="storyOverlay">
+    <div style="display:flex;height:100vh;background:#1a1a1a;">
+      <!-- Sidebar de ferramentas -->
+      <div style="width:280px;background:#222;padding:1rem;overflow-y:auto;color:#fff;font-family:'DM Sans',sans-serif;">
+        <h3 style="font-size:0.9rem;font-weight:600;margin-bottom:1rem;color:#fff;">Editor de Story</h3>
+
+        <div style="margin-bottom:1rem;">
+          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Template</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.4rem;">
+            <button class="story-tpl-btn" onclick="applyStoryTemplate('dark')" style="background:#1a1a1a;color:#fff;border:1px solid #444;padding:0.4rem;font-size:0.7rem;cursor:pointer;">Escuro</button>
+            <button class="story-tpl-btn" onclick="applyStoryTemplate('light')" style="background:#fafaf8;color:#111;border:1px solid #444;padding:0.4rem;font-size:0.7rem;cursor:pointer;">Claro</button>
+            <button class="story-tpl-btn" onclick="applyStoryTemplate('accent')" style="background:#c0392b;color:#fff;border:1px solid #444;padding:0.4rem;font-size:0.7rem;cursor:pointer;">Vermelho</button>
+            <button class="story-tpl-btn" onclick="applyStoryTemplate('gradient')" style="background:linear-gradient(180deg,#000,#c0392b);color:#fff;border:1px solid #444;padding:0.4rem;font-size:0.7rem;cursor:pointer;">Gradiente</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Texto</label>
+          <button onclick="addStoryText('headline')" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">+ Título</button>
+          <button onclick="addStoryText('subtitle')" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.3rem;font-size:0.72rem;cursor:pointer;">+ Subtítulo</button>
+          <button onclick="addStoryText('body')" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.3rem;font-size:0.72rem;cursor:pointer;">+ Texto</button>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Fonte</label>
+          <select id="storyFont" onchange="updateStoryFont()" style="width:100%;background:#333;color:#fff;border:1px solid #555;padding:0.4rem;margin-top:0.4rem;font-size:0.78rem;">
+            <option value="Lora">Lora (Serif)</option>
+            <option value="Playfair Display">Playfair Display</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Bebas Neue">Bebas Neue</option>
+            <option value="Oswald">Oswald</option>
+            <option value="Poppins">Poppins</option>
+            <option value="DM Sans">DM Sans</option>
+            <option value="Raleway">Raleway</option>
+            <option value="Roboto Condensed">Roboto Condensed</option>
+            <option value="Inter">Inter</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Tamanho</label>
+          <input type="range" id="storyFontSize" min="16" max="120" value="48" onchange="updateStoryFontSize()" style="width:100%;margin-top:0.4rem;" />
+          <span id="storyFontSizeLabel" style="font-size:0.7rem;color:#999;">48px</span>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Cor do texto</label>
+          <div style="display:flex;gap:0.3rem;margin-top:0.4rem;flex-wrap:wrap;">
+            <button onclick="setStoryTextColor('#ffffff')" style="width:24px;height:24px;background:#ffffff;border:1px solid #555;cursor:pointer;"></button>
+            <button onclick="setStoryTextColor('#111111')" style="width:24px;height:24px;background:#111111;border:1px solid #555;cursor:pointer;"></button>
+            <button onclick="setStoryTextColor('#c0392b')" style="width:24px;height:24px;background:#c0392b;border:none;cursor:pointer;"></button>
+            <button onclick="setStoryTextColor('#d4a017')" style="width:24px;height:24px;background:#d4a017;border:none;cursor:pointer;"></button>
+            <button onclick="setStoryTextColor('#2980b9')" style="width:24px;height:24px;background:#2980b9;border:none;cursor:pointer;"></button>
+            <button onclick="setStoryTextColor('#2c3e50')" style="width:24px;height:24px;background:#2c3e50;border:none;cursor:pointer;"></button>
+          </div>
+          <input type="color" id="storyColorPicker" onchange="setStoryTextColor(this.value)" style="width:100%;height:28px;margin-top:0.3rem;background:none;border:1px solid #555;cursor:pointer;" />
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Elementos</label>
+          <button onclick="addStoryLogo()" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">+ Logo CartaBrasil</button>
+          <button onclick="addStoryCategory()" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.3rem;font-size:0.72rem;cursor:pointer;">+ Badge Categoria</button>
+          <button onclick="addStoryRect()" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.3rem;font-size:0.72rem;cursor:pointer;">+ Caixa de cor</button>
+        </div>
+
+        <div style="margin-bottom:1rem;">
+          <label style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#999;">Imagem de fundo</label>
+          <button onclick="adjustStoryOverlay()" style="width:100%;background:#333;color:#fff;border:none;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">Escurecer/Clarear fundo</button>
+        </div>
+
+        <button onclick="deleteStorySelected()" style="width:100%;background:#e74c3c;color:#fff;border:none;padding:0.5rem;margin-top:0.5rem;font-size:0.72rem;cursor:pointer;">Excluir selecionado</button>
+
+        <hr style="border-color:#444;margin:1rem 0;" />
+
+        <button onclick="publishStory()" style="width:100%;background:#E1306C;color:#fff;border:none;padding:0.7rem;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;">Publicar Story no Instagram</button>
+        <button onclick="downloadStory()" style="width:100%;background:#444;color:#fff;border:none;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">Baixar PNG</button>
+        <button onclick="closeStoryEditor()" style="width:100%;background:none;color:#999;border:1px solid #555;padding:0.5rem;margin-top:0.4rem;font-size:0.72rem;cursor:pointer;">Fechar</button>
+      </div>
+
+      <!-- Canvas -->
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:1rem;">
+        <canvas id="storyCanvas" width="1080" height="1920"></canvas>
+      </div>
+    </div>
+  </div>
+
   <!-- ════════════ TOAST ════════════ -->
   <div class="toast" id="toast"></div>
 
@@ -1227,8 +1314,10 @@
     <p>Painel Editorial</p>
   </footer>
 
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Oswald:wght@400;600&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;600;700&family=Raleway:wght@400;600;700&family=Roboto+Condensed:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
   <script>
     // ── Config ──────────────────────────────────
     const SUPABASE_URL = 'https://zlcntgizmaapqkteaxkd.supabase.co';
@@ -2147,131 +2236,314 @@
       }
     }
 
-    // ── Canva Stories ─────────────────────────────
-    var canvaConnected = false;
+    // ── Story Editor (Fabric.js) ────────────────────────────
+    var storyCanvas = null;
+    var storyArticleId = null;
+    var storyOverlayRect = null;
+    var storyOverlayOpacity = 0.45;
 
-    async function checkCanvaConnection() {
-      try {
-        var res = await fetch(SUPABASE_URL + '/functions/v1/canva?action=check', {
-          headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
-        });
-        var data = await res.json();
-        canvaConnected = data.connected;
-      } catch (e) { canvaConnected = false; }
+    function initStoryCanvas() {
+      if (storyCanvas) storyCanvas.dispose();
+      var el = document.getElementById('storyCanvas');
+      // Escalar canvas no CSS para caber na tela
+      var maxH = window.innerHeight - 40;
+      var scale = Math.min(1, maxH / 1920, (window.innerWidth - 320) / 1080);
+      el.style.width = (1080 * scale) + 'px';
+      el.style.height = (1920 * scale) + 'px';
+
+      storyCanvas = new fabric.Canvas('storyCanvas', {
+        width: 1080,
+        height: 1920,
+        backgroundColor: '#000000'
+      });
     }
 
-    async function connectCanva() {
-      try {
-        var res = await fetch(SUPABASE_URL + '/functions/v1/canva?action=auth', {
-          headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
-        });
-        var data = await res.json();
-        if (data.auth_url) {
-          var popup = window.open(data.auth_url, 'canva_auth', 'width=600,height=700');
-          window.addEventListener('message', function handler(e) {
-            if (e.data && e.data.canvaAuth === 'success') {
-              canvaConnected = true;
-              toast('Conectado ao Canva!');
-              window.removeEventListener('message', handler);
-            }
+    async function openStoryEditor(articleId) {
+      storyArticleId = articleId;
+      var { data } = await sb.from('articles').select('*').eq('id', articleId).maybeSingle();
+      if (!data) { toast('Artigo não encontrado'); return; }
+
+      document.getElementById('storyOverlay').classList.add('active');
+      initStoryCanvas();
+
+      // Carregar imagem de fundo
+      if (data.image_url) {
+        fabric.Image.fromURL(data.image_url, function(img) {
+          var scaleW = 1080 / img.width;
+          var scaleH = 1920 / img.height;
+          var s = Math.max(scaleW, scaleH);
+          img.set({
+            scaleX: s, scaleY: s,
+            left: 540, top: 960,
+            originX: 'center', originY: 'center',
+            selectable: false, evented: false,
+            name: 'bg-image'
           });
-        }
-      } catch (e) { toast('Erro ao conectar com Canva'); }
-    }
+          storyCanvas.add(img);
+          storyCanvas.sendToBack(img);
 
-    async function createStoryForArticle(articleId) {
-      if (!canvaConnected) {
-        if (confirm('Você precisa conectar sua conta do Canva primeiro. Conectar agora?')) {
-          await connectCanva();
-        }
-        return;
-      }
+          // Overlay escuro
+          storyOverlayRect = new fabric.Rect({
+            width: 1080, height: 1920,
+            fill: 'rgba(0,0,0,' + storyOverlayOpacity + ')',
+            selectable: false, evented: false,
+            name: 'bg-overlay'
+          });
+          storyCanvas.add(storyOverlayRect);
+          storyOverlayRect.moveTo(1);
 
-      toast('Criando Story no Canva...');
-      try {
-        var { data, error } = await sb.from('articles').select('*').eq('id', articleId).maybeSingle();
-        if (error || !data) { toast('Artigo não encontrado'); return; }
+          // Adicionar título automaticamente
+          var titleText = new fabric.Textbox(data.title, {
+            left: 80, top: 1200, width: 920,
+            fontFamily: 'Lora', fontSize: 52, fontWeight: '700',
+            fill: '#ffffff', textAlign: 'left',
+            shadow: '0 2px 8px rgba(0,0,0,0.6)',
+            lineHeight: 1.2, name: 'title'
+          });
+          storyCanvas.add(titleText);
 
-        var res = await fetch(SUPABASE_URL + '/functions/v1/canva?action=create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-          },
-          body: JSON.stringify({
-            image_url: data.image_url,
-            title: 'Story - ' + data.title.substring(0, 50)
-          })
-        });
+          // Descrição
+          if (data.description) {
+            var descText = new fabric.Textbox(data.description, {
+              left: 80, top: 1420, width: 920,
+              fontFamily: 'DM Sans', fontSize: 28, fontWeight: '400',
+              fill: '#cccccc', textAlign: 'left',
+              lineHeight: 1.4, name: 'description'
+            });
+            storyCanvas.add(descText);
+          }
 
-        var result = await res.json();
-        if (result.success && result.edit_url) {
-          toast('Design criado! Abrindo o Canva...');
-          // Salvar design_id para exportar depois
-          localStorage.setItem('canva_story_' + articleId, JSON.stringify({
-            design_id: result.design_id,
-            edit_url: result.edit_url,
-            article_id: articleId,
-            title: data.title
-          }));
-          window.open(result.edit_url, '_blank');
-          // Mostrar botão de publicar story
-          setTimeout(function() {
-            if (confirm('Quando terminar de editar o Story no Canva, clique OK para publicar no Instagram Stories.')) {
-              publishStoryFromCanva(articleId);
-            }
-          }, 2000);
-        } else {
-          toast('Erro ao criar Story: ' + (result.error || 'desconhecido'));
-        }
-      } catch (e) {
-        toast('Erro: ' + e.message);
-      }
-    }
+          // Logo
+          var logo = new fabric.Text('CartaBrasil', {
+            left: 80, top: 100,
+            fontFamily: 'Lora', fontSize: 36, fontWeight: '600',
+            fill: '#ffffff', name: 'logo'
+          });
+          storyCanvas.add(logo);
 
-    async function publishStoryFromCanva(articleId) {
-      var storyData = localStorage.getItem('canva_story_' + articleId);
-      if (!storyData) { toast('Nenhum Story encontrado para este artigo'); return; }
+          // Ponto vermelho do logo
+          var dot = new fabric.Circle({
+            radius: 5, fill: '#c0392b',
+            left: logo.left + logo.width + 6, top: 100,
+            selectable: false, evented: false, name: 'logo-dot'
+          });
+          storyCanvas.add(dot);
 
-      var story = JSON.parse(storyData);
-      toast('Exportando e publicando Story...');
+          // Badge de categoria
+          if (data.category) {
+            var catColors = { politica: '#c0392b', mercados: '#2c3e50', internacional: '#d4a017', tecnologia: '#2980b9', geral: '#7f8c8d', economia: '#2c3e50', esportes: '#27ae60', 'direitos humanos': '#8e44ad' };
+            var catLabel = (data.category || '').charAt(0).toUpperCase() + (data.category || '').slice(1);
+            var catBg = new fabric.Rect({
+              width: catLabel.length * 18 + 30, height: 36,
+              fill: catColors[data.category] || '#7f8c8d',
+              rx: 2, ry: 2, left: 80, top: 1140,
+              name: 'cat-bg'
+            });
+            var catText = new fabric.Text(catLabel.toUpperCase(), {
+              left: 95, top: 1148,
+              fontFamily: 'DM Sans', fontSize: 18, fontWeight: '600',
+              fill: '#ffffff', letterSpacing: 100,
+              name: 'cat-text'
+            });
+            var catGroup = new fabric.Group([catBg, catText], {
+              left: 80, top: 1140, name: 'category'
+            });
+            storyCanvas.add(catGroup);
+          }
 
-      try {
-        var res = await fetch(SUPABASE_URL + '/functions/v1/canva?action=publish-story', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-          },
-          body: JSON.stringify({ design_id: story.design_id })
-        });
-
-        var result = await res.json();
-        if (result.success) {
-          toast('Story publicado no Instagram!');
-          localStorage.removeItem('canva_story_' + articleId);
-        } else {
-          toast('Erro: ' + (result.error || 'falha ao publicar'));
-        }
-      } catch (e) {
-        toast('Erro: ' + e.message);
+          storyCanvas.renderAll();
+        }, { crossOrigin: 'anonymous' });
       }
     }
 
-    async function bulkCreateStory() {
+    function closeStoryEditor() {
+      document.getElementById('storyOverlay').classList.remove('active');
+      if (storyCanvas) { storyCanvas.dispose(); storyCanvas = null; }
+    }
+
+    function addStoryText(type) {
+      if (!storyCanvas) return;
+      var opts = {
+        headline: { text: 'Título aqui', fontSize: 52, fontWeight: '700', fontFamily: 'Lora', fill: '#ffffff', top: 1200 },
+        subtitle: { text: 'Subtítulo aqui', fontSize: 32, fontWeight: '400', fontFamily: 'DM Sans', fill: '#cccccc', top: 1400 },
+        body: { text: 'Texto aqui', fontSize: 24, fontWeight: '400', fontFamily: 'DM Sans', fill: '#ffffff', top: 1500 }
+      };
+      var o = opts[type] || opts.body;
+      var t = new fabric.Textbox(o.text, {
+        left: 80, top: o.top, width: 920,
+        fontFamily: o.fontFamily, fontSize: o.fontSize, fontWeight: o.fontWeight,
+        fill: o.fill, textAlign: 'left', lineHeight: 1.2
+      });
+      storyCanvas.add(t);
+      storyCanvas.setActiveObject(t);
+      storyCanvas.renderAll();
+    }
+
+    function updateStoryFont() {
+      var obj = storyCanvas && storyCanvas.getActiveObject();
+      if (obj && obj.type === 'textbox') {
+        obj.set('fontFamily', document.getElementById('storyFont').value);
+        storyCanvas.renderAll();
+      }
+    }
+
+    function updateStoryFontSize() {
+      var size = parseInt(document.getElementById('storyFontSize').value);
+      document.getElementById('storyFontSizeLabel').textContent = size + 'px';
+      var obj = storyCanvas && storyCanvas.getActiveObject();
+      if (obj && obj.type === 'textbox') {
+        obj.set('fontSize', size);
+        storyCanvas.renderAll();
+      }
+    }
+
+    function setStoryTextColor(color) {
+      var obj = storyCanvas && storyCanvas.getActiveObject();
+      if (obj && (obj.type === 'textbox' || obj.type === 'text')) {
+        obj.set('fill', color);
+        storyCanvas.renderAll();
+      }
+    }
+
+    function addStoryLogo() {
+      if (!storyCanvas) return;
+      var logo = new fabric.Text('CartaBrasil', {
+        left: 80, top: 100,
+        fontFamily: 'Lora', fontSize: 36, fontWeight: '600',
+        fill: '#ffffff'
+      });
+      storyCanvas.add(logo);
+      storyCanvas.setActiveObject(logo);
+      storyCanvas.renderAll();
+    }
+
+    function addStoryCategory() {
+      if (!storyCanvas) return;
+      var t = new fabric.Textbox('CATEGORIA', {
+        left: 80, top: 1140, width: 200,
+        fontFamily: 'DM Sans', fontSize: 18, fontWeight: '600',
+        fill: '#ffffff', backgroundColor: '#c0392b',
+        textAlign: 'center', padding: 8
+      });
+      storyCanvas.add(t);
+      storyCanvas.setActiveObject(t);
+      storyCanvas.renderAll();
+    }
+
+    function addStoryRect() {
+      if (!storyCanvas) return;
+      var r = new fabric.Rect({
+        left: 60, top: 1100, width: 960, height: 400,
+        fill: 'rgba(0,0,0,0.5)', rx: 4, ry: 4
+      });
+      storyCanvas.add(r);
+      storyCanvas.setActiveObject(r);
+      storyCanvas.renderAll();
+    }
+
+    function adjustStoryOverlay() {
+      if (!storyOverlayRect) return;
+      storyOverlayOpacity = storyOverlayOpacity >= 0.8 ? 0 : storyOverlayOpacity + 0.15;
+      storyOverlayRect.set('fill', 'rgba(0,0,0,' + storyOverlayOpacity.toFixed(2) + ')');
+      storyCanvas.renderAll();
+      toast('Opacidade: ' + Math.round(storyOverlayOpacity * 100) + '%');
+    }
+
+    function deleteStorySelected() {
+      var obj = storyCanvas && storyCanvas.getActiveObject();
+      if (obj && obj.name !== 'bg-image' && obj.name !== 'bg-overlay') {
+        storyCanvas.remove(obj);
+        storyCanvas.renderAll();
+      }
+    }
+
+    function applyStoryTemplate(tpl) {
+      if (!storyCanvas) return;
+      var colors = {
+        dark: { bg: 'rgba(0,0,0,0.55)', text: '#ffffff', sub: '#cccccc' },
+        light: { bg: 'rgba(255,255,255,0.7)', text: '#111111', sub: '#555555' },
+        accent: { bg: 'rgba(192,57,43,0.7)', text: '#ffffff', sub: '#ffdddd' },
+        gradient: { bg: 'rgba(0,0,0,0.45)', text: '#ffffff', sub: '#cccccc' }
+      };
+      var c = colors[tpl] || colors.dark;
+      // Atualizar overlay
+      if (storyOverlayRect) {
+        storyOverlayRect.set('fill', c.bg);
+      }
+      // Atualizar textos existentes
+      storyCanvas.getObjects().forEach(function(obj) {
+        if (obj.name === 'title' || obj.type === 'textbox') {
+          if (obj.name === 'title' || obj.fontSize >= 40) obj.set('fill', c.text);
+          else obj.set('fill', c.sub);
+        }
+        if (obj.type === 'text' && obj.name === 'logo') obj.set('fill', c.text);
+      });
+      storyCanvas.renderAll();
+    }
+
+    function getStoryDataURL() {
+      return storyCanvas.toDataURL({ format: 'png', quality: 1, multiplier: 1 });
+    }
+
+    function downloadStory() {
+      var link = document.createElement('a');
+      link.download = 'story-cartabrasil.png';
+      link.href = getStoryDataURL();
+      link.click();
+    }
+
+    async function publishStory() {
+      if (!storyCanvas) return;
+      toast('Exportando Story...');
+
+      // Converter canvas para blob
+      var dataUrl = getStoryDataURL();
+      var blob = await (await fetch(dataUrl)).blob();
+
+      // Upload para Supabase Storage
+      var fileName = 'story-' + Date.now() + '.png';
+      var { data: uploadData, error: uploadError } = await sb.storage
+        .from('article-images')
+        .upload('stories/' + fileName, blob, { contentType: 'image/png', upsert: true });
+
+      if (uploadError) { toast('Erro no upload: ' + uploadError.message); return; }
+
+      var { data: urlData } = sb.storage.from('article-images').getPublicUrl('stories/' + fileName);
+      var publicUrl = urlData.publicUrl;
+
+      toast('Publicando Story no Instagram...');
+
+      // Publicar como Story
+      var res = await fetch(SUPABASE_URL + '/functions/v1/publish-instagram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({
+          image_url: publicUrl,
+          caption: '',
+          media_type: 'STORIES'
+        })
+      });
+
+      var result = await res.json();
+      if (result.success) {
+        toast('Story publicado no Instagram!');
+        closeStoryEditor();
+      } else {
+        toast('Erro: ' + (result.error || JSON.stringify(result)));
+      }
+    }
+
+    function bulkOpenStoryEditor() {
       var checked = document.querySelectorAll('.ig-check:checked');
       if (checked.length === 0) return;
-      if (checked.length > 1) {
-        toast('Selecione apenas 1 artigo para criar Story');
-        return;
-      }
+      if (checked.length > 1) { toast('Selecione apenas 1 artigo para criar Story'); return; }
       var articleId = checked[0].value;
       clearSelection();
-      await createStoryForArticle(articleId);
+      openStoryEditor(articleId);
     }
-
-    // Verificar conexão com Canva ao carregar
-    checkCanvaConnection();
 
     // ── Preview ─────────────────────────────────
     function openPreview() {
