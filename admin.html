@@ -1082,6 +1082,7 @@
       <div class="bulk-bar" id="bulkBar">
         <span id="bulkCount">0 selecionados</span>
         <button onclick="bulkPostInstagram()">Postar no Instagram</button>
+        <button style="background:#7c3aed;" onclick="bulkCreateStory()">Criar Story</button>
         <button class="bulk-cancel" onclick="clearSelection()">Cancelar</button>
       </div>
       <div id="articleList"></div>
@@ -2145,6 +2146,132 @@
         console.error('IG fetch error:', e);
       }
     }
+
+    // ── Canva Stories ─────────────────────────────
+    var canvaConnected = false;
+
+    async function checkCanvaConnection() {
+      try {
+        var res = await fetch(SUPABASE_URL + '/functions/v1/canva?action=check', {
+          headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+        });
+        var data = await res.json();
+        canvaConnected = data.connected;
+      } catch (e) { canvaConnected = false; }
+    }
+
+    async function connectCanva() {
+      try {
+        var res = await fetch(SUPABASE_URL + '/functions/v1/canva?action=auth', {
+          headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+        });
+        var data = await res.json();
+        if (data.auth_url) {
+          var popup = window.open(data.auth_url, 'canva_auth', 'width=600,height=700');
+          window.addEventListener('message', function handler(e) {
+            if (e.data && e.data.canvaAuth === 'success') {
+              canvaConnected = true;
+              toast('Conectado ao Canva!');
+              window.removeEventListener('message', handler);
+            }
+          });
+        }
+      } catch (e) { toast('Erro ao conectar com Canva'); }
+    }
+
+    async function createStoryForArticle(articleId) {
+      if (!canvaConnected) {
+        if (confirm('Você precisa conectar sua conta do Canva primeiro. Conectar agora?')) {
+          await connectCanva();
+        }
+        return;
+      }
+
+      toast('Criando Story no Canva...');
+      try {
+        var { data, error } = await sb.from('articles').select('*').eq('id', articleId).maybeSingle();
+        if (error || !data) { toast('Artigo não encontrado'); return; }
+
+        var res = await fetch(SUPABASE_URL + '/functions/v1/canva?action=create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            image_url: data.image_url,
+            title: 'Story - ' + data.title.substring(0, 50)
+          })
+        });
+
+        var result = await res.json();
+        if (result.success && result.edit_url) {
+          toast('Design criado! Abrindo o Canva...');
+          // Salvar design_id para exportar depois
+          localStorage.setItem('canva_story_' + articleId, JSON.stringify({
+            design_id: result.design_id,
+            edit_url: result.edit_url,
+            article_id: articleId,
+            title: data.title
+          }));
+          window.open(result.edit_url, '_blank');
+          // Mostrar botão de publicar story
+          setTimeout(function() {
+            if (confirm('Quando terminar de editar o Story no Canva, clique OK para publicar no Instagram Stories.')) {
+              publishStoryFromCanva(articleId);
+            }
+          }, 2000);
+        } else {
+          toast('Erro ao criar Story: ' + (result.error || 'desconhecido'));
+        }
+      } catch (e) {
+        toast('Erro: ' + e.message);
+      }
+    }
+
+    async function publishStoryFromCanva(articleId) {
+      var storyData = localStorage.getItem('canva_story_' + articleId);
+      if (!storyData) { toast('Nenhum Story encontrado para este artigo'); return; }
+
+      var story = JSON.parse(storyData);
+      toast('Exportando e publicando Story...');
+
+      try {
+        var res = await fetch(SUPABASE_URL + '/functions/v1/canva?action=publish-story', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ design_id: story.design_id })
+        });
+
+        var result = await res.json();
+        if (result.success) {
+          toast('Story publicado no Instagram!');
+          localStorage.removeItem('canva_story_' + articleId);
+        } else {
+          toast('Erro: ' + (result.error || 'falha ao publicar'));
+        }
+      } catch (e) {
+        toast('Erro: ' + e.message);
+      }
+    }
+
+    async function bulkCreateStory() {
+      var checked = document.querySelectorAll('.ig-check:checked');
+      if (checked.length === 0) return;
+      if (checked.length > 1) {
+        toast('Selecione apenas 1 artigo para criar Story');
+        return;
+      }
+      var articleId = checked[0].value;
+      clearSelection();
+      await createStoryForArticle(articleId);
+    }
+
+    // Verificar conexão com Canva ao carregar
+    checkCanvaConnection();
 
     // ── Preview ─────────────────────────────────
     function openPreview() {
