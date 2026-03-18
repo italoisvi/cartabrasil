@@ -1337,21 +1337,26 @@
         document.body.appendChild(twScript);
       }
 
-      // Inserir anúncio Adsterra no meio do artigo
+      // Inserir anúncio Adsterra no meio do artigo (apenas para não-assinantes)
       (function() {
+        if (localStorage.getItem('cb_plan') === 'premium') return;
         var paragraphs = bodyEl.querySelectorAll('p');
-        if (paragraphs.length >= 4) {
+        if (paragraphs.length >= 4 && !document.getElementById('container-560de24aa0965161505f2e2d219e3c67')) {
           var midIndex = Math.floor(paragraphs.length / 2);
           var adContainer = document.createElement('div');
           adContainer.id = 'container-560de24aa0965161505f2e2d219e3c67';
           adContainer.style.margin = '2rem 0';
           paragraphs[midIndex].parentNode.insertBefore(adContainer, paragraphs[midIndex]);
-          // Carregar script do Adsterra depois que o container existe no DOM
-          var adScript = document.createElement('script');
-          adScript.async = true;
-          adScript.setAttribute('data-cfasync', 'false');
-          adScript.src = 'https://pl28939319.effectivegatecpm.com/560de24aa0965161505f2e2d219e3c67/invoke.js';
-          document.body.appendChild(adScript);
+          if (!document.querySelector('script[src*="560de24aa0965161505f2e2d219e3c67/invoke.js"]')) {
+            console.log('Inserindo anúncio Adsterra...');
+            var adScript = document.createElement('script');
+            adScript.async = true;
+            adScript.setAttribute('data-cfasync', 'false');
+            adScript.src = 'https://pl28939319.effectivegatecpm.com/560de24aa0965161505f2e2d219e3c67/invoke.js';
+            adScript.onload = function() { console.log('Script da Adsterra carregado'); };
+            adScript.onerror = function() { console.log('Erro ao carregar script da Adsterra'); };
+            document.body.appendChild(adScript);
+          }
         }
       })();
 
