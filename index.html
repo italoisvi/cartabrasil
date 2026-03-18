@@ -4,7 +4,6 @@
   <link rel="icon" type="image/png" href="/assets/images/CB.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>if(localStorage.getItem('cb_plan')!=='premium'){var s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6145282174231024';s.crossOrigin='anonymous';document.head.appendChild(s);}</script>
   <title>CartaBrasil — Notícias do Brasil e do mundo</title>
   <meta name="description" content="Acompanhe as últimas notícias do Brasil e do mundo sobre política, economia, tecnologia e internacional. Newsletter gratuita com curadoria diária." />
   <meta name="keywords" content="notícias, Brasil, política, economia, tecnologia, internacional, newsletter" />
@@ -1099,6 +1098,9 @@
     </div>
   </div>
 
+  <!-- ADSTERRA: Banner topo (728x90 desktop / 320x50 mobile) -->
+  <div id="adsterra-top" style="text-align:center;margin:1rem auto;max-width:1280px;"></div>
+
   <!-- CONTENT -->
   <div class="container" id="content">
     <div class="loading">Carregando notícias...</div>
@@ -1529,6 +1531,9 @@
         html += '</div>';
       }
 
+      // ── Adsterra 300x250 entre hero e categorias ──
+      html += '<div id="adsterra-mid" style="text-align:center;margin:2rem auto;"></div>';
+
       // ── Category sections ──
       var catOrder = ['politica', 'economia', 'internacional', 'tecnologia', 'geral', 'direitos-humanos', 'educacao', 'esportes', 'justica', 'saude'];
       catOrder.forEach(function(catKey) {
@@ -1613,6 +1618,45 @@
         setActiveSection(currentSection);
       } else {
         render();
+      }
+    }
+
+    // ── Adsterra: carregar banners após render (não-premium) ──
+    var _origRender = render;
+    render = async function() {
+      await _origRender();
+      if (localStorage.getItem('cb_plan') === 'premium') return;
+      injectAdsterraAds();
+    };
+
+    function injectAdsterraAds() {
+      // Banner topo: 728x90 desktop / 320x50 mobile
+      var topEl = document.getElementById('adsterra-top');
+      if (topEl && !topEl.dataset.loaded) {
+        topEl.dataset.loaded = '1';
+        var isMobile = window.innerWidth < 728;
+        var s1 = document.createElement('script');
+        if (isMobile) {
+          s1.text = "atOptions={'key':'0edbc9017bef7579eefe36945fe0ce33','format':'iframe','height':50,'width':320,'params':{}};";
+        } else {
+          s1.text = "atOptions={'key':'8b0cbbbde66635e4e8676d3a16b242d8','format':'iframe','height':90,'width':728,'params':{}};";
+        }
+        topEl.appendChild(s1);
+        var s2 = document.createElement('script');
+        s2.src = 'https://www.highperformanceformat.com/' + (isMobile ? '0edbc9017bef7579eefe36945fe0ce33' : '8b0cbbbde66635e4e8676d3a16b242d8') + '/invoke.js';
+        topEl.appendChild(s2);
+      }
+
+      // Banner 300x250 entre hero e categorias
+      var midEl = document.getElementById('adsterra-mid');
+      if (midEl && !midEl.dataset.loaded) {
+        midEl.dataset.loaded = '1';
+        var s3 = document.createElement('script');
+        s3.text = "atOptions={'key':'402e25cd0df99f17ace922e0f332028e','format':'iframe','height':250,'width':300,'params':{}};";
+        midEl.appendChild(s3);
+        var s4 = document.createElement('script');
+        s4.src = 'https://www.highperformanceformat.com/402e25cd0df99f17ace922e0f332028e/invoke.js';
+        midEl.appendChild(s4);
       }
     }
 
