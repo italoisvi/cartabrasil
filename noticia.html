@@ -4,7 +4,6 @@
   <link rel="icon" type="image/png" href="/assets/images/CB.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>if(localStorage.getItem('cb_plan')!=='premium'){var s=document.createElement('script');s.async=true;s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6145282174231024';s.crossOrigin='anonymous';document.head.appendChild(s);}</script>
   <title>CartaBrasil</title>
 
   <!-- Open Graph defaults (atualizados dinamicamente via JS) -->
@@ -1337,6 +1336,24 @@
         };
         document.body.appendChild(twScript);
       }
+
+      // Inserir anúncio Adsterra no meio do artigo
+      (function() {
+        var paragraphs = bodyEl.querySelectorAll('p');
+        if (paragraphs.length >= 4) {
+          var midIndex = Math.floor(paragraphs.length / 2);
+          var adContainer = document.createElement('div');
+          adContainer.id = 'container-560de24aa0965161505f2e2d219e3c67';
+          adContainer.style.margin = '2rem 0';
+          paragraphs[midIndex].parentNode.insertBefore(adContainer, paragraphs[midIndex]);
+          // Carregar script do Adsterra depois que o container existe no DOM
+          var adScript = document.createElement('script');
+          adScript.async = true;
+          adScript.setAttribute('data-cfasync', 'false');
+          adScript.src = 'https://pl28939319.effectivegatecpm.com/560de24aa0965161505f2e2d219e3c67/invoke.js';
+          document.body.appendChild(adScript);
+        }
+      })();
 
       // Transição: skeleton → conteúdo
       document.getElementById('articleSkeleton').style.display = 'none';

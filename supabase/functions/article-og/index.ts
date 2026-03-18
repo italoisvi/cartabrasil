@@ -38,8 +38,7 @@ Deno.serve(async (req) => {
 
   let query = supabase
     .from("articles")
-    .select("id, title, description, image_url, category, published_at, author, slug")
-    .eq("status", "published");
+    .select("id, title, description, image_url, category, published_at, author, slug");
 
   if (slug) {
     query = query.eq("slug", slug);
@@ -47,12 +46,14 @@ Deno.serve(async (req) => {
     query = query.eq("id", id!);
   }
 
-  const { data: article } = await query.maybeSingle();
+  const { data: article, error } = await query.maybeSingle();
 
   if (!article) {
     return Response.redirect(`${SITE_URL}`, 302);
   }
 
+  const articleSlug = article.slug || article.id;
+  const shareUrl = `${SITE_URL}/share/${articleSlug}`;
   const articleUrl = `${SITE_URL}/noticia?id=${article.id}`;
   const title = article.title || "CartaBrasil";
   const description = article.description || "As principais notícias do Brasil, curadas para você.";
@@ -66,6 +67,7 @@ Deno.serve(async (req) => {
   <title>${escapeHtml(title)} — CartaBrasil</title>
 
   <!-- Open Graph -->
+  <meta property="fb:app_id" content="1354069589872510" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="CartaBrasil" />
   <meta property="og:title" content="${escapeHtml(title)}" />
@@ -73,7 +75,7 @@ Deno.serve(async (req) => {
   <meta property="og:image" content="${escapeHtml(image)}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:url" content="${escapeHtml(articleUrl)}" />
+  <meta property="og:url" content="${escapeHtml(shareUrl)}" />
   <meta property="og:locale" content="pt_BR" />
   ${article.published_at ? `<meta property="article:published_time" content="${article.published_at}" />` : ""}
   ${author ? `<meta property="article:author" content="${escapeHtml(author)}" />` : ""}
@@ -84,9 +86,8 @@ Deno.serve(async (req) => {
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   <meta name="twitter:image" content="${escapeHtml(image)}" />
 
-  <!-- Redirect real users to the actual page -->
-  <meta http-equiv="refresh" content="0;url=${escapeHtml(articleUrl)}" />
   <link rel="canonical" href="${escapeHtml(articleUrl)}" />
+  <script>window.location.replace("${articleUrl.replace(/"/g, '\\"')}");</script>
 </head>
 <body>
   <p>Redirecionando para <a href="${escapeHtml(articleUrl)}">${escapeHtml(title)}</a>...</p>
