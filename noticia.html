@@ -942,51 +942,24 @@
       margin-bottom: 1.6rem;
     }
 
-    .paywall-form {
-      display: flex;
-      gap: 0.5rem;
-      max-width: 400px;
-      margin: 0 auto 1rem;
-    }
-
-    .paywall-input {
-      flex: 1;
-      padding: 0.7rem 1rem;
-      border: 1px solid var(--rule);
-      border-radius: 4px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      color: var(--ink);
-      background: var(--paper);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .paywall-input:focus {
-      border-color: var(--accent);
-    }
-
-    .paywall-input::placeholder {
-      color: var(--ink-muted);
-    }
-
     .paywall-btn {
-      padding: 0.7rem 1.4rem;
+      display: inline-block;
+      padding: 0.85rem 2rem;
       background: var(--accent);
       color: #fff;
       border: none;
       border-radius: 4px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.78rem;
+      font-size: 0.85rem;
       font-weight: 500;
       letter-spacing: 0.04em;
       cursor: pointer;
       transition: opacity 0.2s;
-      white-space: nowrap;
+      text-decoration: none;
+      margin-bottom: 1rem;
     }
 
     .paywall-btn:hover { opacity: 0.85; }
-    .paywall-btn:disabled { opacity: 0.5; cursor: default; }
 
     .paywall-hint {
       font-family: 'DM Sans', sans-serif;
@@ -1033,8 +1006,7 @@
     @media (max-width: 600px) {
       .paywall { padding: 2rem 1rem 1.5rem; }
       .paywall-title { font-size: 1.2rem; }
-      .paywall-form { flex-direction: column; }
-      .paywall-btn { padding: 0.75rem; }
+      .paywall-btn { padding: 0.75rem 1.5rem; font-size: 0.8rem; }
       .paywall-benefits { gap: 0.8rem; }
     }
 
@@ -1161,18 +1133,15 @@
           <div class="paywall-lock">
             <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
-          <p class="paywall-label">Conteúdo para assinantes</p>
-          <h2 class="paywall-title">Assine a newsletter gratuita e continue lendo</h2>
-          <p class="paywall-desc">Receba as notícias mais importantes do Brasil direto no seu email. Gratuito, sem spam.</p>
-          <form class="paywall-form" id="paywallForm">
-            <input class="paywall-input" type="email" id="paywallEmail" placeholder="Seu melhor email" required />
-            <button class="paywall-btn" type="submit" id="paywallBtn">Assinar grátis</button>
-          </form>
-          <p class="paywall-hint">Já é assinante? <a href="preferencias.html">Acesse suas preferências</a></p>
+          <p class="paywall-label">Conteúdo exclusivo</p>
+          <h2 class="paywall-title">Assine o Premium para continuar lendo</h2>
+          <p class="paywall-desc">Acesso ilimitado a todas as notícias, sem anúncios. O portal mais elegante do Brasil por apenas R$ 9,90/mês.</p>
+          <a class="paywall-btn" href="https://buy.stripe.com/cNi8wQaf36WZ3DWgnT4gg00" id="paywallBtn">Assinar Premium — R$ 9,90/mês</a>
+          <p class="paywall-hint">Já é assinante? <a href="minha-assinatura.html">Verificar assinatura</a></p>
           <div class="paywall-divider"></div>
           <div class="paywall-benefits">
-            <span class="paywall-benefit"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Curadoria diária</span>
-            <span class="paywall-benefit"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 100% gratuito</span>
+            <span class="paywall-benefit"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Leitura ilimitada</span>
+            <span class="paywall-benefit"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Sem anúncios</span>
             <span class="paywall-benefit"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Cancele quando quiser</span>
           </div>
         </div>
@@ -1557,8 +1526,8 @@
         }
       })();
 
-      // ── PAYWALL: bloquear leitura para não-assinantes ──
-      var isSubscriber = !!localStorage.getItem('cb_email');
+      // ── PAYWALL: bloquear leitura para não-premium ──
+      var isSubscriber = localStorage.getItem('cb_plan') === 'premium';
       if (!isSubscriber) {
         // Criar wrapper com overflow truncado ao redor do article-body
         var wrapper = document.createElement('div');
@@ -1589,48 +1558,6 @@
         loadMoreNews(articleId);
       }
     }
-
-    // ── Paywall: handler do formulário de assinatura ──
-    document.getElementById('paywallForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      var email = document.getElementById('paywallEmail').value.trim();
-      if (!email) return;
-
-      var btn = document.getElementById('paywallBtn');
-      btn.textContent = 'Assinando...';
-      btn.disabled = true;
-
-      var { error } = await sb.from('subscribers').upsert({
-        email: email,
-        categories: ['politica', 'economia', 'internacional', 'tecnologia', 'geral', 'direitos-humanos', 'educacao', 'esportes', 'justica', 'saude'],
-        frequency: 'daily',
-        active: true
-      }, { onConflict: 'email' });
-
-      if (error) {
-        btn.textContent = 'Erro — tente novamente';
-        btn.disabled = false;
-        return;
-      }
-
-      // Salvar email e desbloquear o artigo
-      localStorage.setItem('cb_email', email);
-
-      // Remover paywall e mostrar conteúdo completo
-      var wrapper = document.querySelector('.paywall-wrapper');
-      if (wrapper) {
-        var body = wrapper.querySelector('.article-body');
-        wrapper.parentNode.insertBefore(body, wrapper);
-        wrapper.remove();
-      }
-      document.getElementById('paywallBlock').style.display = 'none';
-      document.getElementById('relatedSection').style.display = '';
-      document.getElementById('articleEnd').style.display = '';
-
-      // Carregar mais notícias agora
-      var params = new URLSearchParams(window.location.search);
-      loadMoreNews(params.get('id'));
-    });
 
     // Reescrever links de fontes externas (Agência Brasil) para artigos internos
     async function rewriteExternalLinks(bodyEl, supabase) {
