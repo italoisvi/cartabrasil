@@ -864,6 +864,180 @@
       color: var(--ink-muted);
     }
 
+    /* ── PAYWALL ─────────────────────────────────────────────── */
+    .paywall-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .paywall-wrapper .article-body {
+      max-height: 320px;
+      overflow: hidden;
+    }
+
+    .paywall-fade {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, var(--paper) 85%);
+      pointer-events: none;
+    }
+
+    .paywall {
+      text-align: center;
+      padding: 2.5rem 1.5rem 2rem;
+      margin: 0 auto;
+      max-width: 520px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .paywall-lock {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      margin-bottom: 1.2rem;
+    }
+
+    .paywall-lock svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .paywall-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+
+    .paywall-title {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+      margin-bottom: 0.6rem;
+    }
+
+    .paywall-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--ink-light);
+      line-height: 1.55;
+      margin-bottom: 1.6rem;
+    }
+
+    .paywall-form {
+      display: flex;
+      gap: 0.5rem;
+      max-width: 400px;
+      margin: 0 auto 1rem;
+    }
+
+    .paywall-input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .paywall-input:focus {
+      border-color: var(--accent);
+    }
+
+    .paywall-input::placeholder {
+      color: var(--ink-muted);
+    }
+
+    .paywall-btn {
+      padding: 0.7rem 1.4rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+
+    .paywall-btn:hover { opacity: 0.85; }
+    .paywall-btn:disabled { opacity: 0.5; cursor: default; }
+
+    .paywall-hint {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    .paywall-hint a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    .paywall-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--rule);
+      margin: 1.2rem auto;
+    }
+
+    .paywall-benefits {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .paywall-benefit {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      color: var(--ink-light);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .paywall-benefit svg {
+      width: 14px;
+      height: 14px;
+      stroke: #27ae60;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    @media (max-width: 600px) {
+      .paywall { padding: 2rem 1rem 1.5rem; }
+      .paywall-title { font-size: 1.2rem; }
+      .paywall-form { flex-direction: column; }
+      .paywall-btn { padding: 0.75rem; }
+      .paywall-benefits { gap: 0.8rem; }
+    }
+
     @media (max-width: 768px) {
       .more-news-grid { grid-template-columns: repeat(2, 1fr); }
       .footer-top { grid-template-columns: 1fr 1fr; }
@@ -980,6 +1154,29 @@
       </figure>
 
       <div class="article-body" id="articleBody"></div>
+
+      <!-- Paywall (oculto por padrão, ativado via JS para não-assinantes) -->
+      <div id="paywallBlock" style="display:none;">
+        <div class="paywall">
+          <div class="paywall-lock">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <p class="paywall-label">Conteúdo para assinantes</p>
+          <h2 class="paywall-title">Assine a newsletter gratuita e continue lendo</h2>
+          <p class="paywall-desc">Receba as notícias mais importantes do Brasil direto no seu email. Gratuito, sem spam.</p>
+          <form class="paywall-form" id="paywallForm">
+            <input class="paywall-input" type="email" id="paywallEmail" placeholder="Seu melhor email" required />
+            <button class="paywall-btn" type="submit" id="paywallBtn">Assinar grátis</button>
+          </form>
+          <p class="paywall-hint">Já é assinante? <a href="preferencias.html">Acesse suas preferências</a></p>
+          <div class="paywall-divider"></div>
+          <div class="paywall-benefits">
+            <span class="paywall-benefit"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Curadoria diária</span>
+            <span class="paywall-benefit"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 100% gratuito</span>
+            <span class="paywall-benefit"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Cancele quando quiser</span>
+          </div>
+        </div>
+      </div>
 
       <div id="relatedSection"></div>
     </div>
@@ -1360,15 +1557,80 @@
         }
       })();
 
+      // ── PAYWALL: bloquear leitura para não-assinantes ──
+      var isSubscriber = !!localStorage.getItem('cb_email');
+      if (!isSubscriber) {
+        // Criar wrapper com overflow truncado ao redor do article-body
+        var wrapper = document.createElement('div');
+        wrapper.className = 'paywall-wrapper';
+        bodyEl.parentNode.insertBefore(wrapper, bodyEl);
+        wrapper.appendChild(bodyEl);
+        // Fade gradient sobre o texto cortado
+        var fade = document.createElement('div');
+        fade.className = 'paywall-fade';
+        wrapper.appendChild(fade);
+        // Mostrar o bloco do paywall
+        document.getElementById('paywallBlock').style.display = '';
+        // Esconder related e article-end
+        document.getElementById('relatedSection').style.display = 'none';
+        document.getElementById('articleEnd').style.display = 'none';
+      }
+
       // Transição: skeleton → conteúdo
       document.getElementById('articleSkeleton').style.display = 'none';
       document.getElementById('articleContent').style.display = '';
-      document.getElementById('articleEnd').style.display = '';
+      if (isSubscriber) {
+        document.getElementById('articleEnd').style.display = '';
+      }
       document.querySelector('article').classList.add('loaded');
 
-      // Carregar mais notícias
-      loadMoreNews(articleId);
+      // Carregar mais notícias (apenas para assinantes)
+      if (isSubscriber) {
+        loadMoreNews(articleId);
+      }
     }
+
+    // ── Paywall: handler do formulário de assinatura ──
+    document.getElementById('paywallForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var email = document.getElementById('paywallEmail').value.trim();
+      if (!email) return;
+
+      var btn = document.getElementById('paywallBtn');
+      btn.textContent = 'Assinando...';
+      btn.disabled = true;
+
+      var { error } = await sb.from('subscribers').upsert({
+        email: email,
+        categories: ['politica', 'economia', 'internacional', 'tecnologia', 'geral', 'direitos-humanos', 'educacao', 'esportes', 'justica', 'saude'],
+        frequency: 'daily',
+        active: true
+      }, { onConflict: 'email' });
+
+      if (error) {
+        btn.textContent = 'Erro — tente novamente';
+        btn.disabled = false;
+        return;
+      }
+
+      // Salvar email e desbloquear o artigo
+      localStorage.setItem('cb_email', email);
+
+      // Remover paywall e mostrar conteúdo completo
+      var wrapper = document.querySelector('.paywall-wrapper');
+      if (wrapper) {
+        var body = wrapper.querySelector('.article-body');
+        wrapper.parentNode.insertBefore(body, wrapper);
+        wrapper.remove();
+      }
+      document.getElementById('paywallBlock').style.display = 'none';
+      document.getElementById('relatedSection').style.display = '';
+      document.getElementById('articleEnd').style.display = '';
+
+      // Carregar mais notícias agora
+      var params = new URLSearchParams(window.location.search);
+      loadMoreNews(params.get('id'));
+    });
 
     // Reescrever links de fontes externas (Agência Brasil) para artigos internos
     async function rewriteExternalLinks(bodyEl, supabase) {
