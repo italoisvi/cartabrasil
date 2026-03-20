@@ -976,6 +976,15 @@
       .search-box { margin: 0 0.5rem; }
     }
   </style>
+
+  <!-- Adsterra Popunder (não-premium) -->
+  <script>
+    if (localStorage.getItem('cb_plan') !== 'premium') {
+      var s = document.createElement('script');
+      s.src = 'https://pl28950658.profitablecpmratenetwork.com/e6/73/d6/e673d679dcd6cda75a69f9a28fc2ee75.js';
+      document.head.appendChild(s);
+    }
+  </script>
 </head>
 <body>
 
@@ -1629,35 +1638,32 @@
       injectAdsterraAds();
     };
 
+    function injectAdsterraBanner(el, key, width, height) {
+      if (!el || el.dataset.loaded) return;
+      el.dataset.loaded = '1';
+      var s1 = document.createElement('script');
+      s1.text = "atOptions={'key':'" + key + "','format':'iframe','height':" + height + ",'width':" + width + ",'params':{}};";
+      el.appendChild(s1);
+      var s2 = document.createElement('script');
+      s2.src = 'https://www.highperformanceformat.com/' + key + '/invoke.js';
+      el.appendChild(s2);
+    }
+
     function injectAdsterraAds() {
+      var isMobile = window.innerWidth < 728;
       // Banner topo: 728x90 desktop / 320x50 mobile
       var topEl = document.getElementById('adsterra-top');
-      if (topEl && !topEl.dataset.loaded) {
-        topEl.dataset.loaded = '1';
-        var isMobile = window.innerWidth < 728;
-        var s1 = document.createElement('script');
-        if (isMobile) {
-          s1.text = "atOptions={'key':'0edbc9017bef7579eefe36945fe0ce33','format':'iframe','height':50,'width':320,'params':{}};";
-        } else {
-          s1.text = "atOptions={'key':'8b0cbbbde66635e4e8676d3a16b242d8','format':'iframe','height':90,'width':728,'params':{}};";
-        }
-        topEl.appendChild(s1);
-        var s2 = document.createElement('script');
-        s2.src = 'https://www.highperformanceformat.com/' + (isMobile ? '0edbc9017bef7579eefe36945fe0ce33' : '8b0cbbbde66635e4e8676d3a16b242d8') + '/invoke.js';
-        topEl.appendChild(s2);
+      if (isMobile) {
+        injectAdsterraBanner(topEl, '0edbc9017bef7579eefe36945fe0ce33', 320, 50);
+      } else {
+        injectAdsterraBanner(topEl, '8b0cbbbde66635e4e8676d3a16b242d8', 728, 90);
       }
 
-      // Banner 300x250 entre hero e categorias
-      var midEl = document.getElementById('adsterra-mid');
-      if (midEl && !midEl.dataset.loaded) {
-        midEl.dataset.loaded = '1';
-        var s3 = document.createElement('script');
-        s3.text = "atOptions={'key':'402e25cd0df99f17ace922e0f332028e','format':'iframe','height':250,'width':300,'params':{}};";
-        midEl.appendChild(s3);
-        var s4 = document.createElement('script');
-        s4.src = 'https://www.highperformanceformat.com/402e25cd0df99f17ace922e0f332028e/invoke.js';
-        midEl.appendChild(s4);
-      }
+      // Banner 300x250 entre hero e categorias (delay para não sobrescrever atOptions)
+      setTimeout(function() {
+        var midEl = document.getElementById('adsterra-mid');
+        injectAdsterraBanner(midEl, '402e25cd0df99f17ace922e0f332028e', 300, 250);
+      }, 100);
     }
 
     loadPortal();
