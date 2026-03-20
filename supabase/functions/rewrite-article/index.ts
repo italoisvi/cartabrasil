@@ -15,16 +15,52 @@ function jsonResponse(data: unknown, status = 200) {
   });
 }
 
-// Extrai texto legível de HTML bruto (remove tags, scripts, styles)
+// Tenta extrair conteúdo do artigo via JSON-LD (structured data)
+function extractFromJsonLd(html: string): { title: string; text: string } | null {
+  const regex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let match;
+  while ((match = regex.exec(html)) !== null) {
+    try {
+      const data = JSON.parse(match[1]);
+      // Pode ser um objeto ou array
+      const items = Array.isArray(data) ? data : [data];
+      for (const item of items) {
+        // Procurar NewsArticle, Article, ReportageNewsArticle etc.
+        if (item["@type"] && /Article/i.test(item["@type"])) {
+          const body = item.articleBody || item.text || "";
+          const title = item.headline || item.name || "";
+          if (body.length > 100) {
+            return { title, text: body };
+          }
+        }
+      }
+    } catch (_) {
+      // JSON inválido, pular
+    }
+  }
+  return null;
+}
+
+// Extrai meta tags (og:description, description)
+function extractMetaDescription(html: string): string {
+  const ogDesc = html.match(/<meta[^>]*property="og:description"[^>]*content="([^"]+)"/i);
+  if (ogDesc) return ogDesc[1];
+  const desc = html.match(/<meta[^>]*name="description"[^>]*content="([^"]+)"/i);
+  if (desc) return desc[1];
+  return "";
+}
+
+// Extrai texto legível de HTML bruto (fallback quando não tem JSON-LD)
 function extractTextFromHtml(html: string): string {
-  // Remover scripts, styles, nav, footer, header
+  // Remover scripts, styles, nav, footer, header, aside
   let clean = html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
     .replace(/<nav[\s\S]*?<\/nav>/gi, "")
     .replace(/<footer[\s\S]*?<\/footer>/gi, "")
     .replace(/<header[\s\S]*?<\/header>/gi, "")
-    .replace(/<aside[\s\S]*?<\/aside>/gi, "");
+    .replace(/<aside[\s\S]*?<\/aside>/gi, "")
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, "");
 
   // Tentar extrair do <article> ou <main> se existir
   const articleMatch = clean.match(/<article[\s\S]*?>([\s\S]*?)<\/article>/i);
@@ -32,12 +68,13 @@ function extractTextFromHtml(html: string): string {
   if (articleMatch) clean = articleMatch[1];
   else if (mainMatch) clean = mainMatch[1];
 
-  // Converter <p>, <h1-h6>, <br>, <li> em quebras de linha
+  // Converter tags de bloco em quebras de linha
   clean = clean
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<\/p>/gi, "\n\n")
     .replace(/<\/h[1-6]>/gi, "\n\n")
     .replace(/<\/li>/gi, "\n")
+    .replace(/<\/div>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
@@ -51,7 +88,7 @@ function extractTextFromHtml(html: string): string {
   return clean;
 }
 
-// Extrai o título da página via <title> ou <h1>
+// Extrai o título da página
 function extractTitle(html: string): string {
   const ogTitle = html.match(/<meta[^>]*property="og:title"[^>]*content="([^"]+)"/i);
   if (ogTitle) return ogTitle[1];
@@ -87,8 +124,9 @@ Deno.serve(async (req) => {
   try {
     const res = await fetch(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; CartaBrasil/1.0)",
-        "Accept": "text/html",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
       },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -97,11 +135,33 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: `Erro ao acessar a URL: ${e.message}` }, 400);
   }
 
-  const originalTitle = extractTitle(html);
-  const articleText = extractTextFromHtml(html);
+  // Estratégia de extração (por prioridade):
+  // 1. JSON-LD (structured data) — mais confiável, funciona em SPAs
+  // 2. HTML direto (<article>, <main>, body)
+  // 3. og:description como último recurso
+  let originalTitle = "";
+  let articleText = "";
 
+  const jsonLd = extractFromJsonLd(html);
+  if (jsonLd && jsonLd.text.length > 100) {
+    originalTitle = jsonLd.title;
+    articleText = jsonLd.text;
+  } else {
+    originalTitle = extractTitle(html);
+    articleText = extractTextFromHtml(html);
+  }
+
+  // Fallback: usar og:description se nada funcionou
   if (articleText.length < 100) {
-    return jsonResponse({ error: "Não foi possível extrair conteúdo suficiente da página" }, 400);
+    const metaDesc = extractMetaDescription(html);
+    if (metaDesc.length > 50) {
+      if (!originalTitle) originalTitle = extractTitle(html);
+      articleText = metaDesc;
+    }
+  }
+
+  if (articleText.length < 50) {
+    return jsonResponse({ error: "Não foi possível extrair conteúdo suficiente da página. O site pode usar carregamento dinâmico (SPA)." }, 400);
   }
 
   // Limitar texto para não estourar tokens (aprox 8000 chars)
