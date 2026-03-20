@@ -478,6 +478,73 @@
       gap: 0.75rem;
     }
 
+    /* ── AI Rewrite Bar ─────────────────────────────────────── */
+    .ai-rewrite-bar {
+      margin-bottom: 2rem;
+      padding: 1.2rem 1.5rem;
+      border: 1px dashed var(--rule);
+      border-radius: 6px;
+      background: var(--bg);
+    }
+
+    .ai-rewrite-bar .form-label {
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .ai-rewrite-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .ai-rewrite-row .form-input {
+      flex: 1;
+    }
+
+    .ai-rewrite-btn {
+      background: #2c3e50 !important;
+      color: #fff !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+      padding: 0.75rem 1.2rem !important;
+    }
+
+    .ai-rewrite-btn:hover { opacity: 0.85; }
+
+    .ai-rewrite-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .ai-rewrite-btn svg {
+      flex-shrink: 0;
+    }
+
+    .ai-rewrite-btn.loading svg {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ai-rewrite-hint {
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+      margin-top: 0.5rem;
+    }
+
+    .ai-rewrite-hint.success { color: var(--green); }
+    .ai-rewrite-hint.error { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .ai-rewrite-row { flex-direction: column; }
+      .ai-rewrite-btn { width: 100%; justify-content: center; }
+    }
+
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1102,6 +1169,19 @@
         </div>
       </div>
 
+      <!-- Reescrever com IA -->
+      <div class="ai-rewrite-bar" id="aiRewriteBar">
+        <label class="form-label">Reescrever notícia com IA</label>
+        <div class="ai-rewrite-row">
+          <input type="url" class="form-input" id="aiSourceUrl" placeholder="Cole a URL da notícia original..." />
+          <button class="btn btn-sm ai-rewrite-btn" id="aiRewriteBtn" onclick="rewriteWithAI()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+            Reescrever com IA
+          </button>
+        </div>
+        <p class="ai-rewrite-hint" id="aiRewriteStatus">A IA vai reescrever título, descrição, corpo e sugerir categoria.</p>
+      </div>
+
       <div class="form-grid">
         <div class="form-group full">
           <label class="form-label">Título</label>
@@ -1522,9 +1602,83 @@
       input.click();
     }
 
+    // ── Reescrever notícia com IA ──────────────────────────────
+    async function rewriteWithAI() {
+      var urlInput = document.getElementById('aiSourceUrl');
+      var btn = document.getElementById('aiRewriteBtn');
+      var status = document.getElementById('aiRewriteStatus');
+      var url = urlInput.value.trim();
+
+      if (!url) {
+        urlInput.focus();
+        return;
+      }
+
+      // Validar URL
+      try { new URL(url); } catch (_) {
+        status.textContent = 'URL inválida. Cole uma URL completa (https://...).';
+        status.className = 'ai-rewrite-hint error';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.classList.add('loading');
+      status.textContent = 'Buscando e reescrevendo a notícia... Isso pode levar alguns segundos.';
+      status.className = 'ai-rewrite-hint';
+
+      try {
+        var res = await fetch(SUPABASE_URL + '/functions/v1/rewrite-article', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ url: url }),
+        });
+
+        var data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Erro desconhecido');
+        }
+
+        // Preencher o formulário
+        document.getElementById('edTitle').value = data.title || '';
+        document.getElementById('edDescription').value = data.description || '';
+
+        if (data.category) {
+          var catSelect = document.getElementById('edCategory');
+          // Verificar se a categoria existe no select
+          var optExists = Array.from(catSelect.options).some(function(o) { return o.value === data.category; });
+          if (optExists) catSelect.value = data.category;
+        }
+
+        // Preencher corpo no Quill
+        initQuill();
+        if (data.body) {
+          quill.root.innerHTML = data.body;
+        }
+
+        status.textContent = 'Notícia reescrita com sucesso! Revise antes de publicar.';
+        status.className = 'ai-rewrite-hint success';
+
+      } catch (e) {
+        status.textContent = 'Erro: ' + e.message;
+        status.className = 'ai-rewrite-hint error';
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+
     function openEditor(articleData) {
       initQuill();
       editingArticleId = articleData ? articleData.id : null;
+
+      // Limpar campo de IA
+      document.getElementById('aiSourceUrl').value = '';
+      document.getElementById('aiRewriteStatus').textContent = 'A IA vai reescrever título, descrição, corpo e sugerir categoria.';
+      document.getElementById('aiRewriteStatus').className = 'ai-rewrite-hint';
 
       document.getElementById('edTitle').value = articleData ? articleData.title : '';
       document.getElementById('edDescription').value = articleData ? (articleData.description || '') : '';
